@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // Coshub - 二次元交流网站
 // 主入口文件
 
@@ -24,4 +25,6 @@ if (typeof module !== 'undefined' && module.exports) {
         initApp: initApp
     };
 }
+=======
+>>>>>>> 4391314b1d1d10871f4f1af92f10c6f93c48296b
 
