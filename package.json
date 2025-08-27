@@ -6,15 +6,14 @@
   "scripts": {
     "start": "node index.js",
     "dev": "python -m http.server 8000",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "api:install": "cd apps/api && npm install",
+    "api:start": "cd apps/api && npm run start",
+    "api:dev": "cd apps/api && npm run start:dev",
+    "api:build": "cd apps/api && npm run build",
+    "dev:all": "concurrently \"npm run dev\" \"npm run api:dev\""
   },
-  "keywords": [
-    "二次元",
-    "cosplay",
-    "动漫",
-    "社区",
-    "交流"
-  ],
+  "keywords": ["二次元", "cosplay", "动漫", "社区", "交流"],
   "author": "garrymei",
   "license": "MIT",
   "repository": {
@@ -24,5 +23,9 @@
   "bugs": {
     "url": "https://github.com/garrymei/coshub/issues"
   },
-  "homepage": "https://github.com/garrymei/coshub#readme"
+  "homepage": "https://github.com/garrymei/coshub#readme",
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  },
+  "workspaces": ["apps/*"]
 }
