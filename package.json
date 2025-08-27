@@ -1,0 +1,28 @@
+{
+  "name": "coshub",
+  "version": "1.0.0",
+  "description": "二次元交流网站",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "python -m http.server 8000",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "二次元",
+    "cosplay",
+    "动漫",
+    "社区",
+    "交流"
+  ],
+  "author": "garrymei",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/garrymei/coshub.git"
+  },
+  "bugs": {
+    "url": "https://github.com/garrymei/coshub/issues"
+  },
+  "homepage": "https://github.com/garrymei/coshub#readme"
+}
