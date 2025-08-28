@@ -1,19 +1,30 @@
 {
   "name": "coshub",
   "version": "1.0.0",
-  "description": "二次元交流网站",
-  "main": "index.js",
+  "description": "二次元交流网站 - Monorepo",
+  "private": true,
+  "packageManager": "pnpm@8.0.0",
   "scripts": {
-    "start": "node index.js",
-    "dev": "python -m http.server 8000",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "api:install": "cd apps/api && npm install",
-    "api:start": "cd apps/api && npm run start",
-    "api:dev": "cd apps/api && npm run start:dev",
-    "api:build": "cd apps/api && npm run build",
-    "dev:all": "concurrently \"npm run dev\" \"npm run api:dev\""
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "format": "turbo run format",
+    "test": "turbo run test",
+    "clean": "turbo run clean",
+    "dev:web": "turbo run dev --filter=@coshub/web",
+    "dev:api": "turbo run dev --filter=@coshub/api",
+    "dev:mini": "turbo run dev --filter=@coshub/mini",
+    "build:web": "turbo run build --filter=@coshub/web",
+    "build:api": "turbo run build --filter=@coshub/api",
+    "build:mini": "turbo run build --filter=@coshub/mini",
+    "build:packages": "turbo run build --filter=\"packages/*\"",
+    "dev:all": "concurrently \"pnpm dev:web\" \"pnpm dev:api\"",
+    "docker:start": "./scripts/docker-start.sh --dev",
+    "docker:stop": "./scripts/docker-stop.sh",
+    "install:all": "pnpm install",
+    "legacy:start": "node legacy/index.js"
   },
-  "keywords": ["二次元", "cosplay", "动漫", "社区", "交流"],
+  "keywords": ["二次元", "cosplay", "动漫", "社区", "交流", "monorepo"],
   "author": "garrymei",
   "license": "MIT",
   "repository": {
@@ -25,7 +36,13 @@
   },
   "homepage": "https://github.com/garrymei/coshub#readme",
   "devDependencies": {
+    "turbo": "^1.12.0",
+    "prettier": "^3.0.0",
+    "eslint": "^8.0.0",
     "concurrently": "^8.2.0"
   },
-  "workspaces": ["apps/*"]
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  }
 }

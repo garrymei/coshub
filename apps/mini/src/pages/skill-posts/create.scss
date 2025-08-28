@@ -1,0 +1,102 @@
+.create-skill-post {
+  background: #f8f9fa;
+  min-height: 100vh;
+  padding: 20px;
+  padding-bottom: 120px;
+}
+
+.form-section {
+  background: white;
+  border-radius: 20px;
+  padding: 30px 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  
+  .section-title {
+    font-size: 28px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 25px;
+  }
+}
+
+.form-item {
+  margin-bottom: 25px;
+  
+  .label {
+    display: block;
+    font-size: 22px;
+    color: #333;
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+  
+  .input, .textarea {
+    width: 100%;
+    padding: 20px;
+    border: 2px solid #eee;
+    border-radius: 12px;
+    font-size: 24px;
+    background: #f8f9fa;
+    
+    &:focus {
+      border-color: #FF6B9D;
+      background: white;
+    }
+  }
+  
+  .textarea {
+    min-height: 200px;
+  }
+  
+  .picker-view {
+    padding: 20px;
+    border: 2px solid #eee;
+    border-radius: 12px;
+    background: #f8f9fa;
+    
+    text {
+      font-size: 24px;
+      color: #333;
+    }
+  }
+  
+  .char-count {
+    display: block;
+    font-size: 18px;
+    color: #999;
+    text-align: right;
+    margin-top: 8px;
+  }
+  
+  &.half {
+    width: 48%;
+  }
+}
+
+.form-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.submit-section {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  padding: 20px;
+  border-top: 1px solid #eee;
+  
+  .submit-btn {
+    width: 100%;
+    height: 80px;
+    background: linear-gradient(135deg, #FF6B9D, #9D5CFF);
+    color: white;
+    border: none;
+    border-radius: 40px;
+    font-size: 26px;
+    font-weight: bold;
+  }
+}

@@ -1,0 +1,115 @@
+version: '3.8'
+
+services:
+  # PostgreSQL 数据库
+  postgres:
+    image: postgres:15-alpine
+    container_name: coshub_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: coshub
+      POSTGRES_USER: coshub_user
+      POSTGRES_PASSWORD: coshub_password
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - coshub_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U coshub_user -d coshub"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis 缓存
+  redis:
+    image: redis:7-alpine
+    container_name: coshub_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass coshub_redis_password
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      - coshub_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # MinIO 对象存储
+  minio:
+    image: minio/minio:latest
+    container_name: coshub_minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: coshub_minio_user
+      MINIO_ROOT_PASSWORD: coshub_minio_password
+    ports:
+      - "9000:9000"  # API 端口
+      - "9001:9001"  # Console 端口
+    volumes:
+      - minio_data:/data
+    networks:
+      - coshub_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  # PostgreSQL 管理界面 (可选)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: coshub_pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@coshub.local
+      PGADMIN_DEFAULT_PASSWORD: pgadmin_password
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - coshub_network
+    depends_on:
+      - postgres
+
+  # Redis 管理界面 (可选)
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: coshub_redis_commander
+    restart: unless-stopped
+    environment:
+      REDIS_HOSTS: local:redis:6379:0:coshub_redis_password
+    ports:
+      - "8081:8081"
+    networks:
+      - coshub_network
+    depends_on:
+      - redis
+
+# 网络配置
+networks:
+  coshub_network:
+    driver: bridge
+    name: coshub_network
+
+# 数据卷
+volumes:
+  postgres_data:
+    name: coshub_postgres_data
+  redis_data:
+    name: coshub_redis_data
+  minio_data:
+    name: coshub_minio_data
+  pgadmin_data:
+    name: coshub_pgadmin_data

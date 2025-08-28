@@ -1,0 +1,29 @@
+# 开发环境专用配置
+version: '3.8'
+
+services:
+  postgres:
+    environment:
+      # 开发环境使用更简单的密码
+      POSTGRES_PASSWORD: dev123
+    volumes:
+      # 开发环境挂载本地配置
+      - ../../scripts/db-init:/docker-entrypoint-initdb.d
+
+  redis:
+    command: redis-server --appendonly yes --requirepass dev123
+
+  minio:
+    environment:
+      MINIO_ROOT_USER: dev123
+      MINIO_ROOT_PASSWORD: dev123456
+    # 开发环境暴露更多端口便于调试
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+
+  pgadmin:
+    environment:
+      PGADMIN_DEFAULT_PASSWORD: dev123
+
+# 开发环境可以添加更多调试工具

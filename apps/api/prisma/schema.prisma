@@ -1,0 +1,277 @@
+// Coshub 数据库模型
+// 二次元交流网站核心数据结构
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 用户表
+model User {
+  id          String   @id @default(cuid())
+  username    String   @unique
+  email       String   @unique
+  nickname    String?
+  avatar      String?
+  bio         String?
+  level       UserLevel @default(NEWBIE)
+  verified    Boolean  @default(false)
+  reputation  Int      @default(100)
+  city        String?
+  
+  // 统计数据
+  viewCount   Int      @default(0)
+  followerCount Int    @default(0)
+  followingCount Int   @default(0)
+  
+  // 联系方式
+  wechat      String?
+  qq          String?
+  phone       String?
+  
+  // 系统字段
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+  
+  // 关联关系
+  skillPosts  SkillPost[]
+  requests    Request[]
+  posts       Post[]
+  
+  @@map("users")
+}
+
+// 技能帖表
+model SkillPost {
+  id          String   @id @default(cuid())
+  title       String   @db.VarChar(200)
+  description String   @db.Text
+  category    SkillCategory
+  role        SkillRole
+  experience  ExperienceLevel
+  city        String   @db.VarChar(50)
+  
+  // 价格信息 (JSON)
+  price       Json
+  
+  // 图片和标签
+  images      String[]
+  tags        String[]
+  
+  // 可用性信息 (JSON)
+  availability Json
+  
+  // 联系方式 (JSON)
+  contactInfo Json
+  
+  // 状态和统计
+  status      PostStatus @default(ACTIVE)
+  viewCount   Int      @default(0)
+  favoriteCount Int    @default(0)
+  contactCount Int     @default(0)
+  
+  // 质量评分
+  avgRating   Float    @default(0)
+  reviewCount Int      @default(0)
+  responseRate Int     @default(100)
+  
+  // 关联用户
+  authorId    String
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  
+  // 系统字段
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+  
+  // 关联关系
+  requests    Request[]
+  
+  @@map("skill_posts")
+  @@index([category])
+  @@index([role])
+  @@index([city])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// 请求表 (求助/合作请求)
+model Request {
+  id          String   @id @default(cuid())
+  title       String   @db.VarChar(200)
+  description String   @db.Text
+  type        RequestType
+  category    SkillCategory?
+  city        String?  @db.VarChar(50)
+  
+  // 预算信息 (JSON)
+  budget      Json?
+  
+  // 时间要求
+  deadline    DateTime?
+  urgency     UrgencyLevel @default(NORMAL)
+  
+  // 图片和标签
+  images      String[]
+  tags        String[]
+  
+  // 状态和统计
+  status      RequestStatus @default(OPEN)
+  viewCount   Int      @default(0)
+  responseCount Int    @default(0)
+  
+  // 关联用户
+  requesterId String
+  requester   User     @relation(fields: [requesterId], references: [id], onDelete: Cascade)
+  
+  // 关联技能帖 (可选)
+  skillPostId String?
+  skillPost   SkillPost? @relation(fields: [skillPostId], references: [id], onDelete: SetNull)
+  
+  // 系统字段
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+  
+  @@map("requests")
+  @@index([type])
+  @@index([category])
+  @@index([city])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// 内容帖表 (分享、讨论等)
+model Post {
+  id          String   @id @default(cuid())
+  title       String   @db.VarChar(200)
+  content     String   @db.Text
+  type        PostType
+  category    PostCategory?
+  
+  // 媒体内容
+  images      String[]
+  videos      String[]
+  
+  // 标签
+  tags        String[]
+  
+  // 状态和统计
+  status      PostStatus @default(ACTIVE)
+  viewCount   Int      @default(0)
+  likeCount   Int      @default(0)
+  commentCount Int     @default(0)
+  shareCount  Int      @default(0)
+  
+  // 关联用户
+  authorId    String
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  
+  // 系统字段
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+  
+  @@map("posts")
+  @@index([type])
+  @@index([category])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// 枚举定义
+enum UserLevel {
+  NEWBIE      // 新手
+  BEGINNER    // 初级
+  INTERMEDIATE // 中级
+  ADVANCED    // 高级
+  PROFESSIONAL // 专业
+  EXPERT      // 专家
+}
+
+enum SkillCategory {
+  COSPLAY
+  PHOTOGRAPHY
+  MAKEUP
+  PROP_MAKING
+  COSTUME_MAKING
+  POST_PROCESSING
+  VIDEO_EDITING
+  VOICE_ACTING
+  DRAWING
+  WRITING
+  DANCING
+  SINGING
+}
+
+enum SkillRole {
+  COSER
+  PHOTOGRAPHER
+  MAKEUP_ARTIST
+  PROP_MAKER
+  COSTUME_MAKER
+  LOCATION_OWNER
+  POST_PROCESSOR
+  VIDEOGRAPHER
+  ORGANIZER
+}
+
+enum ExperienceLevel {
+  NEWBIE
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  PROFESSIONAL
+}
+
+enum PostStatus {
+  DRAFT       // 草稿
+  ACTIVE      // 活跃
+  INACTIVE    // 停用
+  DELETED     // 删除
+}
+
+enum RequestType {
+  COSPLAY     // Cosplay 请求
+  SKILL       // 技能求助
+  COLLABORATION // 合作请求
+  EVENT       // 活动组织
+}
+
+enum RequestStatus {
+  OPEN        // 开放
+  IN_PROGRESS // 进行中
+  COMPLETED   // 已完成
+  CANCELLED   // 已取消
+  CLOSED      // 已关闭
+}
+
+enum UrgencyLevel {
+  LOW         // 低
+  NORMAL      // 普通
+  HIGH        // 高
+  URGENT      // 紧急
+}
+
+enum PostType {
+  SHARE       // 分享
+  DISCUSSION  // 讨论
+  TUTORIAL    // 教程
+  NEWS        // 资讯
+  EVENT       // 活动
+}
+
+enum PostCategory {
+  COSPLAY_SHOW    // Cosplay 展示
+  TUTORIAL        // 教程分享
+  EVENT_REPORT    // 活动报告
+  DISCUSSION      // 话题讨论
+  NEWS            // 圈内资讯
+  RESOURCE        // 资源分享
+}
