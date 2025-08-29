@@ -2,6 +2,8 @@
  * 请求相关类型定义
  */
 
+import { SkillCategory } from './skill';
+
 export interface RequestBase {
   id: string;
   title: string;

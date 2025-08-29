@@ -2,6 +2,8 @@
  * 用户相关类型定义
  */
 
+import { Skill } from './skill';
+
 export interface User {
   id: string;
   username: string;

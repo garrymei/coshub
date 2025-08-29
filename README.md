@@ -55,6 +55,32 @@ coshub/
 
 - Node.js >= 18.0.0
 - pnpm >= 8.0.0
+- Docker & Docker Compose (基础设施)
+
+### 🐳 基础设施启动
+
+在启动应用之前，需要先启动基础设施服务：
+
+```bash
+# 启动开发环境基础设施 (PostgreSQL + Redis + MinIO)
+./scripts/docker-start.sh --dev
+
+# 查看服务状态
+docker-compose -f infra/docker/docker-compose.yml -f infra/docker/docker-compose.dev.yml ps
+
+# 停止基础设施
+./scripts/docker-stop.sh
+```
+
+**服务访问信息**：
+- **PostgreSQL**: `postgresql://coshub_user:dev123@localhost:5432/coshub`
+- **Redis**: `redis://:dev123@localhost:6379`  
+- **MinIO**: http://localhost:9000 (用户名: `dev123`, 密码: `dev123456`)
+
+**管理界面**:
+- MinIO Console: http://localhost:9001
+- PgAdmin: http://localhost:5050 (admin@coshub.local / dev123)
+- Redis Commander: http://localhost:8081
 
 ### 安装依赖
 
@@ -69,9 +95,79 @@ cd coshub
 pnpm install
 ```
 
-### 启动开发
+### 🚀 快速启动（三端开发）
+
+#### 1️⃣ 启动 API 服务 (端口 3001)
 
 ```bash
+# 进入 API 目录
+cd apps/api
+
+# 安装依赖 (首次运行)
+pnpm install
+
+# 生成 Prisma 客户端
+npm run db:generate
+
+# 启动开发服务
+pnpm dev
+
+# 或者使用根目录命令
+# pnpm dev:api
+```
+
+**验收标准**: 
+- 健康检查: http://localhost:3001/api/health
+- 上传配置: http://localhost:3001/api/upload/config
+- 技能帖列表: http://localhost:3001/api/skill-posts
+
+#### 2️⃣ 启动 Web 应用 (端口 3000)
+
+```bash
+# 新开终端，进入 Web 目录
+cd apps/web
+
+# 安装依赖 (首次运行)
+pnpm install
+
+# 启动开发服务
+pnpm dev
+
+# 或者使用根目录命令
+# pnpm dev:web
+```
+
+**访问地址**: http://localhost:3000
+
+#### 3️⃣ 构建小程序
+
+```bash
+# 新开终端，进入小程序目录
+cd apps/mini
+
+# 安装依赖 (首次运行)
+pnpm install
+
+# 构建小程序到 dist 目录
+pnpm build
+
+# 或者使用根目录命令
+# pnpm build:mini
+```
+
+**使用方法**: 
+1. 构建完成后，用微信开发者工具打开 `apps/mini` 目录
+2. 构建产物在 `apps/mini/dist/` 目录中
+
+### 🔧 Monorepo 命令
+
+```bash
+# 验证工作区配置
+pnpm -w list --depth -1
+
+# 验证 Turbo 构建
+turbo build
+
 # 启动所有应用
 pnpm dev
 
@@ -92,24 +188,25 @@ pnpm build:api  # 构建 API 服务
 pnpm build:mini # 构建小程序 (输出到 apps/mini/dist)
 ```
 
-### 应用访问
+### 📋 应用信息
 
 #### 🌐 Web 应用
 - **开发环境**: http://localhost:3000
 - **技术栈**: Next.js 14 + React 18 + TypeScript + Tailwind CSS
-- **启动命令**: `pnpm dev:web`
+- **启动命令**: `pnpm dev:web` 或 `cd apps/web && pnpm dev`
 
 #### 🔗 API 服务
 - **开发环境**: http://localhost:3001
 - **健康检查**: http://localhost:3001/api/healthz
 - **技术栈**: NestJS + TypeScript
-- **启动命令**: `pnpm dev:api`
+- **启动命令**: `pnpm dev:api` 或 `cd apps/api && pnpm dev`
+- **验收标准**: 健康检查返回 `{ok:true,service:"api"}`
 
 #### 📱 小程序
 - **开发工具**: 微信开发者工具
 - **构建产物**: `apps/mini/dist/` 目录
 - **技术栈**: Taro 3 + React + TypeScript
-- **构建命令**: `pnpm build:mini`
+- **构建命令**: `pnpm build:mini` 或 `cd apps/mini && pnpm build`
 - **使用方法**: 构建后用微信开发者工具打开 `apps/mini` 目录
 
 ## 本地基础设施

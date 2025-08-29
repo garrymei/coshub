@@ -6,7 +6,7 @@ import {
   SkillPostQueryDTO,
   SkillPostListResponse
 } from '@coshub/types';
-import { Prisma } from '../generated/prisma';
+import { Prisma } from '../../generated/prisma';
 
 @Injectable()
 export class SkillPostsService {
@@ -24,15 +24,15 @@ export class SkillPostsService {
       data: {
         title: createSkillPostDto.title,
         description: createSkillPostDto.description,
-        category: createSkillPostDto.category,
-        role: createSkillPostDto.role,
-        experience: createSkillPostDto.experience,
+        category: createSkillPostDto.category as any,
+        role: createSkillPostDto.role as any,
+        experience: createSkillPostDto.experience as any,
         city: createSkillPostDto.city,
         price: createSkillPostDto.price as Prisma.JsonObject,
         images: createSkillPostDto.images,
         tags: createSkillPostDto.tags,
-        availability: createSkillPostDto.availability as Prisma.JsonObject,
-        contactInfo: createSkillPostDto.contactInfo as Prisma.JsonObject,
+        availability: createSkillPostDto.availability as any,
+        contactInfo: createSkillPostDto.contactInfo as any,
         authorId: firstUser.id,
       },
       include: {
@@ -52,11 +52,11 @@ export class SkillPostsService {
 
     // 应用筛选条件
     if (query.category) {
-      where.category = query.category;
+      where.category = query.category as any;
     }
 
     if (query.role) {
-      where.role = query.role;
+      where.role = query.role as any;
     }
 
     if (query.city) {
@@ -128,6 +128,8 @@ export class SkillPostsService {
       page,
       limit,
       totalPages: Math.ceil(total / limit),
+      hasNext: page < Math.ceil(total / limit),
+      hasPrev: page > 1,
     };
   }
 
@@ -201,9 +203,37 @@ export class SkillPostsService {
     }, {} as Record<string, number>);
 
     return Object.entries(tagCounts)
-      .sort(([, a], [, b]) => b - a)
+      .sort(([, a], [, b]) => (b as number) - (a as number))
       .slice(0, 20)
       .map(([tag]) => tag);
+  }
+
+  // 更新技能帖
+  async update(id: string, updateSkillPostDto: any): Promise<SkillPost> {
+    const skillPost = await this.prisma.skillPost.update({
+      where: { id },
+      data: {
+        ...updateSkillPostDto,
+        updatedAt: new Date(),
+      },
+      include: {
+        author: true,
+      },
+    });
+
+    return this.transformSkillPost(skillPost);
+  }
+
+  // 删除技能帖（软删除）
+  async remove(id: string): Promise<boolean> {
+    await this.prisma.skillPost.update({
+      where: { id },
+      data: {
+        deletedAt: new Date(),
+      },
+    });
+
+    return true;
   }
 
   // 转换数据库模型到API模型
@@ -228,10 +258,12 @@ export class SkillPostsService {
         viewCount: skillPost.viewCount,
         favoriteCount: skillPost.favoriteCount,
         contactCount: skillPost.contactCount,
+        likeCount: skillPost.likeCount || 0,
         avgRating: skillPost.avgRating,
         reviewCount: skillPost.reviewCount,
         responseRate: skillPost.responseRate,
       },
+      status: skillPost.status,
       createdAt: skillPost.createdAt.toISOString(),
       updatedAt: skillPost.updatedAt.toISOString(),
     };

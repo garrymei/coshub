@@ -4,6 +4,22 @@
  * 这个包提供了统一的 API 调用接口，包含错误处理、重试机制、类型安全等功能
  */
 
+import { CoshubClient } from './client';
+import type { ClientConfig, RequestOptions } from './client';
+import {
+  UserService,
+  PostService,
+  RequestService,
+  SkillService,
+  AuthService,
+  UploadService
+} from './services';
+import {
+  CoshubError,
+  ErrorHandler,
+  RetryHandler
+} from './errors';
+
 export { CoshubClient } from './client';
 export type { ClientConfig, RequestOptions } from './client';
 

@@ -55,7 +55,7 @@
     "@tarojs/taro": "3.6.25",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "@coshub/types": "workspace:*"
+    "@coshub/types": "file:../../packages/types"
   },
   "devDependencies": {
     "@babel/core": "^7.8.0",

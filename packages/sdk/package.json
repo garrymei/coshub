@@ -24,7 +24,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@coshub/types": "workspace:*"
+    "@coshub/types": "file:../types"
   },
   "devDependencies": {
     "tsup": "^7.0.0",

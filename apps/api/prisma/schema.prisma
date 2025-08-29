@@ -75,6 +75,7 @@ model SkillPost {
   viewCount   Int      @default(0)
   favoriteCount Int    @default(0)
   contactCount Int     @default(0)
+  likeCount   Int      @default(0)
   
   // 质量评分
   avgRating   Float    @default(0)

@@ -149,14 +149,14 @@ export class AuthService {
    * 登录
    */
   async login(credentials: { email: string; password: string }): Promise<ApiResponse<{ token: string; user: User }>> {
-    return this.client.post('/auth/login', credentials, { skipAuth: true });
+    return this.client.request('/auth/login', { method: 'POST', data: credentials, skipAuth: true });
   }
 
   /**
    * 注册
    */
   async register(userData: { username: string; email: string; password: string }): Promise<ApiResponse<{ token: string; user: User }>> {
-    return this.client.post('/auth/register', userData, { skipAuth: true });
+    return this.client.request('/auth/register', { method: 'POST', data: userData, skipAuth: true });
   }
 
   /**
