@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "二次元交流网站 - Monorepo",
   "private": true,
-  "packageManager": "pnpm@8.0.0",
+  "packageManager": "pnpm@9.15.9",
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
@@ -22,9 +22,18 @@
     "docker:start": "./scripts/docker-start.sh --dev",
     "docker:stop": "./scripts/docker-stop.sh",
     "install:all": "pnpm install",
-    "legacy:start": "node legacy/index.js"
+    "legacy:start": "node legacy/index.js",
+    "prepare": "husky",
+    "commitlint": "commitlint --edit $GIT_PARAMS"
   },
-  "keywords": ["二次元", "cosplay", "动漫", "社区", "交流", "monorepo"],
+  "keywords": [
+    "二次元",
+    "cosplay",
+    "动漫",
+    "社区",
+    "交流",
+    "monorepo"
+  ],
   "author": "garrymei",
   "license": "MIT",
   "repository": {
@@ -39,10 +48,13 @@
     "turbo": "^1.12.0",
     "prettier": "^3.0.0",
     "eslint": "^8.0.0",
-    "concurrently": "^8.2.0"
+    "concurrently": "^8.2.0",
+    "husky": "^9.0.0",
+    "@commitlint/cli": "^19.0.0",
+    "@commitlint/config-conventional": "^19.0.0"
   },
   "engines": {
     "node": ">=18.0.0",
-    "pnpm": ">=8.0.0"
+    "pnpm": ">=9.0.0"
   }
 }

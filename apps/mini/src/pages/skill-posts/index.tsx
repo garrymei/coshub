@@ -1,8 +1,9 @@
 import { Component } from 'react'
 import { View, Text, Navigator, Image, Input, Picker } from '@tarojs/components'
-import { skillPostApi, formatPrice, showToast } from '../../utils/api'
+import { skillsApi as skillPostApi, formatPrice, showToast } from '../../utils/api'
 import { SKILL_CATEGORIES, SKILL_ROLES, POPULAR_CITIES, getLabel } from '../../utils/constants'
-import type { SkillPost, SkillPostQueryDTO } from '@coshub/types'
+type SkillPost = any;
+type SkillPostQueryDTO = { city?: string; role?: string; page?: number; limit?: number; keyword?: string };
 import './index.scss'
 
 interface State {

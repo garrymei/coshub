@@ -3,13 +3,13 @@ version: '3.8'
 services:
   # PostgreSQL 数据库
   postgres:
-    image: postgres:15-alpine
+    image: postgres:16-alpine
     container_name: coshub_postgres
     restart: unless-stopped
     environment:
       POSTGRES_DB: coshub
-      POSTGRES_USER: coshub_user
-      POSTGRES_PASSWORD: coshub_password
+      POSTGRES_USER: coshub
+      POSTGRES_PASSWORD: coshub123
       POSTGRES_INITDB_ARGS: "--encoding=UTF8"
     ports:
       - "5432:5432"

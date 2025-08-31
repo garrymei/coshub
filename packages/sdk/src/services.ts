@@ -128,10 +128,10 @@ export class SkillService {
   constructor(private client: CoshubClient) {}
 
   /**
-   * 获取技能列表
+   * 获取技能列表（分页/城市/角色）
    */
-  async getSkills(params?: PaginationParams): Promise<ApiResponse<PaginatedResponse<Skill>>> {
-    return this.client.get('/skills', params);
+  async getSkills(params?: PaginationParams & { city?: string; role?: string; lat?: number; lng?: number; radius?: number }): Promise<ApiResponse<PaginatedResponse<Skill>>> {
+    return this.client.get('/skills', params as any);
   }
 
   /**
@@ -139,6 +139,27 @@ export class SkillService {
    */
   async certifySkill(userId: string, skillId: string, data: any): Promise<ApiResponse<void>> {
     return this.client.post(`/users/${userId}/skills/${skillId}/certify`, data);
+  }
+
+  /**
+   * 获取技能详情
+   */
+  async getSkill(id: string): Promise<ApiResponse<Skill>> {
+    return this.client.get(`/skills/${id}`);
+  }
+
+  /**
+   * 发布技能（内存实现对应接口）
+   */
+  async createSkill(payload: {
+    title: string;
+    city: string;
+    role: string;
+    description?: string;
+    images?: string[];
+    author?: string;
+  }): Promise<ApiResponse<Skill>> {
+    return this.client.post('/skills', payload);
   }
 }
 

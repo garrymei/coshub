@@ -56,6 +56,9 @@ model SkillPost {
   role        SkillRole
   experience  ExperienceLevel
   city        String   @db.VarChar(50)
+  lat         Float?   @db.DoublePrecision
+  lng         Float?   @db.DoublePrecision
+  geohash     String?  @db.VarChar(16)
   
   // 价格信息 (JSON)
   price       Json
@@ -98,6 +101,7 @@ model SkillPost {
   @@index([category])
   @@index([role])
   @@index([city])
+  @@index([geohash])
   @@index([status])
   @@index([createdAt])
 }

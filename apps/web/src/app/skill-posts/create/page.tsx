@@ -1,3 +1,100 @@
+"use client";
+import { useState } from "react";
+import { z } from "zod";
+import { api } from "@/lib/api";
+
+const schema = z.object({
+  title: z.string().min(1).max(200),
+  city: z.string().min(1),
+  role: z.string().min(1),
+  description: z.string().optional(),
+  images: z.string().array().optional(),
+});
+
+export default function CreateSkillPostPage() {
+  const [form, setForm] = useState({ title: "", city: "", role: "", description: "" });
+  const [images, setImages] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const [msg, setMsg] = useState<string>("");
+
+  const submit = async () => {
+    const parsed = schema.safeParse(form);
+    if (!parsed.success) {
+      setMsg("表单校验失败");
+      return;
+    }
+    const payload = { ...parsed.data, images } as any;
+    const res = await api.skills.createSkill(payload);
+    setMsg(res.success ? "发布成功" : "发布失败");
+  };
+
+  const onFilesSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    setUploading(true);
+    try {
+      const uploadedUrls: string[] = [];
+      for (const file of Array.from(files)) {
+        // 1) 向后端申请直传签名
+        const presignResp = await fetch("http://localhost:3001/api/upload/presign", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ filename: file.name, mimeType: file.type, fileSize: file.size })
+        });
+        const presignJson = await presignResp.json();
+        if (!presignJson.success) throw new Error("获取上传签名失败");
+        const { uploadUrl, fields, fileUrl } = presignJson.data;
+
+        // 2) 直传到对象存储（PUT）
+        const putResp = await fetch(uploadUrl, {
+          method: "PUT",
+          headers: { "Content-Type": fields["Content-Type"] || file.type },
+          body: file
+        });
+        if (!putResp.ok) throw new Error("上传失败");
+        uploadedUrls.push(fileUrl);
+      }
+      setImages((prev) => [...prev, ...uploadedUrls]);
+      setMsg(`已上传 ${uploadedUrls.length} 张图片`);
+    } catch (err: any) {
+      setMsg(err?.message || "上传失败");
+    } finally {
+      setUploading(false);
+      // 清空 input 以便可重复选择同一文件
+      e.currentTarget.value = "";
+    }
+  };
+
+  return (
+    <main className="p-6 space-y-4">
+      <h1 className="text-2xl font-bold">发布技能帖</h1>
+      <div className="space-y-2 max-w-xl">
+        <input className="border p-2 w-full" placeholder="标题"
+               value={form.title} onChange={e=>setForm({...form,title:e.target.value})}/>
+        <input className="border p-2 w-full" placeholder="城市"
+               value={form.city} onChange={e=>setForm({...form,city:e.target.value})}/>
+        <input className="border p-2 w-full" placeholder="角色"
+               value={form.role} onChange={e=>setForm({...form,role:e.target.value})}/>
+        <textarea className="border p-2 w-full" placeholder="描述（可选）"
+                  value={form.description} onChange={e=>setForm({...form,description:e.target.value})}/>
+        <div className="space-y-2">
+          <input type="file" multiple accept="image/*" onChange={onFilesSelected} />
+          {uploading && <div>上传中...</div>}
+          {images.length > 0 && (
+            <div className="flex gap-2 flex-wrap">
+              {images.map((url) => (
+                <img key={url} src={url} alt="uploaded" className="w-20 h-20 object-cover border" />
+              ))}
+            </div>
+          )}
+        </div>
+        <button className="px-4 py-2 bg-black text-white" onClick={submit}>提交</button>
+        {msg && <div>{msg}</div>}
+      </div>
+    </main>
+  );
+}
+
 'use client';
 
 import { useState } from 'react';
