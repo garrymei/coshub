@@ -1,5 +1,12 @@
-import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { IsArray, IsNotEmpty, IsOptional, IsString, IsUrl, MaxLength } from 'class-validator';
+import { ApiProperty, PartialType } from "@nestjs/swagger";
+import {
+  IsArray,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUrl,
+  MaxLength,
+} from "class-validator";
 
 export class CreateSkillDto {
   @ApiProperty()
@@ -74,5 +81,3 @@ export class QuerySkillsDto {
   @IsOptional()
   lng?: string;
 }
-
-

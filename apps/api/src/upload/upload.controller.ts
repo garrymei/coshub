@@ -10,9 +10,9 @@ import {
   HttpStatus,
   ValidationPipe,
   UsePipes,
-} from '@nestjs/common';
-import { UploadService } from './upload.service';
-import { ApiResponse } from '@coshub/types';
+} from "@nestjs/common";
+import { UploadService } from "./upload.service";
+import { ApiResponse } from "@coshub/types";
 
 export class PresignRequestDTO {
   filename: string;
@@ -24,29 +24,31 @@ export class BatchPresignRequestDTO {
   files: PresignRequestDTO[];
 }
 
-@Controller('upload')
+@Controller("upload")
 export class UploadController {
   constructor(private readonly uploadService: UploadService) {}
 
   // 获取单个文件上传预签名 URL
-  @Post('presign')
+  @Post("presign")
   @UsePipes(new ValidationPipe({ transform: true }))
-  async getPresignedUrl(@Body() request: PresignRequestDTO): Promise<ApiResponse<any>> {
+  async getPresignedUrl(
+    @Body() request: PresignRequestDTO,
+  ): Promise<ApiResponse<any>> {
     try {
       // 暂时硬编码用户ID，后续从JWT获取
-      const userId = 'temp-user-id';
+      const userId = "temp-user-id";
 
       const presignedData = await this.uploadService.generatePresignedPost(
         request.filename,
         request.mimeType,
         request.fileSize,
-        userId
+        userId,
       );
 
       return {
         success: true,
         data: presignedData,
-        message: '获取上传链接成功',
+        message: "获取上传链接成功",
         timestamp: new Date().toISOString(),
       };
     } catch (error) {
@@ -54,34 +56,37 @@ export class UploadController {
         {
           success: false,
           error: {
-            code: 'PRESIGN_FAILED',
-            message: '生成上传链接失败',
+            code: "PRESIGN_FAILED",
+            message: "生成上传链接失败",
             details: error.message,
           },
           timestamp: new Date().toISOString(),
         },
-        HttpStatus.BAD_REQUEST
+        HttpStatus.BAD_REQUEST,
       );
     }
   }
 
   // 获取批量文件上传预签名 URL
-  @Post('presign/batch')
+  @Post("presign/batch")
   @UsePipes(new ValidationPipe({ transform: true }))
-  async getBatchPresignedUrls(@Body() request: BatchPresignRequestDTO): Promise<ApiResponse<any[]>> {
+  async getBatchPresignedUrls(
+    @Body() request: BatchPresignRequestDTO,
+  ): Promise<ApiResponse<any[]>> {
     try {
       // 暂时硬编码用户ID，后续从JWT获取
-      const userId = 'temp-user-id';
+      const userId = "temp-user-id";
 
-      const presignedDataList = await this.uploadService.generateBatchPresignedPost(
-        request.files,
-        userId
-      );
+      const presignedDataList =
+        await this.uploadService.generateBatchPresignedPost(
+          request.files,
+          userId,
+        );
 
       return {
         success: true,
         data: presignedDataList,
-        message: '获取批量上传链接成功',
+        message: "获取批量上传链接成功",
         timestamp: new Date().toISOString(),
       };
     } catch (error) {
@@ -89,37 +94,37 @@ export class UploadController {
         {
           success: false,
           error: {
-            code: 'BATCH_PRESIGN_FAILED',
-            message: '生成批量上传链接失败',
+            code: "BATCH_PRESIGN_FAILED",
+            message: "生成批量上传链接失败",
             details: error.message,
           },
           timestamp: new Date().toISOString(),
         },
-        HttpStatus.BAD_REQUEST
+        HttpStatus.BAD_REQUEST,
       );
     }
   }
 
   // 删除文件
-  @Delete('file')
-  async deleteFile(@Query('url') fileUrl: string): Promise<ApiResponse<void>> {
+  @Delete("file")
+  async deleteFile(@Query("url") fileUrl: string): Promise<ApiResponse<void>> {
     try {
       if (!fileUrl) {
         throw new HttpException(
           {
             success: false,
             error: {
-              code: 'MISSING_PARAMETER',
-              message: '缺少文件URL参数',
+              code: "MISSING_PARAMETER",
+              message: "缺少文件URL参数",
             },
             timestamp: new Date().toISOString(),
           },
-          HttpStatus.BAD_REQUEST
+          HttpStatus.BAD_REQUEST,
         );
       }
 
       // 暂时硬编码用户ID，后续从JWT获取
-      const userId = 'temp-user-id';
+      const userId = "temp-user-id";
 
       const success = await this.uploadService.deleteFile(fileUrl, userId);
 
@@ -128,18 +133,18 @@ export class UploadController {
           {
             success: false,
             error: {
-              code: 'DELETE_FAILED',
-              message: '删除文件失败',
+              code: "DELETE_FAILED",
+              message: "删除文件失败",
             },
             timestamp: new Date().toISOString(),
           },
-          HttpStatus.INTERNAL_SERVER_ERROR
+          HttpStatus.INTERNAL_SERVER_ERROR,
         );
       }
 
       return {
         success: true,
-        message: '删除文件成功',
+        message: "删除文件成功",
         timestamp: new Date().toISOString(),
       };
     } catch (error) {
@@ -151,32 +156,32 @@ export class UploadController {
         {
           success: false,
           error: {
-            code: 'DELETE_ERROR',
-            message: '删除文件时发生错误',
+            code: "DELETE_ERROR",
+            message: "删除文件时发生错误",
             details: error.message,
           },
           timestamp: new Date().toISOString(),
         },
-        HttpStatus.INTERNAL_SERVER_ERROR
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
 
   // 获取文件信息
-  @Get('file/info')
-  async getFileInfo(@Query('url') fileUrl: string): Promise<ApiResponse<any>> {
+  @Get("file/info")
+  async getFileInfo(@Query("url") fileUrl: string): Promise<ApiResponse<any>> {
     try {
       if (!fileUrl) {
         throw new HttpException(
           {
             success: false,
             error: {
-              code: 'MISSING_PARAMETER',
-              message: '缺少文件URL参数',
+              code: "MISSING_PARAMETER",
+              message: "缺少文件URL参数",
             },
             timestamp: new Date().toISOString(),
           },
-          HttpStatus.BAD_REQUEST
+          HttpStatus.BAD_REQUEST,
         );
       }
 
@@ -187,19 +192,19 @@ export class UploadController {
           {
             success: false,
             error: {
-              code: 'FILE_NOT_FOUND',
-              message: '文件不存在',
+              code: "FILE_NOT_FOUND",
+              message: "文件不存在",
             },
             timestamp: new Date().toISOString(),
           },
-          HttpStatus.NOT_FOUND
+          HttpStatus.NOT_FOUND,
         );
       }
 
       return {
         success: true,
         data: fileInfo,
-        message: '获取文件信息成功',
+        message: "获取文件信息成功",
         timestamp: new Date().toISOString(),
       };
     } catch (error) {
@@ -211,19 +216,19 @@ export class UploadController {
         {
           success: false,
           error: {
-            code: 'GET_FILE_INFO_ERROR',
-            message: '获取文件信息时发生错误',
+            code: "GET_FILE_INFO_ERROR",
+            message: "获取文件信息时发生错误",
             details: error.message,
           },
           timestamp: new Date().toISOString(),
         },
-        HttpStatus.INTERNAL_SERVER_ERROR
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
 
   // 获取上传配置
-  @Get('config')
+  @Get("config")
   async getUploadConfig(): Promise<ApiResponse<any>> {
     try {
       const config = this.uploadService.getUploadConfig();
@@ -237,7 +242,7 @@ export class UploadController {
           maxFiles: config.maxFiles,
           expiresIn: config.expiresIn,
         },
-        message: '获取上传配置成功',
+        message: "获取上传配置成功",
         timestamp: new Date().toISOString(),
       };
     } catch (error) {
@@ -245,19 +250,19 @@ export class UploadController {
         {
           success: false,
           error: {
-            code: 'GET_CONFIG_ERROR',
-            message: '获取上传配置失败',
+            code: "GET_CONFIG_ERROR",
+            message: "获取上传配置失败",
             details: error.message,
           },
           timestamp: new Date().toISOString(),
         },
-        HttpStatus.INTERNAL_SERVER_ERROR
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
 
   // 健康检查
-  @Get('health')
+  @Get("health")
   async healthCheck(): Promise<ApiResponse<any>> {
     try {
       const isHealthy = await this.uploadService.healthCheck();
@@ -265,11 +270,11 @@ export class UploadController {
       return {
         success: true,
         data: {
-          status: isHealthy ? 'healthy' : 'unhealthy',
-          service: 'upload',
-          storage: 'minio',
+          status: isHealthy ? "healthy" : "unhealthy",
+          service: "upload",
+          storage: "minio",
         },
-        message: isHealthy ? '上传服务正常' : '上传服务异常',
+        message: isHealthy ? "上传服务正常" : "上传服务异常",
         timestamp: new Date().toISOString(),
       };
     } catch (error) {
@@ -277,13 +282,13 @@ export class UploadController {
         {
           success: false,
           error: {
-            code: 'HEALTH_CHECK_ERROR',
-            message: '健康检查失败',
+            code: "HEALTH_CHECK_ERROR",
+            message: "健康检查失败",
             details: error.message,
           },
           timestamp: new Date().toISOString(),
         },
-        HttpStatus.INTERNAL_SERVER_ERROR
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }

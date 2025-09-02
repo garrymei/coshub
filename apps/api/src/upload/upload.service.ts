@@ -1,6 +1,6 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
-import * as Minio from 'minio';
-import { ConfigService } from '@nestjs/config';
+import { Injectable, BadRequestException } from "@nestjs/common";
+import * as Minio from "minio";
+import { ConfigService } from "@nestjs/config";
 
 export interface PresignedPostData {
   uploadUrl: string;
@@ -26,21 +26,31 @@ export class UploadService {
   constructor(private configService: ConfigService) {
     // 初始化 MinIO 客户端
     this.minioClient = new Minio.Client({
-      endPoint: this.configService.get('MINIO_ENDPOINT', 'localhost:9000').replace('http://', '').replace('https://', ''),
-      port: this.configService.get('MINIO_PORT', 9000),
-      useSSL: this.configService.get('MINIO_USE_SSL', false),
-      accessKey: this.configService.get('MINIO_ACCESS_KEY', 'minioadmin'),
-      secretKey: this.configService.get('MINIO_SECRET_KEY', 'minioadmin'),
+      endPoint: this.configService
+        .get("MINIO_ENDPOINT", "localhost:9000")
+        .replace("http://", "")
+        .replace("https://", ""),
+      port: this.configService.get("MINIO_PORT", 9000),
+      useSSL: this.configService.get("MINIO_USE_SSL", false),
+      accessKey: this.configService.get("MINIO_ACCESS_KEY", "minioadmin"),
+      secretKey: this.configService.get("MINIO_SECRET_KEY", "minioadmin"),
     });
 
-    this.bucketName = this.configService.get('MINIO_BUCKET', 'coshub-uploads');
-    
+    this.bucketName = this.configService.get("MINIO_BUCKET", "coshub-uploads");
+
     // 上传配置
     this.config = {
-      maxFileSize: parseInt(this.configService.get('UPLOAD_MAX_FILE_SIZE', '10485760')), // 10MB
-      allowedMimeTypes: this.configService.get('UPLOAD_ALLOWED_IMAGES', 'jpg,jpeg,png,gif,webp').split(',').map(ext => `image/${ext.replace('jpg', 'jpeg')}`),
-      maxFiles: parseInt(this.configService.get('UPLOAD_MAX_FILES', '9')),
-      expiresIn: parseInt(this.configService.get('UPLOAD_PRESIGN_EXPIRES', '3600')), // 1小时
+      maxFileSize: parseInt(
+        this.configService.get("UPLOAD_MAX_FILE_SIZE", "10485760"),
+      ), // 10MB
+      allowedMimeTypes: this.configService
+        .get("UPLOAD_ALLOWED_IMAGES", "jpg,jpeg,png,gif,webp")
+        .split(",")
+        .map((ext) => `image/${ext.replace("jpg", "jpeg")}`),
+      maxFiles: parseInt(this.configService.get("UPLOAD_MAX_FILES", "9")),
+      expiresIn: parseInt(
+        this.configService.get("UPLOAD_PRESIGN_EXPIRES", "3600"),
+      ), // 1小时
     };
 
     this.initBucket();
@@ -51,27 +61,30 @@ export class UploadService {
     try {
       const exists = await this.minioClient.bucketExists(this.bucketName);
       if (!exists) {
-        await this.minioClient.makeBucket(this.bucketName, 'us-east-1');
+        await this.minioClient.makeBucket(this.bucketName, "us-east-1");
         console.log(`✅ 创建存储桶: ${this.bucketName}`);
-        
+
         // 设置桶策略，允许公开读取
         const policy = {
-          Version: '2012-10-17',
+          Version: "2012-10-17",
           Statement: [
             {
-              Effect: 'Allow',
-              Principal: { AWS: ['*'] },
-              Action: ['s3:GetObject'],
+              Effect: "Allow",
+              Principal: { AWS: ["*"] },
+              Action: ["s3:GetObject"],
               Resource: [`arn:aws:s3:::${this.bucketName}/*`],
             },
           ],
         };
-        
-        await this.minioClient.setBucketPolicy(this.bucketName, JSON.stringify(policy));
+
+        await this.minioClient.setBucketPolicy(
+          this.bucketName,
+          JSON.stringify(policy),
+        );
         console.log(`✅ 设置存储桶公开读取策略: ${this.bucketName}`);
       }
     } catch (error) {
-      console.error('❌ 初始化存储桶失败:', error);
+      console.error("❌ 初始化存储桶失败:", error);
     }
   }
 
@@ -80,7 +93,7 @@ export class UploadService {
     filename: string,
     mimeType: string,
     fileSize: number,
-    userId?: string
+    userId?: string,
   ): Promise<PresignedPostData> {
     // 验证文件类型
     if (!this.config.allowedMimeTypes.includes(mimeType)) {
@@ -89,7 +102,9 @@ export class UploadService {
 
     // 验证文件大小
     if (fileSize > this.config.maxFileSize) {
-      throw new BadRequestException(`文件大小超过限制: ${fileSize} > ${this.config.maxFileSize}`);
+      throw new BadRequestException(
+        `文件大小超过限制: ${fileSize} > ${this.config.maxFileSize}`,
+      );
     }
 
     // 生成唯一文件名
@@ -97,10 +112,10 @@ export class UploadService {
     const randomStr = Math.random().toString(36).substring(2, 8);
     const ext = this.getFileExtension(filename);
     const uniqueFilename = `${timestamp}-${randomStr}${ext}`;
-    
+
     // 生成对象键 (根据用户ID和日期组织目录结构)
-    const date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-    const objectKey = userId 
+    const date = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+    const objectKey = userId
       ? `users/${userId}/${date}/${uniqueFilename}`
       : `public/${date}/${uniqueFilename}`;
 
@@ -109,25 +124,25 @@ export class UploadService {
       const uploadUrl = await this.minioClient.presignedPutObject(
         this.bucketName,
         objectKey,
-        this.config.expiresIn
+        this.config.expiresIn,
       );
 
       // 生成文件访问 URL
-      const fileUrl = `${this.configService.get('MINIO_ENDPOINT', 'http://localhost:9000')}/${this.bucketName}/${objectKey}`;
+      const fileUrl = `${this.configService.get("MINIO_ENDPOINT", "http://localhost:9000")}/${this.bucketName}/${objectKey}`;
 
       return {
         uploadUrl,
         fields: {
-          'Content-Type': mimeType,
-          'Content-Length': fileSize.toString(),
+          "Content-Type": mimeType,
+          "Content-Length": fileSize.toString(),
         },
         fileUrl,
         filename: uniqueFilename,
         expires: Date.now() + this.config.expiresIn * 1000,
       };
     } catch (error) {
-      console.error('生成预签名 URL 失败:', error);
-      throw new BadRequestException('生成上传链接失败');
+      console.error("生成预签名 URL 失败:", error);
+      throw new BadRequestException("生成上传链接失败");
     }
   }
 
@@ -138,20 +153,22 @@ export class UploadService {
       mimeType: string;
       fileSize: number;
     }>,
-    userId?: string
+    userId?: string,
   ): Promise<PresignedPostData[]> {
     if (files.length > this.config.maxFiles) {
-      throw new BadRequestException(`文件数量超过限制: ${files.length} > ${this.config.maxFiles}`);
+      throw new BadRequestException(
+        `文件数量超过限制: ${files.length} > ${this.config.maxFiles}`,
+      );
     }
 
     const results: PresignedPostData[] = [];
-    
+
     for (const file of files) {
       const presignedData = await this.generatePresignedPost(
         file.filename,
         file.mimeType,
         file.fileSize,
-        userId
+        userId,
       );
       results.push(presignedData);
     }
@@ -164,16 +181,16 @@ export class UploadService {
     try {
       // 从文件 URL 中提取对象键
       const objectKey = this.extractObjectKeyFromUrl(fileUrl);
-      
+
       // 权限检查：确保用户只能删除自己的文件
       if (userId && !objectKey.startsWith(`users/${userId}/`)) {
-        throw new BadRequestException('无权限删除此文件');
+        throw new BadRequestException("无权限删除此文件");
       }
 
       await this.minioClient.removeObject(this.bucketName, objectKey);
       return true;
     } catch (error) {
-      console.error('删除文件失败:', error);
+      console.error("删除文件失败:", error);
       return false;
     }
   }
@@ -182,15 +199,18 @@ export class UploadService {
   async getFileInfo(fileUrl: string): Promise<any> {
     try {
       const objectKey = this.extractObjectKeyFromUrl(fileUrl);
-      const stat = await this.minioClient.statObject(this.bucketName, objectKey);
+      const stat = await this.minioClient.statObject(
+        this.bucketName,
+        objectKey,
+      );
       return {
         size: stat.size,
         lastModified: stat.lastModified,
-        contentType: stat.metaData?.['content-type'],
+        contentType: stat.metaData?.["content-type"],
         etag: stat.etag,
       };
     } catch (error) {
-      console.error('获取文件信息失败:', error);
+      console.error("获取文件信息失败:", error);
       return null;
     }
   }
@@ -202,16 +222,16 @@ export class UploadService {
 
   // 辅助方法：获取文件扩展名
   private getFileExtension(filename: string): string {
-    const lastDotIndex = filename.lastIndexOf('.');
-    return lastDotIndex !== -1 ? filename.substring(lastDotIndex) : '';
+    const lastDotIndex = filename.lastIndexOf(".");
+    return lastDotIndex !== -1 ? filename.substring(lastDotIndex) : "";
   }
 
   // 辅助方法：从 URL 中提取对象键
   private extractObjectKeyFromUrl(fileUrl: string): string {
     const url = new URL(fileUrl);
-    const pathParts = url.pathname.split('/');
+    const pathParts = url.pathname.split("/");
     // 移除空字符串和桶名，剩下的就是对象键
-    return pathParts.slice(2).join('/');
+    return pathParts.slice(2).join("/");
   }
 
   // 健康检查

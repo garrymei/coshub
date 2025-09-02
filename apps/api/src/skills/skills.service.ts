@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { Injectable } from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
 
 export interface SkillItem {
   id: string;
@@ -16,31 +16,51 @@ export interface SkillItem {
 export class SkillsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(data: { title: string; city: string; role: string; description?: string; images?: string[]; author?: string; lat?: number; lng?: number; }) {
+  async create(data: {
+    title: string;
+    city: string;
+    role: string;
+    description?: string;
+    images?: string[];
+    author?: string;
+    lat?: number;
+    lng?: number;
+  }) {
     const created = await this.prisma.skillPost.create({
       data: {
         title: data.title,
-        description: data.description || '',
-        category: 'COSPLAY',
+        description: data.description || "",
+        category: "COSPLAY",
         role: data.role as any,
-        experience: 'BEGINNER',
+        experience: "BEGINNER",
         city: data.city,
         lat: data.lat ?? null,
         lng: data.lng ?? null,
-        geohash: data.lat != null && data.lng != null ? this.encodeGeohash(data.lat, data.lng) : null,
-        price: { type: 'negotiable' } as any,
+        geohash:
+          data.lat != null && data.lng != null
+            ? this.encodeGeohash(data.lat, data.lng)
+            : null,
+        price: { type: "negotiable" } as any,
         images: data.images || [],
         tags: [],
         availability: {},
         contactInfo: {},
-        status: 'ACTIVE',
+        status: "ACTIVE",
         authorId: (await this.prisma.user.findFirst()).id,
       },
     });
     return created;
   }
 
-  async findAll(params: { city?: string; role?: string; page?: number; pageSize?: number; lat?: number; lng?: number; radius?: number }) {
+  async findAll(params: {
+    city?: string;
+    role?: string;
+    page?: number;
+    pageSize?: number;
+    lat?: number;
+    lng?: number;
+    radius?: number;
+  }) {
     const { city, role, page = 1, pageSize = 10, lat, lng, radius } = params;
     const where: any = {};
     if (city) where.city = city;
@@ -73,21 +93,26 @@ export class SkillsService {
 
   private encodeGeohash(_lat: number, _lng: number): string {
     // 占位：后续可引入 geohash 库，这里先返回空字符串以避免依赖
-    return '';
+    return "";
   }
 
-  private haversineDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  private haversineDistance(
+    lat1: number,
+    lon1: number,
+    lat2: number,
+    lon2: number,
+  ): number {
     const toRad = (x: number) => (x * Math.PI) / 180;
     const R = 6371; // km
     const dLat = toRad(lat2 - lat1);
     const dLon = toRad(lon2 - lon1);
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      Math.cos(toRad(lat1)) *
+        Math.cos(toRad(lat2)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
   }
 }
-
-
