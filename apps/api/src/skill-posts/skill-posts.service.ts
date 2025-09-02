@@ -106,29 +106,36 @@ export class SkillPostsService {
 
     // Keyset pagination 实现
     const limit = query.limit || 10;
-    
+
     // 如果提供了游标，添加游标条件
     if (query.cursor) {
-      const cursorField = query.sortBy === "createdAt" ? "createdAt" : 
-                         query.sortBy === "updatedAt" ? "updatedAt" : "id";
-      
+      const cursorField =
+        query.sortBy === "createdAt"
+          ? "createdAt"
+          : query.sortBy === "updatedAt"
+            ? "updatedAt"
+            : "id";
+
       // 解析游标（假设游标是 base64 编码的 JSON）
       try {
-        const cursorData = JSON.parse(Buffer.from(query.cursor, 'base64').toString());
+        const cursorData = JSON.parse(
+          Buffer.from(query.cursor, "base64").toString(),
+        );
         if (cursorData[cursorField]) {
           where[cursorField] = {
-            [orderBy[cursorField] === 'desc' ? 'lt' : 'gt']: cursorData[cursorField]
+            [orderBy[cursorField] === "desc" ? "lt" : "gt"]:
+              cursorData[cursorField],
           };
         }
       } catch (error) {
         // 游标解析失败，忽略游标条件
-        console.warn('Invalid cursor format:', error);
+        console.warn("Invalid cursor format:", error);
       }
     }
 
     // 获取数据（多取一条用于判断是否有下一页）
     const take = limit + 1;
-    
+
     const skillPosts = await this.prisma.skillPost.findMany({
       where,
       orderBy,
@@ -141,19 +148,23 @@ export class SkillPostsService {
     // 判断是否有下一页
     const hasNext = skillPosts.length > limit;
     const items = skillPosts.slice(0, limit);
-    
+
     // 计算下一页游标
     let nextCursor: string | undefined;
     if (hasNext && items.length > 0) {
       const lastItem = items[items.length - 1];
-      const cursorField = query.sortBy === "createdAt" ? "createdAt" : 
-                         query.sortBy === "updatedAt" ? "updatedAt" : "id";
-      
+      const cursorField =
+        query.sortBy === "createdAt"
+          ? "createdAt"
+          : query.sortBy === "updatedAt"
+            ? "updatedAt"
+            : "id";
+
       const cursorData = {
         [cursorField]: lastItem[cursorField],
-        id: lastItem.id // 总是包含 id 作为唯一标识
+        id: lastItem.id, // 总是包含 id 作为唯一标识
       };
-      nextCursor = Buffer.from(JSON.stringify(cursorData)).toString('base64');
+      nextCursor = Buffer.from(JSON.stringify(cursorData)).toString("base64");
     }
 
     // 获取总数（仅用于向后兼容）

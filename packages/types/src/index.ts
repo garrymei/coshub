@@ -22,12 +22,13 @@ export * from "./skill-post";
 // 举报相关类型
 export * from "./report";
 
+// 认证相关类型
+export * from "./auth";
+
 // 通用类型
 export * from "./common";
 
-// 校验器（zod schemas）
-export { createSkillPostSchema } from "./validators/skill-post";
-export type { CreateSkillPostInput } from "./validators/skill-post";
+
 
 // 版本信息
 export const VERSION = "0.1.0";

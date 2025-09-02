@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Module, NestModule, MiddlewareConsumer } from "@nestjs/common";
 import { APP_GUARD } from "@nestjs/core";
 import { ConfigModule } from "@nestjs/config";
 import { ThrottlerModule, ThrottlerGuard } from "@nestjs/throttler";
@@ -10,12 +10,17 @@ import { SkillPostsModule } from "./skill-posts/skill-posts.module";
 import { SkillsModule } from "./skills/skills.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { UploadModule } from "./upload/upload.module";
+import { ReportsModule } from "./reports/reports.module";
+import { CacheModule } from "./cache/cache.module";
+import { LoggerModule } from "./logger/logger.module";
+import { LoggerMiddleware } from "./logger/logger.middleware";
+import { AuthModule } from "./auth/auth.module";
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ".env",
+      envFilePath: [".env.local", ".env"],
     }),
     ThrottlerModule.forRoot({
       throttlers: [{ ttl: 60_000, limit: 120 }],
@@ -24,6 +29,10 @@ import { UploadModule } from "./upload/upload.module";
     SkillPostsModule,
     UploadModule,
     SkillsModule,
+    ReportsModule,
+    CacheModule,
+    LoggerModule,
+    AuthModule,
   ],
   controllers: [AppController, HealthController],
   providers: [
@@ -32,4 +41,10 @@ import { UploadModule } from "./upload/upload.module";
     { provide: APP_GUARD, useClass: ThrottlerGuard },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(LoggerMiddleware)
+      .forRoutes("*");
+  }
+}

@@ -1,7 +1,7 @@
 import { Component } from "react";
 import { View, Text, Image, Button } from "@tarojs/components";
 import Taro from "@tarojs/taro";
-import { skillPostApi, formatPrice, showToast } from "../../utils/api";
+import { skillsApi, formatPrice, showToast } from "../../utils/api";
 import {
   SKILL_CATEGORIES,
   SKILL_ROLES,
@@ -45,7 +45,7 @@ export default class SkillPostDetail extends Component<{}, State> {
     try {
       this.setState({ loading: true });
 
-      const response = await skillPostApi.getDetail(id);
+      const response = await skillsApi.getDetail(id);
 
       if (response.success && response.data) {
         this.setState({

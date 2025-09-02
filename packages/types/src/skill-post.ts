@@ -142,9 +142,9 @@ export interface UpdateSkillPostDTO extends Partial<CreateSkillPostDTO> {
 
 export interface SkillPostQueryDTO {
   // Keyset pagination (替换 offset 分页)
-  cursor?: string;        // 游标 (通常是 id 或 createdAt)
-  limit?: number;         // 每页数量
-  
+  cursor?: string; // 游标 (通常是 id 或 createdAt)
+  limit?: number; // 每页数量
+
   // 筛选条件
   category?: SkillCategory;
   role?: SkillRole;
@@ -153,14 +153,14 @@ export interface SkillPostQueryDTO {
   priceMin?: number;
   priceMax?: number;
   experience?: ExperienceLevel;
-  
+
   // 排序
   sortBy?: SkillPostSortBy;
   sortOrder?: "asc" | "desc";
-  
+
   // 搜索
   keyword?: string;
-  
+
   // 向后兼容 (已废弃，建议使用 cursor)
   page?: number;
 }
@@ -178,11 +178,11 @@ export enum SkillPostSortBy {
 export interface SkillPostListResponse {
   items: SkillPost[];
   total: number;
-  
+
   // Keyset pagination
-  nextCursor?: string;    // 下一页游标
-  hasNext: boolean;       // 是否有下一页
-  
+  nextCursor?: string; // 下一页游标
+  hasNext: boolean; // 是否有下一页
+
   // 向后兼容 (已废弃)
   page?: number;
   limit?: number;

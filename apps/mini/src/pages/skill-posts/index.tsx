@@ -8,9 +8,11 @@ import {
   Picker,
 } from "@tarojs/components";
 import {
-  skillsApi as skillPostApi,
+  skillsApi,
   formatPrice,
   showToast,
+  hideLoading,
+  showLoading,
 } from "../../utils/api";
 import {
   SKILL_CATEGORIES,
@@ -64,7 +66,7 @@ export default class SkillPostsPage extends Component<{}, State> {
     try {
       this.setState({ loading: true });
 
-      const response = await skillPostApi.getList(this.state.filters);
+      const response = await skillsApi.getList(this.state.filters);
 
       if (response.success && response.data) {
         this.setState({

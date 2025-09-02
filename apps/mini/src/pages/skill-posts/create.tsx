@@ -6,14 +6,10 @@ import {
   Textarea,
   Picker,
   Button,
+  Switch,
 } from "@tarojs/components";
 import Taro from "@tarojs/taro";
-import {
-  skillPostApi,
-  showToast,
-  showLoading,
-  hideLoading,
-} from "../../utils/api";
+import { skillsApi, showToast, hideLoading, showLoading } from "../../utils/api";
 import {
   SKILL_CATEGORIES,
   SKILL_ROLES,
@@ -24,13 +20,14 @@ import {
 } from "../../utils/constants";
 import type {
   CreateSkillPostDTO,
+} from "@coshub/types";
+import {
   SkillCategory,
   SkillRole,
   ExperienceLevel,
   PriceType,
   ContactMethod,
 } from "@coshub/types";
-import { createSkillPostSchema } from "@coshub/types";
 import "./create.scss";
 
 interface State {
@@ -47,7 +44,7 @@ interface State {
 }
 
 export default class CreateSkillPost extends Component<{}, State> {
-  constructor(props) {
+  constructor(props: any) {
     super(props);
     this.state = {
       formData: {
@@ -164,6 +161,19 @@ export default class CreateSkillPost extends Component<{}, State> {
         price: {
           ...this.state.formData.price,
           type: PRICE_TYPES[index].value,
+          // 重置与类型不相关/不需要的字段，避免校验失败
+          amount:
+            PRICE_TYPES[index].value === PriceType.FIXED
+              ? this.state.formData.price.amount || 0
+              : undefined,
+          range:
+            PRICE_TYPES[index].value === PriceType.RANGE
+              ? this.state.formData.price.range || { min: 0, max: 0 }
+              : undefined,
+          negotiable:
+            PRICE_TYPES[index].value === PriceType.NEGOTIABLE
+              ? true
+              : this.state.formData.price.negotiable ?? false,
         },
       },
     });
@@ -232,15 +242,26 @@ export default class CreateSkillPost extends Component<{}, State> {
     });
   };
 
-  // 表单验证（共享 zod schema）
+  // 表单验证
   validateForm = (): string | null => {
     const { formData } = this.state;
-    const { imageUrls, tagText, ...submitData } = formData as any;
-    const parsed = createSkillPostSchema.safeParse(submitData);
-    if (!parsed.success) {
-      const first = parsed.error.issues[0];
-      return first?.message || "表单校验失败";
+    
+    if (!formData.title?.trim()) {
+      return "请输入标题";
     }
+    
+    if (!formData.description?.trim()) {
+      return "请输入描述";
+    }
+    
+    if (!formData.city?.trim()) {
+      return "请输入城市";
+    }
+    
+    if (formData.price.amount <= 0) {
+      return "请输入有效的价格";
+    }
+    
     return null;
   };
 
@@ -258,7 +279,7 @@ export default class CreateSkillPost extends Component<{}, State> {
       // 准备提交数据，移除临时字段
       const { imageUrls, tagText, ...submitData } = this.state.formData;
 
-      const response = await skillPostApi.create(submitData);
+      const response = await skillsApi.create(submitData);
 
       if (response.success) {
         hideLoading();
@@ -462,10 +483,88 @@ export default class CreateSkillPost extends Component<{}, State> {
                   this.handleNestedInputChange(
                     "price",
                     "amount",
-                    Number(e.detail.value),
+                    Number(e.detail.value || 0),
                   )
                 }
               />
+              <View style={{ marginTop: 8 }}>
+                <Text className="label">是否可议价</Text>
+                <Switch
+                  checked={!!formData.price.negotiable}
+                  onChange={(ev) =>
+                    this.handleNestedInputChange(
+                      "price",
+                      "negotiable",
+                      !!ev.detail.value,
+                    )
+                  }
+                />
+              </View>
+            </View>
+          )}
+
+          {formData.price.type === "range" && (
+            <View className="form-item">
+              <Text className="label">价格区间 (元) *</Text>
+              <View className="form-row">
+                <View className="form-item half">
+                  <Text className="label">最小值</Text>
+                  <Input
+                    className="input"
+                    type="number"
+                    placeholder="例如 100"
+                    value={String(formData.price.range?.min ?? "")}
+                    onInput={(e) =>
+                      this.handleNestedInputChange("price", "range", {
+                        min: Number(e.detail.value || 0),
+                        max: formData.price.range?.max ?? 0,
+                      })
+                    }
+                  />
+                </View>
+                <View className="form-item half">
+                  <Text className="label">最大值</Text>
+                  <Input
+                    className="input"
+                    type="number"
+                    placeholder="例如 300"
+                    value={String(formData.price.range?.max ?? "")}
+                    onInput={(e) =>
+                      this.handleNestedInputChange("price", "range", {
+                        min: formData.price.range?.min ?? 0,
+                        max: Number(e.detail.value || 0),
+                      })
+                    }
+                  />
+                </View>
+              </View>
+              <View style={{ marginTop: 8 }}>
+                <Text className="label">是否可议价</Text>
+                <Switch
+                  checked={!!formData.price.negotiable}
+                  onChange={(ev) =>
+                    this.handleNestedInputChange(
+                      "price",
+                      "negotiable",
+                      !!ev.detail.value,
+                    )
+                  }
+                />
+              </View>
+            </View>
+          )}
+
+          {formData.price.type === "free" && (
+            <View className="form-item">
+              <Text className="label">免费</Text>
+              <Text>该服务免费提供，不需要填写价格。</Text>
+            </View>
+          )}
+
+          {formData.price.type === "negotiable" && (
+            <View className="form-item">
+              <Text className="label">价格面议</Text>
+              <Text>与服务者协商确定价格。</Text>
             </View>
           )}
         </View>

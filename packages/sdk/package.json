@@ -17,7 +17,7 @@
     "dist"
   ],
   "scripts": {
-    "prebuild": "pnpm -w --filter @coshub/types build",
+    "prebuild": "pnpm --filter @coshub/types build",
     "build": "tsup src/index.ts --format cjs,esm --dts",
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
     "lint": "eslint \"src/**/*.ts\" --fix",

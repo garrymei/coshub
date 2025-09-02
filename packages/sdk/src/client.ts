@@ -168,7 +168,7 @@ export class CoshubClient {
       if (response.ok) {
         return {
           success: true,
-          data,
+          data: data as T,
           timestamp: new Date().toISOString(),
         };
       } else {
@@ -198,7 +198,7 @@ export class CoshubClient {
   /**
    * 处理错误
    */
-  private handleError(error: any): ApiResponse {
+  private handleError<T>(error: any): ApiResponse<T> {
     let apiError: ApiError;
 
     if (error.name === "AbortError") {

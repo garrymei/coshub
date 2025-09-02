@@ -11,6 +11,7 @@ import {
   HttpStatus,
   ValidationPipe,
   UsePipes,
+  UseGuards,
 } from "@nestjs/common";
 import { SkillPostsService } from "./skill-posts.service";
 import {
@@ -21,6 +22,11 @@ import {
   SkillPostListResponse,
   ApiResponse,
 } from "@coshub/types";
+import { PermissionGuard } from "../auth/guards/permission.guard";
+import { RateLimitGuard } from "../auth/guards/rate-limit.guard";
+import { RequirePermissions } from "../auth/decorators/permissions.decorator";
+import { RateLimit } from "../auth/decorators/rate-limit.decorator";
+import { Permission, RateLimitType } from "@coshub/types";
 
 @Controller("skill-posts")
 export class SkillPostsController {
@@ -28,6 +34,9 @@ export class SkillPostsController {
 
   @Post()
   @UsePipes(new ValidationPipe({ transform: true }))
+  @UseGuards(PermissionGuard, RateLimitGuard)
+  @RequirePermissions(Permission.CREATE_SKILL_POST)
+  @RateLimit(RateLimitType.CREATE_POST)
   async create(
     @Body() createSkillPostDto: CreateSkillPostDTO,
   ): Promise<ApiResponse<SkillPost>> {
@@ -133,6 +142,9 @@ export class SkillPostsController {
 
   @Put(":id")
   @UsePipes(new ValidationPipe({ transform: true }))
+  @UseGuards(PermissionGuard, RateLimitGuard)
+  @RequirePermissions(Permission.EDIT_SKILL_POST)
+  @RateLimit(RateLimitType.EDIT_POST)
   async update(
     @Param("id") id: string,
     @Body() updateSkillPostDto: UpdateSkillPostDTO,
@@ -185,6 +197,9 @@ export class SkillPostsController {
   }
 
   @Delete(":id")
+  @UseGuards(PermissionGuard, RateLimitGuard)
+  @RequirePermissions(Permission.DELETE_SKILL_POST)
+  @RateLimit(RateLimitType.DELETE_POST)
   async remove(@Param("id") id: string): Promise<ApiResponse<void>> {
     try {
       const success = await this.skillPostsService.remove(id);

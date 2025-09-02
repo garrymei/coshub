@@ -20,6 +20,7 @@ model User {
   avatar      String?
   bio         String?
   level       UserLevel @default(NEWBIE)
+  role        UserRole  @default(USER)
   verified    Boolean  @default(false)
   reputation  Int      @default(100)
   city        String?
@@ -43,6 +44,8 @@ model User {
   skillPosts  SkillPost[]
   requests    Request[]
   posts       Post[]
+  reports     Report[]  @relation("UserReports")
+  comments    Comment[] @relation("UserComments")
   
   @@map("users")
 }
@@ -190,6 +193,106 @@ model Post {
   @@index([createdAt])
 }
 
+// 举报表
+model Report {
+  id          String   @id @default(cuid())
+  type        ReportType
+  targetType  ReportTargetType
+  targetId    String
+  reason      ReportReason
+  description String   @db.Text
+  content     String?  @db.Text
+  
+  // 举报人信息
+  reporterId  String
+  reporter    User     @relation("UserReports", fields: [reporterId], references: [id], onDelete: Cascade)
+  
+  // 证据
+  evidence    String[]
+  
+  // 内容安全检查结果
+  contentCheckResult Json?
+  
+  // 状态
+  status      ReportStatus @default(PENDING)
+  
+  // 处理信息
+  processedBy String?
+  processedAt DateTime?
+  processNote String?  @db.Text
+  
+  // 系统字段
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // 关联关系
+  violationLogs ContentViolationLog[]
+  
+  @@map("reports")
+  @@index([type])
+  @@index([targetType])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// 评论表
+model Comment {
+  id          String   @id @default(cuid())
+  content     String   @db.Text
+  
+  // 评论目标
+  targetType  CommentTargetType
+  targetId    String
+  
+  // 评论人信息
+  authorId    String
+  author      User     @relation("UserComments", fields: [authorId], references: [id], onDelete: Cascade)
+  
+  // 父评论（回复）
+  parentId    String?
+  parent      Comment? @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies     Comment[] @relation("CommentReplies")
+  
+  // 状态
+  status      CommentStatus @default(ACTIVE)
+  
+  // 统计
+  likeCount   Int      @default(0)
+  
+  // 系统字段
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+  
+  @@map("comments")
+  @@index([targetType])
+  @@index([targetId])
+  @@index([parentId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// 内容违规日志表
+model ContentViolationLog {
+  id          String   @id @default(cuid())
+  reportId    String
+  report      Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  
+  // 违规内容
+  content     String   @db.Text
+  contentType String
+  
+  // 检查结果
+  checkResult Json
+  
+  // 系统字段
+  createdAt   DateTime @default(now())
+  
+  @@map("content_violation_logs")
+  @@index([reportId])
+  @@index([createdAt])
+}
+
 // 枚举定义
 enum UserLevel {
   NEWBIE      // 新手
@@ -198,6 +301,17 @@ enum UserLevel {
   ADVANCED    // 高级
   PROFESSIONAL // 专业
   EXPERT      // 专家
+}
+
+enum UserRole {
+  USER        // 普通用户
+  COSER       // Coser
+  PHOTOGRAPHER // 摄影师
+  MAKEUP_ARTIST // 妆娘
+  WIG_MAKER   // 毛娘
+  PROP_MAKER  // 道具师
+  MODERATOR   // 版主
+  ADMIN       // 管理员
 }
 
 enum SkillCategory {
@@ -279,4 +393,54 @@ enum PostCategory {
   DISCUSSION      // 话题讨论
   NEWS            // 圈内资讯
   RESOURCE        // 资源分享
+}
+
+// 举报相关枚举
+enum ReportType {
+  INAPPROPRIATE_CONTENT  // 不当内容
+  SPAM                   // 垃圾信息
+  HARASSMENT             // 骚扰行为
+  COPYRIGHT_VIOLATION    // 版权侵犯
+  FAKE_INFORMATION       // 虚假信息
+  OTHER                  // 其他
+}
+
+enum ReportTargetType {
+  SKILL_POST     // 技能帖
+  POST           // 帖子
+  COMMENT        // 评论
+  USER           // 用户
+  OTHER          // 其他
+}
+
+enum ReportReason {
+  INAPPROPRIATE  // 不当内容
+  SPAM           // 垃圾信息
+  HARASSMENT     // 骚扰
+  COPYRIGHT      // 版权问题
+  FAKE           // 虚假信息
+  VIOLENCE       // 暴力内容
+  SEXUAL         // 色情内容
+  OTHER          // 其他
+}
+
+enum ReportStatus {
+  PENDING        // 待处理
+  PROCESSING     // 处理中
+  RESOLVED       // 已解决
+  REJECTED       // 已驳回
+  CLOSED         // 已关闭
+}
+
+// 评论相关枚举
+enum CommentTargetType {
+  SKILL_POST     // 技能帖
+  POST           // 帖子
+  USER           // 用户
+}
+
+enum CommentStatus {
+  ACTIVE         // 活跃
+  HIDDEN         // 隐藏
+  DELETED        // 已删除
 }

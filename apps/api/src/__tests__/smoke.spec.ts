@@ -74,6 +74,7 @@ class FakePrismaService {
 
 const FakeStorage: StorageProvider = {
   ensureBucket: async () => {},
+  bucketExists: async () => true,
   presignedPut: async () => 'http://localhost:9000/coshub-uploads/demo',
   removeObject: async () => {},
   statObject: async () => ({ size: 0, lastModified: new Date() }),

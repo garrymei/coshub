@@ -41,6 +41,7 @@
   "author": "garrymei",
   "dependencies": {
     "@babel/runtime": "^7.21.0",
+    "@coshub/types": "file:../../packages/types",
     "@tarojs/components": "3.6.25",
     "@tarojs/helper": "3.6.25",
     "@tarojs/plugin-framework-react": "3.6.25",
@@ -50,12 +51,12 @@
     "@tarojs/plugin-platform-swan": "3.6.25",
     "@tarojs/plugin-platform-tt": "3.6.25",
     "@tarojs/plugin-platform-weapp": "3.6.25",
+    "@tarojs/react": "^4.1.6",
     "@tarojs/runtime": "3.6.25",
     "@tarojs/shared": "3.6.25",
     "@tarojs/taro": "3.6.25",
     "react": "^18.0.0",
-    "react-dom": "^18.0.0",
-    "@coshub/types": "file:../../packages/types"
+    "react-dom": "^18.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.8.0",
