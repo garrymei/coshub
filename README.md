@@ -259,6 +259,20 @@ MINIO_SECRET_KEY="<YOUR_SECRET_KEY>"
 | PgAdmin | http://localhost:5050 | 数据库管理 |
 | Redis Commander | http://localhost:8081 | 缓存管理 |
 
+## 近期变更
+
+- 前端（P0 集成）
+  - Web 使用 `NEXT_PUBLIC_API_BASE_URL` 配置 SDK 基址，便于 dev/prod 切换（apps/web/src/lib/api.ts）
+  - SDK 实现直传上传（预签名 + PUT），Web 创建页接入 SDK 上传与创建（packages/sdk/src/services.ts；apps/web/src/app/skill-posts/*）
+  - API 启用 UploadModule，CORS 支持通过 `CORS_ORIGINS` 配置；SkillPost 返回的枚举/状态与前端类型对齐（apps/api/src/*）
+
+- 其他代工改动（样式与工程优化）
+  - API 代码风格统一：import/字符串改为双引号、控制台日志文案优化，保持功能不变（apps/api/src/**/*.ts）
+  - PrismaService 与若干模块的小幅格式化重排，逻辑不变（apps/api/src/prisma/prisma.service.ts 等）
+  - UploadService 日志与参数格式更规范（apps/api/src/upload/upload.service.ts）
+  - 格式化脚本范围调整：`format` 仅处理 `src/**/*.ts`（apps/api/package.json）
+  - Web 构建配置增强：`next.config.js` 新增 `transpilePackages`（含 `@coshub/types`, `@coshub/sdk`）与 `experimental.externalDir: true`，改善 Monorepo 包联编与外部目录导入
+
 ### 代码规范
 
 ```bash
