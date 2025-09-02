@@ -21,6 +21,8 @@ export interface UploadConfig {
 export class UploadService {
   private bucketName: string;
   private config: UploadConfig;
+  private providerType: string;
+  private publicEndpoint: string;
 
   constructor(
     private readonly configService: ConfigService,
@@ -43,6 +45,12 @@ export class UploadService {
         this.configService.get("UPLOAD_PRESIGN_EXPIRES", "3600"),
       ), // 1小时
     };
+
+    // provider 与公共访问端点
+    this.providerType = (this.configService.get('STORAGE_TYPE', 'minio') || 'minio').toString();
+    const minioEp = this.configService.get('MINIO_ENDPOINT', 'http://localhost:9000');
+    const s3Ep = this.configService.get('S3_ENDPOINT', minioEp);
+    this.publicEndpoint = this.providerType === 'minio' ? minioEp : s3Ep;
 
     // 初始化存储桶
     this.initBucket();
@@ -185,6 +193,14 @@ export class UploadService {
   // 获取上传配置信息
   getUploadConfig(): UploadConfig {
     return { ...this.config };
+  }
+
+  getProviderMeta() {
+    return {
+      type: this.providerType,
+      endpoint: this.publicEndpoint,
+      bucket: this.bucketName,
+    };
   }
 
   // 辅助方法：获取文件扩展名

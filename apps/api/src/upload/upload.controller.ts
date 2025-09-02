@@ -232,6 +232,7 @@ export class UploadController {
   async getUploadConfig(): Promise<ApiResponse<any>> {
     try {
       const config = this.uploadService.getUploadConfig();
+      const meta = this.uploadService.getProviderMeta();
 
       return {
         success: true,
@@ -241,6 +242,7 @@ export class UploadController {
           allowedMimeTypes: config.allowedMimeTypes,
           maxFiles: config.maxFiles,
           expiresIn: config.expiresIn,
+          provider: meta,
         },
         message: "获取上传配置成功",
         timestamp: new Date().toISOString(),
@@ -266,13 +268,14 @@ export class UploadController {
   async healthCheck(): Promise<ApiResponse<any>> {
     try {
       const isHealthy = await this.uploadService.healthCheck();
+      const meta = this.uploadService.getProviderMeta();
 
       return {
         success: true,
         data: {
           status: isHealthy ? "healthy" : "unhealthy",
           service: "upload",
-          storage: "minio",
+          storage: meta.type,
         },
         message: isHealthy ? "上传服务正常" : "上传服务异常",
         timestamp: new Date().toISOString(),
