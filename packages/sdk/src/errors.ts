@@ -2,7 +2,7 @@
  * 错误处理工具
  */
 
-import type { ApiError, ApiResponse } from '@coshub/types';
+import type { ApiError, ApiResponse } from "@coshub/types";
 
 export class CoshubError extends Error {
   public readonly code: string;
@@ -11,7 +11,7 @@ export class CoshubError extends Error {
 
   constructor(apiError: ApiError) {
     super(apiError.message);
-    this.name = 'CoshubError';
+    this.name = "CoshubError";
     this.code = apiError.code;
     this.details = apiError.details;
     this.timestamp = new Date().toISOString();
@@ -28,28 +28,28 @@ export class CoshubError extends Error {
    * 检查是否为网络错误
    */
   isNetworkError(): boolean {
-    return this.code === 'NETWORK_ERROR' || this.code === 'TIMEOUT';
+    return this.code === "NETWORK_ERROR" || this.code === "TIMEOUT";
   }
 
   /**
    * 检查是否为认证错误
    */
   isAuthError(): boolean {
-    return this.code === '401' || this.code === '403';
+    return this.code === "401" || this.code === "403";
   }
 
   /**
    * 检查是否为验证错误
    */
   isValidationError(): boolean {
-    return this.code === '400' || this.code === 'VALIDATION_ERROR';
+    return this.code === "400" || this.code === "VALIDATION_ERROR";
   }
 
   /**
    * 检查是否为服务器错误
    */
   isServerError(): boolean {
-    return this.code.startsWith('5') || this.code === 'UNKNOWN_ERROR';
+    return this.code.startsWith("5") || this.code === "UNKNOWN_ERROR";
   }
 }
 
@@ -80,48 +80,48 @@ export class ErrorHandler {
   static getUserMessage(error: unknown): string {
     if (error instanceof CoshubError) {
       switch (error.code) {
-        case 'NETWORK_ERROR':
-          return '网络连接失败，请检查网络设置';
-        case 'TIMEOUT':
-          return '请求超时，请稍后重试';
-        case '401':
-          return '请先登录';
-        case '403':
-          return '没有权限执行此操作';
-        case '404':
-          return '请求的资源不存在';
-        case '429':
-          return '请求过于频繁，请稍后重试';
-        case '500':
-          return '服务器内部错误，请稍后重试';
+        case "NETWORK_ERROR":
+          return "网络连接失败，请检查网络设置";
+        case "TIMEOUT":
+          return "请求超时，请稍后重试";
+        case "401":
+          return "请先登录";
+        case "403":
+          return "没有权限执行此操作";
+        case "404":
+          return "请求的资源不存在";
+        case "429":
+          return "请求过于频繁，请稍后重试";
+        case "500":
+          return "服务器内部错误，请稍后重试";
         default:
-          return error.message || '操作失败';
+          return error.message || "操作失败";
       }
     }
-    
+
     if (error instanceof Error) {
       return error.message;
     }
-    
-    return '未知错误';
+
+    return "未知错误";
   }
 
   /**
    * 记录错误到控制台（开发环境）
    */
   static logError(error: unknown, context?: string): void {
-    if (process.env.NODE_ENV === 'development') {
-      console.group(`🚨 CoshubSDK Error${context ? ` [${context}]` : ''}`);
-      
+    if (process.env.NODE_ENV === "development") {
+      console.group(`🚨 CoshubSDK Error${context ? ` [${context}]` : ""}`);
+
       if (error instanceof CoshubError) {
-        console.error('Code:', error.code);
-        console.error('Message:', error.message);
-        console.error('Details:', error.details);
-        console.error('Timestamp:', error.timestamp);
+        console.error("Code:", error.code);
+        console.error("Message:", error.message);
+        console.error("Details:", error.details);
+        console.error("Timestamp:", error.timestamp);
       } else {
         console.error(error);
       }
-      
+
       console.groupEnd();
     }
   }
@@ -140,7 +140,7 @@ export class RetryHandler {
       maxAttempts: number;
       delay: number;
       shouldRetry?: (error: unknown) => boolean;
-    }
+    },
   ): Promise<T> {
     const { maxAttempts, delay, shouldRetry } = options;
     let lastError: unknown;
@@ -150,14 +150,14 @@ export class RetryHandler {
         return await fn();
       } catch (error) {
         lastError = error;
-        
+
         // 如果是最后一次尝试，或者不应该重试，则抛出错误
         if (attempt === maxAttempts || (shouldRetry && !shouldRetry(error))) {
           throw error;
         }
-        
+
         // 等待后重试
-        await new Promise(resolve => setTimeout(resolve, delay * attempt));
+        await new Promise((resolve) => setTimeout(resolve, delay * attempt));
       }
     }
 

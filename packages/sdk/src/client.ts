@@ -2,7 +2,7 @@
  * HTTP 客户端封装
  */
 
-import type { ApiResponse, ApiError } from '@coshub/types';
+import type { ApiResponse, ApiError } from "@coshub/types";
 
 export interface ClientConfig {
   baseURL: string;
@@ -15,7 +15,7 @@ export interface ClientConfig {
 }
 
 export interface RequestOptions {
-  method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+  method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
   headers?: Record<string, string>;
   params?: Record<string, any>;
   data?: any;
@@ -31,7 +31,7 @@ export class CoshubClient {
     this.config = {
       timeout: 10000,
       retry: { attempts: 3, delay: 1000 },
-      ...config
+      ...config,
     };
   }
 
@@ -43,7 +43,7 @@ export class CoshubClient {
   }
 
   /**
-   * 清除认证 Token  
+   * 清除认证 Token
    */
   clearAuthToken() {
     this.authToken = undefined;
@@ -52,14 +52,17 @@ export class CoshubClient {
   /**
    * 发送 HTTP 请求
    */
-  async request<T = any>(endpoint: string, options: RequestOptions = {}): Promise<ApiResponse<T>> {
+  async request<T = any>(
+    endpoint: string,
+    options: RequestOptions = {},
+  ): Promise<ApiResponse<T>> {
     const {
-      method = 'GET',
+      method = "GET",
       headers = {},
       params,
       data,
       timeout = this.config.timeout,
-      skipAuth = false
+      skipAuth = false,
     } = options;
 
     const url = this.buildURL(endpoint, params);
@@ -73,7 +76,7 @@ export class CoshubClient {
         method,
         headers: requestHeaders,
         body: data ? JSON.stringify(data) : undefined,
-        signal: controller.signal
+        signal: controller.signal,
       });
 
       clearTimeout(timeoutId);
@@ -88,29 +91,32 @@ export class CoshubClient {
   /**
    * GET 请求
    */
-  async get<T = any>(endpoint: string, params?: Record<string, any>): Promise<ApiResponse<T>> {
-    return this.request<T>(endpoint, { method: 'GET', params });
+  async get<T = any>(
+    endpoint: string,
+    params?: Record<string, any>,
+  ): Promise<ApiResponse<T>> {
+    return this.request<T>(endpoint, { method: "GET", params });
   }
 
   /**
    * POST 请求
    */
   async post<T = any>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
-    return this.request<T>(endpoint, { method: 'POST', data });
+    return this.request<T>(endpoint, { method: "POST", data });
   }
 
   /**
    * PUT 请求
    */
   async put<T = any>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
-    return this.request<T>(endpoint, { method: 'PUT', data });
+    return this.request<T>(endpoint, { method: "PUT", data });
   }
 
   /**
    * DELETE 请求
    */
   async delete<T = any>(endpoint: string): Promise<ApiResponse<T>> {
-    return this.request<T>(endpoint, { method: 'DELETE' });
+    return this.request<T>(endpoint, { method: "DELETE" });
   }
 
   /**
@@ -118,7 +124,7 @@ export class CoshubClient {
    */
   private buildURL(endpoint: string, params?: Record<string, any>): string {
     const url = new URL(endpoint, this.config.baseURL);
-    
+
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
@@ -133,15 +139,18 @@ export class CoshubClient {
   /**
    * 构建请求头
    */
-  private buildHeaders(headers: Record<string, string>, skipAuth: boolean): Record<string, string> {
+  private buildHeaders(
+    headers: Record<string, string>,
+    skipAuth: boolean,
+  ): Record<string, string> {
     const requestHeaders: Record<string, string> = {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       ...this.config.headers,
-      ...headers
+      ...headers,
     };
 
     if (!skipAuth && this.authToken) {
-      requestHeaders['Authorization'] = `Bearer ${this.authToken}`;
+      requestHeaders["Authorization"] = `Bearer ${this.authToken}`;
     }
 
     return requestHeaders;
@@ -152,15 +161,15 @@ export class CoshubClient {
    */
   private async handleResponse<T>(response: Response): Promise<ApiResponse<T>> {
     const text = await response.text();
-    
+
     try {
       const data = text ? JSON.parse(text) : null;
-      
+
       if (response.ok) {
         return {
           success: true,
           data,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         };
       } else {
         return {
@@ -168,20 +177,20 @@ export class CoshubClient {
           error: {
             code: String(response.status),
             message: data?.message || response.statusText,
-            details: data
+            details: data,
           },
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         };
       }
     } catch (parseError) {
       return {
         success: false,
         error: {
-          code: 'PARSE_ERROR',
-          message: 'Failed to parse response',
-          details: { originalText: text }
+          code: "PARSE_ERROR",
+          message: "Failed to parse response",
+          details: { originalText: text },
         },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     }
   }
@@ -192,28 +201,28 @@ export class CoshubClient {
   private handleError(error: any): ApiResponse {
     let apiError: ApiError;
 
-    if (error.name === 'AbortError') {
+    if (error.name === "AbortError") {
       apiError = {
-        code: 'TIMEOUT',
-        message: 'Request timeout'
+        code: "TIMEOUT",
+        message: "Request timeout",
       };
-    } else if (error instanceof TypeError && error.message.includes('fetch')) {
+    } else if (error instanceof TypeError && error.message.includes("fetch")) {
       apiError = {
-        code: 'NETWORK_ERROR',
-        message: 'Network connection failed'
+        code: "NETWORK_ERROR",
+        message: "Network connection failed",
       };
     } else {
       apiError = {
-        code: 'UNKNOWN_ERROR',
-        message: error.message || 'An unknown error occurred',
-        details: error
+        code: "UNKNOWN_ERROR",
+        message: error.message || "An unknown error occurred",
+        details: error,
       };
     }
 
     return {
       success: false,
       error: apiError,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 }

@@ -2,8 +2,8 @@
  * 帖子相关类型定义
  */
 
-import { UploadedFile, Tag } from './common';
-import { SkillCategory } from './skill';
+import { UploadedFile, Tag } from "./common";
+import { SkillCategory } from "./skill";
 
 export interface Post {
   id: string;
@@ -24,28 +24,28 @@ export interface Post {
 }
 
 export enum PostType {
-  SHOWCASE = 'showcase',     // 作品展示
-  TUTORIAL = 'tutorial',     // 教程
-  DISCUSSION = 'discussion', // 讨论
-  NEWS = 'news',            // 资讯
-  EVENT = 'event'           // 活动
+  SHOWCASE = "showcase", // 作品展示
+  TUTORIAL = "tutorial", // 教程
+  DISCUSSION = "discussion", // 讨论
+  NEWS = "news", // 资讯
+  EVENT = "event", // 活动
 }
 
 export enum PostCategory {
-  COSPLAY = 'cosplay',
-  PHOTOGRAPHY = 'photography',
-  MAKEUP = 'makeup',
-  PROP_MAKING = 'prop_making',
-  COSTUME_MAKING = 'costume_making',
-  ANIME_DISCUSSION = 'anime_discussion',
-  COMMUNITY = 'community',
-  TIPS_TRICKS = 'tips_tricks'
+  COSPLAY = "cosplay",
+  PHOTOGRAPHY = "photography",
+  MAKEUP = "makeup",
+  PROP_MAKING = "prop_making",
+  COSTUME_MAKING = "costume_making",
+  ANIME_DISCUSSION = "anime_discussion",
+  COMMUNITY = "community",
+  TIPS_TRICKS = "tips_tricks",
 }
 
 export interface PostMetadata {
   character?: string;
   anime?: string;
-  difficulty?: 'easy' | 'medium' | 'hard' | 'expert';
+  difficulty?: "easy" | "medium" | "hard" | "expert";
   estimatedTime?: number; // 分钟
   materials?: string[];
   tools?: string[];

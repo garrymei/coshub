@@ -20,7 +20,7 @@ export interface PaginationParams {
   page: number;
   limit: number;
   sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: "asc" | "desc";
 }
 
 export interface PaginatedResponse<T> {
@@ -67,10 +67,10 @@ export interface Comment {
 }
 
 export enum CommentTargetType {
-  POST = 'post',
-  REQUEST = 'request',
-  USER = 'user',
-  GALLERY_ITEM = 'gallery_item'
+  POST = "post",
+  REQUEST = "request",
+  USER = "user",
+  GALLERY_ITEM = "gallery_item",
 }
 
 export interface Like {
@@ -82,10 +82,10 @@ export interface Like {
 }
 
 export enum LikeTargetType {
-  POST = 'post',
-  COMMENT = 'comment',
-  REQUEST = 'request',
-  GALLERY_ITEM = 'gallery_item'
+  POST = "post",
+  COMMENT = "comment",
+  REQUEST = "request",
+  GALLERY_ITEM = "gallery_item",
 }
 
 export interface Notification {
@@ -100,10 +100,10 @@ export interface Notification {
 }
 
 export enum NotificationType {
-  LIKE = 'like',
-  COMMENT = 'comment',
-  FOLLOW = 'follow',
-  REQUEST_APPLICATION = 'request_application',
-  REQUEST_ACCEPTED = 'request_accepted',
-  SYSTEM = 'system'
+  LIKE = "like",
+  COMMENT = "comment",
+  FOLLOW = "follow",
+  REQUEST_APPLICATION = "request_application",
+  REQUEST_ACCEPTED = "request_accepted",
+  SYSTEM = "system",
 }

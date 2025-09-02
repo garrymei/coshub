@@ -1,21 +1,28 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { api } from '@/lib/api';
-import { 
-  SKILL_CATEGORIES, 
-  SKILL_ROLES, 
-  EXPERIENCE_LEVELS, 
-  PRICE_TYPES, 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { api } from "@/lib/api";
+import {
+  SKILL_CATEGORIES,
+  SKILL_ROLES,
+  EXPERIENCE_LEVELS,
+  PRICE_TYPES,
   CONTACT_METHODS,
   POPULAR_CITIES,
-  POPULAR_TAGS 
-} from '@/lib/constants';
-import type { CreateSkillPostDTO, SkillCategory, SkillRole, ExperienceLevel, PriceType, ContactMethod } from '@/lib/api';
+  POPULAR_TAGS,
+} from "@/lib/constants";
+import type {
+  CreateSkillPostDTO,
+  SkillCategory,
+  SkillRole,
+  ExperienceLevel,
+  PriceType,
+  ContactMethod,
+} from "@/lib/api";
 
-interface FormData extends Omit<CreateSkillPostDTO, 'images'> {
+interface FormData extends Omit<CreateSkillPostDTO, "images"> {
   images: string[];
   imageUrls: string; // 用于输入图片URL的临时字段
 }
@@ -24,132 +31,157 @@ function CreateSkillPostPageLegacy() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const [formData, setFormData] = useState<FormData>({
-    title: '',
-    description: '',
+    title: "",
+    description: "",
     category: SkillCategory.COSPLAY,
     role: SkillRole.COSER,
-    city: '',
+    city: "",
     price: {
       type: PriceType.FIXED,
       amount: 0,
-      currency: 'CNY',
-      negotiable: false
+      currency: "CNY",
+      negotiable: false,
     },
     images: [],
-    imageUrls: '',
+    imageUrls: "",
     tags: [],
     experience: ExperienceLevel.INTERMEDIATE,
     availability: {
       weekdays: true,
       weekends: true,
       holidays: false,
-      timeSlots: [{ start: '09:00', end: '18:00' }],
-      advance: 3
+      timeSlots: [{ start: "09:00", end: "18:00" }],
+      advance: 3,
     },
     contactInfo: {
-      wechat: '',
-      qq: '',
-      phone: '',
-      email: '',
-      preferred: ContactMethod.WECHAT
-    }
+      wechat: "",
+      qq: "",
+      phone: "",
+      email: "",
+      preferred: ContactMethod.WECHAT,
+    },
   });
 
   const handleInputChange = (field: string, value: any) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
-  const handleNestedInputChange = (parentField: string, field: string, value: any) => {
-    setFormData(prev => ({
+  const handleNestedInputChange = (
+    parentField: string,
+    field: string,
+    value: any,
+  ) => {
+    setFormData((prev) => ({
       ...prev,
       [parentField]: {
         ...prev[parentField as keyof FormData],
-        [field]: value
-      }
+        [field]: value,
+      },
     }));
   };
 
   const handleImageUrlsChange = (urls: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       imageUrls: urls,
-      images: urls.split('\n').filter(url => url.trim()).slice(0, 9)
+      images: urls
+        .split("\n")
+        .filter((url) => url.trim())
+        .slice(0, 9),
     }));
   };
 
   const handleTagsChange = (tagText: string) => {
-    const tags = tagText.split(/[,，\s]+/).filter(tag => tag.trim()).slice(0, 10);
-    setFormData(prev => ({
+    const tags = tagText
+      .split(/[,，\s]+/)
+      .filter((tag) => tag.trim())
+      .slice(0, 10);
+    setFormData((prev) => ({
       ...prev,
-      tags
+      tags,
     }));
   };
 
   const addTimeSlot = () => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       availability: {
         ...prev.availability,
         timeSlots: [
           ...prev.availability.timeSlots,
-          { start: '09:00', end: '18:00' }
-        ]
-      }
+          { start: "09:00", end: "18:00" },
+        ],
+      },
     }));
   };
 
   const removeTimeSlot = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       availability: {
         ...prev.availability,
-        timeSlots: prev.availability.timeSlots.filter((_, i) => i !== index)
-      }
+        timeSlots: prev.availability.timeSlots.filter((_, i) => i !== index),
+      },
     }));
   };
 
-  const updateTimeSlot = (index: number, field: 'start' | 'end', value: string) => {
-    setFormData(prev => ({
+  const updateTimeSlot = (
+    index: number,
+    field: "start" | "end",
+    value: string,
+  ) => {
+    setFormData((prev) => ({
       ...prev,
       availability: {
         ...prev.availability,
-        timeSlots: prev.availability.timeSlots.map((slot, i) => 
-          i === index ? { ...slot, [field]: value } : slot
-        )
-      }
+        timeSlots: prev.availability.timeSlots.map((slot, i) =>
+          i === index ? { ...slot, [field]: value } : slot,
+        ),
+      },
     }));
   };
 
   const validateForm = (): string | null => {
     if (!formData.title.trim() || formData.title.length < 5) {
-      return '标题至少需要5个字符';
+      return "标题至少需要5个字符";
     }
     if (!formData.description.trim() || formData.description.length < 20) {
-      return '描述至少需要20个字符';
+      return "描述至少需要20个字符";
     }
     if (!formData.city.trim()) {
-      return '请填写城市';
+      return "请填写城市";
     }
     if (formData.images.length === 0) {
-      return '至少需要添加1张图片';
+      return "至少需要添加1张图片";
     }
-    if (formData.price.type === 'fixed' && (!formData.price.amount || formData.price.amount <= 0)) {
-      return '请设置正确的固定价格';
+    if (
+      formData.price.type === "fixed" &&
+      (!formData.price.amount || formData.price.amount <= 0)
+    ) {
+      return "请设置正确的固定价格";
     }
-    if (formData.price.type === 'range' && (!formData.price.range || formData.price.range.min >= formData.price.range.max)) {
-      return '请设置正确的价格区间';
+    if (
+      formData.price.type === "range" &&
+      (!formData.price.range ||
+        formData.price.range.min >= formData.price.range.max)
+    ) {
+      return "请设置正确的价格区间";
     }
-    
+
     // 检查联系方式
     const { contactInfo } = formData;
-    const hasContact = contactInfo.wechat || contactInfo.qq || contactInfo.phone || contactInfo.email;
+    const hasContact =
+      contactInfo.wechat ||
+      contactInfo.qq ||
+      contactInfo.phone ||
+      contactInfo.email;
     if (!hasContact) {
-      return '至少需要填写一种联系方式';
+      return "至少需要填写一种联系方式";
     }
 
     return null;
@@ -157,7 +189,7 @@ function CreateSkillPostPageLegacy() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const validationError = validateForm();
     if (validationError) {
       setError(validationError);
@@ -170,17 +202,17 @@ function CreateSkillPostPageLegacy() {
 
       // 准备提交数据，移除临时字段
       const { imageUrls, ...submitData } = formData;
-      
+
       const response = await api.skillPosts.create(submitData as any);
-      
+
       if (response.success) {
         router.push(`/skill-posts/${response.data.id}`);
       } else {
-        setError(response.error?.message || '发布失败');
+        setError(response.error?.message || "发布失败");
       }
     } catch (err) {
-      setError('网络请求失败，请稍后重试');
-      console.error('Error creating skill post:', err);
+      setError("网络请求失败，请稍后重试");
+      console.error("Error creating skill post:", err);
     } finally {
       setLoading(false);
     }
@@ -209,8 +241,10 @@ function CreateSkillPostPageLegacy() {
             <div className="lg:col-span-2 space-y-6">
               {/* 基本信息 */}
               <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">基本信息</h2>
-                
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                  基本信息
+                </h2>
+
                 <div className="space-y-4">
                   {/* 标题 */}
                   <div>
@@ -220,7 +254,9 @@ function CreateSkillPostPageLegacy() {
                     <input
                       type="text"
                       value={formData.title}
-                      onChange={(e) => handleInputChange('title', e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("title", e.target.value)
+                      }
                       placeholder="简明扼要地描述你的技能服务"
                       className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-coshub-primary"
                       maxLength={100}
@@ -238,10 +274,12 @@ function CreateSkillPostPageLegacy() {
                       </label>
                       <select
                         value={formData.category}
-                        onChange={(e) => handleInputChange('category', e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange("category", e.target.value)
+                        }
                         className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-coshub-primary"
                       >
-                        {SKILL_CATEGORIES.map(cat => (
+                        {SKILL_CATEGORIES.map((cat) => (
                           <option key={cat.value} value={cat.value}>
                             {cat.label}
                           </option>
@@ -255,10 +293,12 @@ function CreateSkillPostPageLegacy() {
                       </label>
                       <select
                         value={formData.role}
-                        onChange={(e) => handleInputChange('role', e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange("role", e.target.value)
+                        }
                         className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-coshub-primary"
                       >
-                        {SKILL_ROLES.map(role => (
+                        {SKILL_ROLES.map((role) => (
                           <option key={role.value} value={role.value}>
                             {role.label}
                           </option>
@@ -276,13 +316,15 @@ function CreateSkillPostPageLegacy() {
                       <input
                         type="text"
                         value={formData.city}
-                        onChange={(e) => handleInputChange('city', e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange("city", e.target.value)
+                        }
                         placeholder="选择或输入城市"
                         list="cities"
                         className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-coshub-primary"
                       />
                       <datalist id="cities">
-                        {POPULAR_CITIES.map(city => (
+                        {POPULAR_CITIES.map((city) => (
                           <option key={city} value={city} />
                         ))}
                       </datalist>
@@ -294,10 +336,12 @@ function CreateSkillPostPageLegacy() {
                       </label>
                       <select
                         value={formData.experience}
-                        onChange={(e) => handleInputChange('experience', e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange("experience", e.target.value)
+                        }
                         className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-coshub-primary"
                       >
-                        {EXPERIENCE_LEVELS.map(level => (
+                        {EXPERIENCE_LEVELS.map((level) => (
                           <option key={level.value} value={level.value}>
                             {level.label}
                           </option>
@@ -313,7 +357,9 @@ function CreateSkillPostPageLegacy() {
                     </label>
                     <textarea
                       value={formData.description}
-                      onChange={(e) => handleInputChange('description', e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("description", e.target.value)
+                      }
                       placeholder="详细介绍你的技能、经验、提供的服务内容等"
                       rows={6}
                       className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-coshub-primary"
@@ -341,17 +387,22 @@ function CreateSkillPostPageLegacy() {
                         try {
                           const resp = await api.upload.uploadFiles(files);
                           if (resp.success && resp.data) {
-                            setFormData(prev => ({
+                            setFormData((prev) => ({
                               ...prev,
-                              images: [...prev.images, ...resp.data.urls].slice(0, 9),
-                              imageUrls: [...prev.images, ...resp.data.urls].slice(0, 9).join('\n')
+                              images: [...prev.images, ...resp.data.urls].slice(
+                                0,
+                                9,
+                              ),
+                              imageUrls: [...prev.images, ...resp.data.urls]
+                                .slice(0, 9)
+                                .join("\n"),
                             }));
                           } else {
-                            setError(resp.error?.message || '图片上传失败');
+                            setError(resp.error?.message || "图片上传失败");
                           }
                         } finally {
                           setLoading(false);
-                          e.currentTarget.value = '';
+                          e.currentTarget.value = "";
                         }
                       }}
                       className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none mb-3"
@@ -375,7 +426,8 @@ function CreateSkillPostPageLegacy() {
                             alt={`预览 ${index + 1}`}
                             className="w-full h-20 object-cover rounded border"
                             onError={(e) => {
-                              e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2VlZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjEwIiBmaWxsPSIjOTk5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+5Zu+54mH6ZSZ6K+vPC90ZXh0Pjwvc3ZnPg==';
+                              e.currentTarget.src =
+                                "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2VlZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjEwIiBmaWxsPSIjOTk5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+5Zu+54mH6ZSZ6K+vPC90ZXh0Pjwvc3ZnPg==";
                             }}
                           />
                         ))}
@@ -390,7 +442,7 @@ function CreateSkillPostPageLegacy() {
                     </label>
                     <input
                       type="text"
-                      value={formData.tags.join(', ')}
+                      value={formData.tags.join(", ")}
                       onChange={(e) => handleTagsChange(e.target.value)}
                       placeholder="二次元, 写真, 精修, 专业器材"
                       className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-coshub-primary"
@@ -398,13 +450,15 @@ function CreateSkillPostPageLegacy() {
                     <div className="mt-2">
                       <p className="text-xs text-gray-500 mb-1">推荐标签：</p>
                       <div className="flex flex-wrap gap-1">
-                        {POPULAR_TAGS.slice(0, 8).map(tag => (
+                        {POPULAR_TAGS.slice(0, 8).map((tag) => (
                           <button
                             key={tag}
                             type="button"
                             onClick={() => {
                               if (!formData.tags.includes(tag)) {
-                                handleTagsChange([...formData.tags, tag].join(', '));
+                                handleTagsChange(
+                                  [...formData.tags, tag].join(", "),
+                                );
                               }
                             }}
                             className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded"
@@ -420,8 +474,10 @@ function CreateSkillPostPageLegacy() {
 
               {/* 价格设置 */}
               <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">价格设置</h2>
-                
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                  价格设置
+                </h2>
+
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -429,10 +485,12 @@ function CreateSkillPostPageLegacy() {
                     </label>
                     <select
                       value={formData.price.type}
-                      onChange={(e) => handleNestedInputChange('price', 'type', e.target.value)}
+                      onChange={(e) =>
+                        handleNestedInputChange("price", "type", e.target.value)
+                      }
                       className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-coshub-primary"
                     >
-                      {PRICE_TYPES.map(type => (
+                      {PRICE_TYPES.map((type) => (
                         <option key={type.value} value={type.value}>
                           {type.label}
                         </option>
@@ -440,7 +498,7 @@ function CreateSkillPostPageLegacy() {
                     </select>
                   </div>
 
-                  {formData.price.type === 'fixed' && (
+                  {formData.price.type === "fixed" && (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         固定价格 (元) *
@@ -448,14 +506,20 @@ function CreateSkillPostPageLegacy() {
                       <input
                         type="number"
                         min="0"
-                        value={formData.price.amount || ''}
-                        onChange={(e) => handleNestedInputChange('price', 'amount', Number(e.target.value))}
+                        value={formData.price.amount || ""}
+                        onChange={(e) =>
+                          handleNestedInputChange(
+                            "price",
+                            "amount",
+                            Number(e.target.value),
+                          )
+                        }
                         className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-coshub-primary"
                       />
                     </div>
                   )}
 
-                  {formData.price.type === 'range' && (
+                  {formData.price.type === "range" && (
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -464,11 +528,13 @@ function CreateSkillPostPageLegacy() {
                         <input
                           type="number"
                           min="0"
-                          value={formData.price.range?.min || ''}
-                          onChange={(e) => handleNestedInputChange('price', 'range', {
-                            ...formData.price.range,
-                            min: Number(e.target.value)
-                          })}
+                          value={formData.price.range?.min || ""}
+                          onChange={(e) =>
+                            handleNestedInputChange("price", "range", {
+                              ...formData.price.range,
+                              min: Number(e.target.value),
+                            })
+                          }
                           className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-coshub-primary"
                         />
                       </div>
@@ -479,11 +545,13 @@ function CreateSkillPostPageLegacy() {
                         <input
                           type="number"
                           min="0"
-                          value={formData.price.range?.max || ''}
-                          onChange={(e) => handleNestedInputChange('price', 'range', {
-                            ...formData.price.range,
-                            max: Number(e.target.value)
-                          })}
+                          value={formData.price.range?.max || ""}
+                          onChange={(e) =>
+                            handleNestedInputChange("price", "range", {
+                              ...formData.price.range,
+                              max: Number(e.target.value),
+                            })
+                          }
                           className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-coshub-primary"
                         />
                       </div>
@@ -495,10 +563,19 @@ function CreateSkillPostPageLegacy() {
                       type="checkbox"
                       id="negotiable"
                       checked={formData.price.negotiable}
-                      onChange={(e) => handleNestedInputChange('price', 'negotiable', e.target.checked)}
+                      onChange={(e) =>
+                        handleNestedInputChange(
+                          "price",
+                          "negotiable",
+                          e.target.checked,
+                        )
+                      }
                       className="mr-2"
                     />
-                    <label htmlFor="negotiable" className="text-sm text-gray-700">
+                    <label
+                      htmlFor="negotiable"
+                      className="text-sm text-gray-700"
+                    >
                       价格可商议
                     </label>
                   </div>
@@ -510,8 +587,10 @@ function CreateSkillPostPageLegacy() {
             <div className="lg:col-span-1 space-y-6">
               {/* 可用时间 */}
               <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">可用时间</h2>
-                
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                  可用时间
+                </h2>
+
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -522,7 +601,13 @@ function CreateSkillPostPageLegacy() {
                         <input
                           type="checkbox"
                           checked={formData.availability.weekdays}
-                          onChange={(e) => handleNestedInputChange('availability', 'weekdays', e.target.checked)}
+                          onChange={(e) =>
+                            handleNestedInputChange(
+                              "availability",
+                              "weekdays",
+                              e.target.checked,
+                            )
+                          }
                           className="mr-2"
                         />
                         工作日
@@ -531,7 +616,13 @@ function CreateSkillPostPageLegacy() {
                         <input
                           type="checkbox"
                           checked={formData.availability.weekends}
-                          onChange={(e) => handleNestedInputChange('availability', 'weekends', e.target.checked)}
+                          onChange={(e) =>
+                            handleNestedInputChange(
+                              "availability",
+                              "weekends",
+                              e.target.checked,
+                            )
+                          }
                           className="mr-2"
                         />
                         周末
@@ -540,7 +631,13 @@ function CreateSkillPostPageLegacy() {
                         <input
                           type="checkbox"
                           checked={formData.availability.holidays}
-                          onChange={(e) => handleNestedInputChange('availability', 'holidays', e.target.checked)}
+                          onChange={(e) =>
+                            handleNestedInputChange(
+                              "availability",
+                              "holidays",
+                              e.target.checked,
+                            )
+                          }
                           className="mr-2"
                         />
                         节假日
@@ -557,14 +654,18 @@ function CreateSkillPostPageLegacy() {
                         <input
                           type="time"
                           value={slot.start}
-                          onChange={(e) => updateTimeSlot(index, 'start', e.target.value)}
+                          onChange={(e) =>
+                            updateTimeSlot(index, "start", e.target.value)
+                          }
                           className="border border-gray-300 rounded px-2 py-1 text-sm"
                         />
                         <span>-</span>
                         <input
                           type="time"
                           value={slot.end}
-                          onChange={(e) => updateTimeSlot(index, 'end', e.target.value)}
+                          onChange={(e) =>
+                            updateTimeSlot(index, "end", e.target.value)
+                          }
                           className="border border-gray-300 rounded px-2 py-1 text-sm"
                         />
                         {formData.availability.timeSlots.length > 1 && (
@@ -596,7 +697,13 @@ function CreateSkillPostPageLegacy() {
                       min="0"
                       max="30"
                       value={formData.availability.advance}
-                      onChange={(e) => handleNestedInputChange('availability', 'advance', Number(e.target.value))}
+                      onChange={(e) =>
+                        handleNestedInputChange(
+                          "availability",
+                          "advance",
+                          Number(e.target.value),
+                        )
+                      }
                       className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-coshub-primary"
                     />
                   </div>
@@ -605,8 +712,10 @@ function CreateSkillPostPageLegacy() {
 
               {/* 联系方式 */}
               <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">联系方式</h2>
-                
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                  联系方式
+                </h2>
+
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -615,7 +724,13 @@ function CreateSkillPostPageLegacy() {
                     <input
                       type="text"
                       value={formData.contactInfo.wechat}
-                      onChange={(e) => handleNestedInputChange('contactInfo', 'wechat', e.target.value)}
+                      onChange={(e) =>
+                        handleNestedInputChange(
+                          "contactInfo",
+                          "wechat",
+                          e.target.value,
+                        )
+                      }
                       placeholder="微信号"
                       className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-coshub-primary"
                     />
@@ -628,7 +743,13 @@ function CreateSkillPostPageLegacy() {
                     <input
                       type="text"
                       value={formData.contactInfo.qq}
-                      onChange={(e) => handleNestedInputChange('contactInfo', 'qq', e.target.value)}
+                      onChange={(e) =>
+                        handleNestedInputChange(
+                          "contactInfo",
+                          "qq",
+                          e.target.value,
+                        )
+                      }
                       placeholder="QQ号"
                       className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-coshub-primary"
                     />
@@ -641,7 +762,13 @@ function CreateSkillPostPageLegacy() {
                     <input
                       type="tel"
                       value={formData.contactInfo.phone}
-                      onChange={(e) => handleNestedInputChange('contactInfo', 'phone', e.target.value)}
+                      onChange={(e) =>
+                        handleNestedInputChange(
+                          "contactInfo",
+                          "phone",
+                          e.target.value,
+                        )
+                      }
                       placeholder="手机号"
                       className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-coshub-primary"
                     />
@@ -654,7 +781,13 @@ function CreateSkillPostPageLegacy() {
                     <input
                       type="email"
                       value={formData.contactInfo.email}
-                      onChange={(e) => handleNestedInputChange('contactInfo', 'email', e.target.value)}
+                      onChange={(e) =>
+                        handleNestedInputChange(
+                          "contactInfo",
+                          "email",
+                          e.target.value,
+                        )
+                      }
                       placeholder="邮箱地址"
                       className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-coshub-primary"
                     />
@@ -666,10 +799,16 @@ function CreateSkillPostPageLegacy() {
                     </label>
                     <select
                       value={formData.contactInfo.preferred}
-                      onChange={(e) => handleNestedInputChange('contactInfo', 'preferred', e.target.value)}
+                      onChange={(e) =>
+                        handleNestedInputChange(
+                          "contactInfo",
+                          "preferred",
+                          e.target.value,
+                        )
+                      }
                       className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-coshub-primary"
                     >
-                      {CONTACT_METHODS.map(method => (
+                      {CONTACT_METHODS.map((method) => (
                         <option key={method.value} value={method.value}>
                           {method.label}
                         </option>
@@ -686,15 +825,15 @@ function CreateSkillPostPageLegacy() {
                     {error}
                   </div>
                 )}
-                
+
                 <button
                   type="submit"
                   disabled={loading}
                   className="w-full bg-coshub-primary text-white py-3 rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
                 >
-                  {loading ? '发布中...' : '发布技能帖'}
+                  {loading ? "发布中..." : "发布技能帖"}
                 </button>
-                
+
                 <p className="text-xs text-gray-500 mt-2 text-center">
                   发布即表示同意平台相关协议
                 </p>

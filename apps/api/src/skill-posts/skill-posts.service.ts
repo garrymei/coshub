@@ -243,16 +243,16 @@ export class SkillPostsService {
   private transformSkillPost(skillPost: any): SkillPost {
     const mapStatus = (s: string) => {
       switch (s) {
-        case 'DRAFT':
-          return 'draft';
-        case 'ACTIVE':
-          return 'published';
-        case 'INACTIVE':
-          return 'paused';
-        case 'DELETED':
-          return 'closed';
+        case "DRAFT":
+          return "draft";
+        case "ACTIVE":
+          return "published";
+        case "INACTIVE":
+          return "paused";
+        case "DELETED":
+          return "closed";
         default:
-          return 'published';
+          return "published";
       }
     };
 

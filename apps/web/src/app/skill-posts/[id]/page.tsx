@@ -1,17 +1,24 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { api } from '@/lib/api';
-import { SKILL_CATEGORIES, SKILL_ROLES, EXPERIENCE_LEVELS, CONTACT_METHODS } from '@/lib/constants';
-import type { SkillPost } from '@/lib/api';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { api } from "@/lib/api";
+import {
+  SKILL_CATEGORIES,
+  SKILL_ROLES,
+  EXPERIENCE_LEVELS,
+  CONTACT_METHODS,
+} from "@/lib/constants";
+import type { SkillPost } from "@/lib/api";
 
 interface SkillPostDetailPageProps {
   params: { id: string };
 }
 
-export default function SkillPostDetailPage({ params }: SkillPostDetailPageProps) {
+export default function SkillPostDetailPage({
+  params,
+}: SkillPostDetailPageProps) {
   const [skillPost, setSkillPost] = useState<SkillPost | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,16 +29,16 @@ export default function SkillPostDetailPage({ params }: SkillPostDetailPageProps
     const fetchSkillPost = async () => {
       try {
         setLoading(true);
-      const response = await api.skillPosts.get(params.id as string);
-        
+        const response = await api.skillPosts.get(params.id as string);
+
         if (response.success && response.data) {
           setSkillPost(response.data);
         } else {
-          setError('技能帖不存在或已被删除');
+          setError("技能帖不存在或已被删除");
         }
       } catch (err) {
-        setError('获取技能帖详情失败');
-        console.error('Error fetching skill post:', err);
+        setError("获取技能帖详情失败");
+        console.error("Error fetching skill post:", err);
       } finally {
         setLoading(false);
       }
@@ -43,25 +50,28 @@ export default function SkillPostDetailPage({ params }: SkillPostDetailPageProps
   const formatPrice = (post: SkillPost) => {
     const { price } = post;
     switch (price.type) {
-      case 'free':
-        return '免费';
-      case 'fixed':
+      case "free":
+        return "免费";
+      case "fixed":
         return `¥${price.amount}`;
-      case 'range':
+      case "range":
         return `¥${price.range?.min}-${price.range?.max}`;
-      case 'negotiable':
-        return '面议';
+      case "negotiable":
+        return "面议";
       default:
-        return '价格面议';
+        return "价格面议";
     }
   };
 
-  const getLabel = (value: string, options: { value: string; label: string }[]) => {
-    return options.find(option => option.value === value)?.label || value;
+  const getLabel = (
+    value: string,
+    options: { value: string; label: string }[],
+  ) => {
+    return options.find((option) => option.value === value)?.label || value;
   };
 
   const formatTimeSlots = (timeSlots: { start: string; end: string }[]) => {
-    return timeSlots.map(slot => `${slot.start}-${slot.end}`).join(', ');
+    return timeSlots.map((slot) => `${slot.start}-${slot.end}`).join(", ");
   };
 
   if (loading) {
@@ -119,7 +129,7 @@ export default function SkillPostDetailPage({ params }: SkillPostDetailPageProps
                   </div>
                 )}
               </div>
-              
+
               {/* 图片缩略图 */}
               {skillPost.images.length > 1 && (
                 <div className="flex gap-2 overflow-x-auto">
@@ -128,7 +138,9 @@ export default function SkillPostDetailPage({ params }: SkillPostDetailPageProps
                       key={index}
                       onClick={() => setCurrentImageIndex(index)}
                       className={`flex-shrink-0 w-16 h-16 rounded border-2 overflow-hidden ${
-                        index === currentImageIndex ? 'border-coshub-primary' : 'border-gray-200'
+                        index === currentImageIndex
+                          ? "border-coshub-primary"
+                          : "border-gray-200"
                       }`}
                     >
                       <img
@@ -159,8 +171,11 @@ export default function SkillPostDetailPage({ params }: SkillPostDetailPageProps
                 <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
                   {getLabel(skillPost.experience, EXPERIENCE_LEVELS)}
                 </span>
-                {skillPost.tags.map(tag => (
-                  <span key={tag} className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
+                {skillPost.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm"
+                  >
                     {tag}
                   </span>
                 ))}
@@ -168,7 +183,9 @@ export default function SkillPostDetailPage({ params }: SkillPostDetailPageProps
 
               {/* 描述 */}
               <div className="mb-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-3">服务描述</h2>
+                <h2 className="text-lg font-semibold text-gray-900 mb-3">
+                  服务描述
+                </h2>
                 <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
                   {skillPost.description}
                 </p>
@@ -176,7 +193,9 @@ export default function SkillPostDetailPage({ params }: SkillPostDetailPageProps
 
               {/* 可用时间 */}
               <div className="mb-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-3">可用时间</h2>
+                <h2 className="text-lg font-semibold text-gray-900 mb-3">
+                  可用时间
+                </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-gray-600 mb-2">可接单时间：</p>
@@ -212,7 +231,9 @@ export default function SkillPostDetailPage({ params }: SkillPostDetailPageProps
 
               {/* 统计信息 */}
               <div className="border-t pt-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-3">服务统计</h2>
+                <h2 className="text-lg font-semibold text-gray-900 mb-3">
+                  服务统计
+                </h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="text-center">
                     <p className="text-2xl font-bold text-coshub-primary">
@@ -258,14 +279,20 @@ export default function SkillPostDetailPage({ params }: SkillPostDetailPageProps
               <div className="border-t pt-6 mb-6">
                 <div className="flex items-center gap-3 mb-4">
                   <img
-                    src={skillPost.authorAvatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${skillPost.authorName}`}
+                    src={
+                      skillPost.authorAvatar ||
+                      `https://api.dicebear.com/7.x/avataaars/svg?seed=${skillPost.authorName}`
+                    }
                     alt={skillPost.authorName}
                     className="w-12 h-12 rounded-full"
                   />
                   <div>
-                    <p className="font-semibold text-gray-900">{skillPost.authorName}</p>
+                    <p className="font-semibold text-gray-900">
+                      {skillPost.authorName}
+                    </p>
                     <p className="text-sm text-gray-600">
-                      发布于 {new Date(skillPost.createdAt).toLocaleDateString()}
+                      发布于{" "}
+                      {new Date(skillPost.createdAt).toLocaleDateString()}
                     </p>
                   </div>
                 </div>
@@ -274,28 +301,28 @@ export default function SkillPostDetailPage({ params }: SkillPostDetailPageProps
               {/* 联系方式 */}
               <div className="space-y-3">
                 <p className="font-medium text-gray-900">联系方式：</p>
-                
+
                 {skillPost.contactInfo.wechat && (
                   <div className="flex items-center gap-2 text-sm">
                     <span className="text-green-600">💬</span>
                     <span>微信：{skillPost.contactInfo.wechat}</span>
                   </div>
                 )}
-                
+
                 {skillPost.contactInfo.qq && (
                   <div className="flex items-center gap-2 text-sm">
                     <span className="text-blue-600">🐧</span>
                     <span>QQ：{skillPost.contactInfo.qq}</span>
                   </div>
                 )}
-                
+
                 {skillPost.contactInfo.phone && (
                   <div className="flex items-center gap-2 text-sm">
                     <span className="text-gray-600">📞</span>
                     <span>电话：{skillPost.contactInfo.phone}</span>
                   </div>
                 )}
-                
+
                 {skillPost.contactInfo.email && (
                   <div className="flex items-center gap-2 text-sm">
                     <span className="text-gray-600">📧</span>
@@ -304,7 +331,8 @@ export default function SkillPostDetailPage({ params }: SkillPostDetailPageProps
                 )}
 
                 <p className="text-xs text-gray-500 mt-2">
-                  推荐联系方式：{getLabel(skillPost.contactInfo.preferred, CONTACT_METHODS)}
+                  推荐联系方式：
+                  {getLabel(skillPost.contactInfo.preferred, CONTACT_METHODS)}
                 </p>
               </div>
 

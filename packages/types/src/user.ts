@@ -2,7 +2,7 @@
  * 用户相关类型定义
  */
 
-import { Skill } from './skill';
+import { Skill } from "./skill";
 
 export interface User {
   id: string;
@@ -22,17 +22,17 @@ export interface User {
 }
 
 export enum UserLevel {
-  NEWBIE = 'newbie',       // 萌新
-  REGULAR = 'regular',     // 普通用户
-  VIP = 'vip',            // VIP用户
-  MODERATOR = 'moderator', // 版主
-  ADMIN = 'admin'         // 管理员
+  NEWBIE = "newbie", // 萌新
+  REGULAR = "regular", // 普通用户
+  VIP = "vip", // VIP用户
+  MODERATOR = "moderator", // 版主
+  ADMIN = "admin", // 管理员
 }
 
 export enum Gender {
-  MALE = 'male',
-  FEMALE = 'female',
-  OTHER = 'other'
+  MALE = "male",
+  FEMALE = "female",
+  OTHER = "other",
 }
 
 export interface UserProfile {
@@ -51,12 +51,12 @@ export interface SocialLink {
 }
 
 export enum SocialPlatform {
-  WEIBO = 'weibo',
-  BILIBILI = 'bilibili',
-  QQ = 'qq',
-  WECHAT = 'wechat',
-  TWITTER = 'twitter',
-  INSTAGRAM = 'instagram'
+  WEIBO = "weibo",
+  BILIBILI = "bilibili",
+  QQ = "qq",
+  WECHAT = "wechat",
+  TWITTER = "twitter",
+  INSTAGRAM = "instagram",
 }
 
 export interface UserStats {

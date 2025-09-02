@@ -1,11 +1,11 @@
 /**
  * @coshub/sdk - Coshub 前端请求 SDK
- * 
+ *
  * 这个包提供了统一的 API 调用接口，包含错误处理、重试机制、类型安全等功能
  */
 
-import { CoshubClient } from './client';
-import type { ClientConfig, RequestOptions } from './client';
+import { CoshubClient } from "./client";
+import type { ClientConfig, RequestOptions } from "./client";
 import {
   UserService,
   PostService,
@@ -13,16 +13,12 @@ import {
   SkillService,
   AuthService,
   UploadService,
-  SkillPostsService
-} from './services';
-import {
-  CoshubError,
-  ErrorHandler,
-  RetryHandler
-} from './errors';
+  SkillPostsService,
+} from "./services";
+import { CoshubError, ErrorHandler, RetryHandler } from "./errors";
 
-export { CoshubClient } from './client';
-export type { ClientConfig, RequestOptions } from './client';
+export { CoshubClient } from "./client";
+export type { ClientConfig, RequestOptions } from "./client";
 
 export {
   UserService,
@@ -30,14 +26,10 @@ export {
   RequestService,
   SkillService,
   AuthService,
-  UploadService
-} from './services';
+  UploadService,
+} from "./services";
 
-export {
-  CoshubError,
-  ErrorHandler,
-  RetryHandler
-} from './errors';
+export { CoshubError, ErrorHandler, RetryHandler } from "./errors";
 
 // 导出类型定义（从 @coshub/types 重新导出）
 export type {
@@ -53,8 +45,8 @@ export type {
   SkillCategory,
   ApiResponse,
   PaginatedResponse,
-  PaginationParams
-} from '@coshub/types';
+  PaginationParams,
+} from "@coshub/types";
 
 /**
  * SDK 工厂类，提供便捷的初始化方法
@@ -69,10 +61,13 @@ export class CoshubSDK {
   public readonly upload: UploadService;
   public readonly skillPosts: SkillPostsService;
 
-  constructor(baseURL: string, config?: Partial<import('./client').ClientConfig>) {
+  constructor(
+    baseURL: string,
+    config?: Partial<import("./client").ClientConfig>,
+  ) {
     this.client = new CoshubClient({
       baseURL,
-      ...config
+      ...config,
     });
 
     // 初始化所有服务
@@ -102,7 +97,10 @@ export class CoshubSDK {
   /**
    * 创建 SDK 实例的便捷方法
    */
-  static create(baseURL: string, config?: Partial<import('./client').ClientConfig>): CoshubSDK {
+  static create(
+    baseURL: string,
+    config?: Partial<import("./client").ClientConfig>,
+  ): CoshubSDK {
     return new CoshubSDK(baseURL, config);
   }
 
@@ -110,9 +108,9 @@ export class CoshubSDK {
    * 创建开发环境 SDK 实例
    */
   static createDev(): CoshubSDK {
-    return new CoshubSDK('http://localhost:3001/api', {
+    return new CoshubSDK("http://localhost:3001/api", {
       timeout: 15000,
-      retry: { attempts: 2, delay: 1000 }
+      retry: { attempts: 2, delay: 1000 },
     });
   }
 
@@ -122,7 +120,7 @@ export class CoshubSDK {
   static createProd(baseURL: string): CoshubSDK {
     return new CoshubSDK(baseURL, {
       timeout: 10000,
-      retry: { attempts: 3, delay: 2000 }
+      retry: { attempts: 3, delay: 2000 },
     });
   }
 }
@@ -131,4 +129,4 @@ export class CoshubSDK {
 export default CoshubSDK;
 
 // 版本信息
-export const VERSION = '0.1.0';
+export const VERSION = "0.1.0";
