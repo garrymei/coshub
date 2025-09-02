@@ -104,32 +104,71 @@ export class SkillPostsService {
         orderBy.updatedAt = "desc";
     }
 
-    // 分页
-    const page = query.page || 1;
+    // Keyset pagination 实现
     const limit = query.limit || 10;
-    const skip = (page - 1) * limit;
+    
+    // 如果提供了游标，添加游标条件
+    if (query.cursor) {
+      const cursorField = query.sortBy === "createdAt" ? "createdAt" : 
+                         query.sortBy === "updatedAt" ? "updatedAt" : "id";
+      
+      // 解析游标（假设游标是 base64 编码的 JSON）
+      try {
+        const cursorData = JSON.parse(Buffer.from(query.cursor, 'base64').toString());
+        if (cursorData[cursorField]) {
+          where[cursorField] = {
+            [orderBy[cursorField] === 'desc' ? 'lt' : 'gt']: cursorData[cursorField]
+          };
+        }
+      } catch (error) {
+        // 游标解析失败，忽略游标条件
+        console.warn('Invalid cursor format:', error);
+      }
+    }
 
-    const [skillPosts, total] = await Promise.all([
-      this.prisma.skillPost.findMany({
-        where,
-        orderBy,
-        skip,
-        take: limit,
-        include: {
-          author: true,
-        },
-      }),
-      this.prisma.skillPost.count({ where }),
-    ]);
+    // 获取数据（多取一条用于判断是否有下一页）
+    const take = limit + 1;
+    
+    const skillPosts = await this.prisma.skillPost.findMany({
+      where,
+      orderBy,
+      take,
+      include: {
+        author: true,
+      },
+    });
+
+    // 判断是否有下一页
+    const hasNext = skillPosts.length > limit;
+    const items = skillPosts.slice(0, limit);
+    
+    // 计算下一页游标
+    let nextCursor: string | undefined;
+    if (hasNext && items.length > 0) {
+      const lastItem = items[items.length - 1];
+      const cursorField = query.sortBy === "createdAt" ? "createdAt" : 
+                         query.sortBy === "updatedAt" ? "updatedAt" : "id";
+      
+      const cursorData = {
+        [cursorField]: lastItem[cursorField],
+        id: lastItem.id // 总是包含 id 作为唯一标识
+      };
+      nextCursor = Buffer.from(JSON.stringify(cursorData)).toString('base64');
+    }
+
+    // 获取总数（仅用于向后兼容）
+    const total = await this.prisma.skillPost.count({ where });
 
     return {
-      items: skillPosts.map((post) => this.transformSkillPost(post)),
+      items: items.map((post) => this.transformSkillPost(post)),
       total,
-      page,
+      nextCursor,
+      hasNext,
+      // 向后兼容字段
+      page: query.page || 1,
       limit,
       totalPages: Math.ceil(total / limit),
-      hasNext: page < Math.ceil(total / limit),
-      hasPrev: page > 1,
+      hasPrev: query.page ? query.page > 1 : false,
     };
   }
 

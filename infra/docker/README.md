@@ -7,20 +7,20 @@
 ### 🗄️ PostgreSQL 数据库
 - **端口**: 5432
 - **数据库名**: coshub
-- **用户名**: coshub_user
-- **密码**: coshub_password (生产环境请修改)
+- **用户名**: coshub
+- **密码**: ${POSTGRES_PASSWORD:-coshub_password} (生产环境请修改)
 - **用途**: 主数据库，存储用户、帖子、请求等业务数据
 
 ### 🚀 Redis 缓存
 - **端口**: 6379
-- **密码**: coshub_redis_password (生产环境请修改)
+- **密码**: ${REDIS_PASSWORD:-coshub_redis_password} (生产环境请修改)
 - **用途**: 缓存、会话存储、消息队列
 
 ### 📁 MinIO 对象存储
 - **API 端口**: 9000
 - **Console 端口**: 9001
-- **Access Key**: coshub_minio_user
-- **Secret Key**: coshub_minio_password
+- **Access Key**: ${MINIO_ROOT_USER:-coshub_minio_user}
+- **Secret Key**: ${MINIO_ROOT_PASSWORD:-coshub_minio_password}
 - **用途**: 文件存储（图片、视频、文档等）
 
 ### 🔧 管理工具
@@ -66,40 +66,40 @@ docker-compose down -v
 #### PostgreSQL
 ```bash
 # 生产环境
-DATABASE_URL="postgresql://coshub_user:coshub_password@localhost:5432/coshub"
+DATABASE_URL="postgresql://coshub:${POSTGRES_PASSWORD:-coshub_password}@localhost:5432/coshub"
 
 # 开发环境
-DATABASE_URL="postgresql://coshub_user:dev123@localhost:5432/coshub"
+DATABASE_URL="postgresql://coshub:${POSTGRES_PASSWORD:-dev_password}@localhost:5432/coshub"
 ```
 
 #### Redis
 ```bash
 # 生产环境
-REDIS_URL="redis://:coshub_redis_password@localhost:6379"
+REDIS_URL="redis://:${REDIS_PASSWORD:-coshub_redis_password}@localhost:6379"
 
 # 开发环境
-REDIS_URL="redis://:dev123@localhost:6379"
+REDIS_URL="redis://:${REDIS_PASSWORD:-dev_redis_password}@localhost:6379"
 ```
 
 #### MinIO
 ```bash
 # 生产环境
 MINIO_ENDPOINT="localhost:9000"
-MINIO_ACCESS_KEY="coshub_minio_user"
-MINIO_SECRET_KEY="coshub_minio_password"
+MINIO_ACCESS_KEY="${MINIO_ROOT_USER:-coshub_minio_user}"
+MINIO_SECRET_KEY="${MINIO_ROOT_PASSWORD:-coshub_minio_password}"
 
 # 开发环境
 MINIO_ENDPOINT="localhost:9000"
-MINIO_ACCESS_KEY="dev123"
-MINIO_SECRET_KEY="dev123456"
+MINIO_ACCESS_KEY="${MINIO_ROOT_USER:-dev_user}"
+MINIO_SECRET_KEY="${MINIO_ROOT_PASSWORD:-dev_password}"
 ```
 
 ## 🌐 Web 管理界面
 
 | 服务 | 地址 | 用户名 | 密码 |
 |------|------|--------|------|
-| MinIO Console | http://localhost:9001 | coshub_minio_user | coshub_minio_password |
-| PgAdmin | http://localhost:5050 | admin@coshub.local | pgadmin_password |
+| MinIO Console | http://localhost:9001 | ${MINIO_ROOT_USER:-coshub_minio_user} | ${MINIO_ROOT_PASSWORD:-coshub_minio_password} |
+| PgAdmin | http://localhost:5050 | admin@coshub.local | ${PGADMIN_PASSWORD:-pgadmin_password} |
 | Redis Commander | http://localhost:8081 | - | - |
 
 *开发环境密码请参考 docker-compose.dev.yml 文件*
@@ -124,22 +124,22 @@ docker-compose logs postgres redis minio
 ### 2. 数据库操作
 ```bash
 # 连接到 PostgreSQL
-docker-compose exec postgres psql -U coshub_user -d coshub
+docker-compose exec postgres psql -U coshub -d coshub
 
 # 导入 SQL 文件
-docker-compose exec -T postgres psql -U coshub_user -d coshub < backup.sql
+docker-compose exec -T postgres psql -U coshub -d coshub < backup.sql
 
 # 创建数据库备份
-docker-compose exec postgres pg_dump -U coshub_user coshub > backup.sql
+docker-compose exec postgres pg_dump -U coshub -d coshub > backup.sql
 ```
 
 ### 3. Redis 操作
 ```bash
 # 连接到 Redis
-docker-compose exec redis redis-cli -a coshub_redis_password
+docker-compose exec redis redis-cli -a ${REDIS_PASSWORD:-coshub_redis_password}
 
 # 查看 Redis 信息
-docker-compose exec redis redis-cli -a coshub_redis_password info
+docker-compose exec redis redis-cli -a ${REDIS_PASSWORD:-coshub_redis_password} info
 ```
 
 ### 4. MinIO 操作

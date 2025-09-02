@@ -9,7 +9,7 @@ services:
     environment:
       POSTGRES_DB: coshub
       POSTGRES_USER: coshub
-      POSTGRES_PASSWORD: coshub123
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-coshub_password}
       POSTGRES_INITDB_ARGS: "--encoding=UTF8"
     ports:
       - "5432:5432"
@@ -19,7 +19,7 @@ services:
     networks:
       - coshub_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U coshub_user -d coshub"]
+      test: ["CMD-SHELL", "pg_isready -U coshub -d coshub"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -29,7 +29,7 @@ services:
     image: redis:7-alpine
     container_name: coshub_redis
     restart: unless-stopped
-    command: redis-server --appendonly yes --requirepass coshub_redis_password
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-coshub_redis_password}
     ports:
       - "6379:6379"
     volumes:
@@ -50,8 +50,8 @@ services:
     restart: unless-stopped
     command: server /data --console-address ":9001"
     environment:
-      MINIO_ROOT_USER: coshub_minio_user
-      MINIO_ROOT_PASSWORD: coshub_minio_password
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-coshub_minio_user}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-coshub_minio_password}
     ports:
       - "9000:9000"  # API 端口
       - "9001:9001"  # Console 端口
@@ -72,7 +72,7 @@ services:
     restart: unless-stopped
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@coshub.local
-      PGADMIN_DEFAULT_PASSWORD: pgadmin_password
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-pgadmin_password}
       PGADMIN_CONFIG_SERVER_MODE: 'False'
     ports:
       - "5050:80"
@@ -89,7 +89,7 @@ services:
     container_name: coshub_redis_commander
     restart: unless-stopped
     environment:
-      REDIS_HOSTS: local:redis:6379:0:coshub_redis_password
+      REDIS_HOSTS: local:redis:6379:0:${REDIS_PASSWORD:-coshub_redis_password}
     ports:
       - "8081:8081"
     networks:

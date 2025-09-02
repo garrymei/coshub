@@ -142,27 +142,27 @@ Content-Length: {fileSize}
 
 ```bash
 # 查看数据库状态
-npm run db:studio
+pnpm run db:studio
 
 # 重置数据库
-npm run db:reset
+pnpm run db:reset
 
 # 创建新迁移
 npx prisma migrate dev --name 迁移名称
 
 # 手动运行种子数据
-npm run db:seed
+pnpm run db:seed
 ```
 
 ### 访问管理界面
 
 - **PgAdmin**: http://localhost:5050
-  - 邮箱: admin@coshub.com
-  - 密码: admin123
+  - 邮箱: admin@coshub.local
+  - 密码: 请参考环境变量配置
 
 - **MinIO Console**: http://localhost:9001
-  - 用户名: minioadmin
-  - 密码: minioadmin
+  - 用户名: 请参考环境变量配置
+  - 密码: 请参考环境变量配置
 
 - **Redis Commander**: http://localhost:8081
 

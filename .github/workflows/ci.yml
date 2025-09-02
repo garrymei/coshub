@@ -39,10 +39,23 @@ jobs:
       - name: Install dependencies (workspace)
         run: pnpm -w install --frozen-lockfile
 
+      - name: Lint
+        run: pnpm -w lint
+
       - name: Build (turbo pipeline)
         run: pnpm -w build
 
-      - name: Lint
-        run: pnpm -w lint
+      - name: Test
+        run: pnpm -w test
+
+      - name: Changesets version
+        if: github.ref == 'refs/heads/main'
+        uses: changesets/action@v1
+        with:
+          title: "Version Packages"
+          commit: "chore: version packages"
+          tag: "v${{ steps.changesets.outputs.publishedPackages }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 

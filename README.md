@@ -86,6 +86,22 @@ docker-compose -f infra/docker/docker-compose.yml -f infra/docker/docker-compose
 - 本地默认端口：PostgreSQL 5432、Redis 6379、MinIO 9000/9001
 - **环境变量配置**: 复制 `.env.example` 为 `.env` 并填写实际值，确保开发凭据安全隔离
 
+**Docker 环境变量**: 在 `infra/docker/` 目录下创建 `.env` 文件，配置以下变量：
+```bash
+# PostgreSQL 配置
+POSTGRES_PASSWORD=your_secure_postgres_password
+
+# Redis 配置  
+REDIS_PASSWORD=your_secure_redis_password
+
+# MinIO 配置
+MINIO_ROOT_USER=your_minio_user
+MINIO_ROOT_PASSWORD=your_secure_minio_password
+
+# PgAdmin 配置
+PGADMIN_PASSWORD=your_secure_pgadmin_password
+```
+
 **管理界面**:
 - MinIO Console: http://localhost:9001
 - PgAdmin: http://localhost:5050
