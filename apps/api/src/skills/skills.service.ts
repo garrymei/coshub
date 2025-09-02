@@ -31,7 +31,7 @@ export class SkillsService {
         title: data.title,
         description: data.description || "",
         category: "COSPLAY",
-        role: data.role as any,
+        role: (data.role ? String(data.role).toUpperCase() : 'COSER') as any,
         experience: "BEGINNER",
         city: data.city,
         lat: data.lat ?? null,
@@ -64,7 +64,7 @@ export class SkillsService {
     const { city, role, page = 1, pageSize = 10, lat, lng, radius } = params;
     const where: any = {};
     if (city) where.city = city;
-    if (role) where.role = role as any;
+    if (role) where.role = (String(role).toUpperCase()) as any;
     // 使用 geohash 前缀进行粗筛
     let coarseWhere: any = { ...where };
     if (lat != null && lng != null && radius != null && radius > 0) {

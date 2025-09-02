@@ -8,5 +8,5 @@ export interface StorageProvider {
   removeObject(bucket: string, objectKey: string): Promise<void>;
   statObject(bucket: string, objectKey: string): Promise<{ size: number; lastModified: Date; etag?: string; contentType?: string }>;
   getPublicUrl(bucket: string, objectKey: string): string;
+  bucketExists(bucket: string): Promise<boolean>;
 }
-

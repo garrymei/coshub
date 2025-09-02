@@ -62,5 +62,12 @@ export class MinioStorageProvider implements StorageProvider {
   getPublicUrl(bucket: string, objectKey: string): string {
     return `${this.endpoint}/${bucket}/${objectKey}`;
   }
-}
 
+  async bucketExists(bucket: string): Promise<boolean> {
+    try {
+      return await this.client.bucketExists(bucket);
+    } catch {
+      return false;
+    }
+  }
+}

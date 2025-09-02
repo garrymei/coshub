@@ -220,9 +220,9 @@ export class UploadService {
   // 健康检查
   async healthCheck(): Promise<boolean> {
     try {
-      // 简化：确保 bucket 不抛错即视为健康
-      await this.storage.ensureBucket(this.bucketName);
-      return true;
+      // 只读检查：存在即健康
+      const ok = await this.storage.bucketExists(this.bucketName);
+      return !!ok;
     } catch {
       return false;
     }

@@ -36,7 +36,11 @@ export class S3StorageProvider implements StorageProvider {
             },
           ],
         };
-        await this.client.setBucketPolicy(bucket, JSON.stringify(policy));
+        try {
+          await this.client.setBucketPolicy(bucket, JSON.stringify(policy));
+        } catch (e) {
+          // 某些云厂商策略设置需要控制台操作或权限，忽略此错误
+        }
       }
     }
   }
@@ -57,5 +61,12 @@ export class S3StorageProvider implements StorageProvider {
   getPublicUrl(bucket: string, objectKey: string): string {
     return `${this.endpoint}/${bucket}/${objectKey}`;
   }
-}
 
+  async bucketExists(bucket: string): Promise<boolean> {
+    try {
+      return await this.client.bucketExists(bucket);
+    } catch {
+      return false;
+    }
+  }
+}
