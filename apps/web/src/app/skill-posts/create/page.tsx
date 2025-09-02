@@ -149,9 +149,18 @@ function CreateSkillPostPageLegacy() {
 
   const validateForm = (): string | null => {
     const { imageUrls, ...submitData } = formData as any;
-    const parsed = createSkillPostSchema.safeParse(submitData);
-    if (!parsed.success) {
-      return parsed.error.issues[0]?.message || "表单校验失败";
+    // 简单的表单验证
+    if (!submitData.title?.trim()) {
+      return "请输入标题";
+    }
+    if (!submitData.description?.trim()) {
+      return "请输入描述";
+    }
+    if (!submitData.city?.trim()) {
+      return "请输入城市";
+    }
+    if (submitData.price.amount <= 0) {
+      return "请输入有效的价格";
     }
     return null;
   };
@@ -814,3 +823,5 @@ function CreateSkillPostPageLegacy() {
     </div>
   );
 }
+
+export default CreateSkillPostPageLegacy;
