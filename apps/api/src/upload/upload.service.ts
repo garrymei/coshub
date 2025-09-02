@@ -29,7 +29,13 @@ export class UploadService {
     @Inject(STORAGE_PROVIDER) private readonly storage: StorageProvider,
   ) {
 
-    this.bucketName = this.configService.get("MINIO_BUCKET", "coshub-uploads");
+    // 根据存储类型决定桶名配置项
+    const providerType = (this.configService.get('STORAGE_TYPE', 'minio') || 'minio').toString();
+    const minioBucket = this.configService.get('MINIO_BUCKET', 'coshub-uploads');
+    this.bucketName =
+      providerType === 'minio'
+        ? minioBucket
+        : this.configService.get('S3_BUCKET', minioBucket);
 
     // 上传配置
     this.config = {
