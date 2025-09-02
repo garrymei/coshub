@@ -21,6 +21,7 @@ import type {
   PriceType,
   ContactMethod,
 } from "@/lib/api";
+import { createSkillPostSchema } from "@coshub/types";
 
 interface FormData extends Omit<CreateSkillPostDTO, "images"> {
   images: string[];
@@ -147,43 +148,11 @@ function CreateSkillPostPageLegacy() {
   };
 
   const validateForm = (): string | null => {
-    if (!formData.title.trim() || formData.title.length < 5) {
-      return "标题至少需要5个字符";
+    const { imageUrls, ...submitData } = formData as any;
+    const parsed = createSkillPostSchema.safeParse(submitData);
+    if (!parsed.success) {
+      return parsed.error.issues[0]?.message || "表单校验失败";
     }
-    if (!formData.description.trim() || formData.description.length < 20) {
-      return "描述至少需要20个字符";
-    }
-    if (!formData.city.trim()) {
-      return "请填写城市";
-    }
-    if (formData.images.length === 0) {
-      return "至少需要添加1张图片";
-    }
-    if (
-      formData.price.type === "fixed" &&
-      (!formData.price.amount || formData.price.amount <= 0)
-    ) {
-      return "请设置正确的固定价格";
-    }
-    if (
-      formData.price.type === "range" &&
-      (!formData.price.range ||
-        formData.price.range.min >= formData.price.range.max)
-    ) {
-      return "请设置正确的价格区间";
-    }
-
-    // 检查联系方式
-    const { contactInfo } = formData;
-    const hasContact =
-      contactInfo.wechat ||
-      contactInfo.qq ||
-      contactInfo.phone ||
-      contactInfo.email;
-    if (!hasContact) {
-      return "至少需要填写一种联系方式";
-    }
-
     return null;
   };
 

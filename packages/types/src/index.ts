@@ -19,8 +19,15 @@ export * from "./post";
 // 技能帖相关类型
 export * from "./skill-post";
 
+// 举报相关类型
+export * from "./report";
+
 // 通用类型
 export * from "./common";
+
+// 校验器（zod schemas）
+export { createSkillPostSchema } from "./validators/skill-post";
+export type { CreateSkillPostInput } from "./validators/skill-post";
 
 // 版本信息
 export const VERSION = "0.1.0";
