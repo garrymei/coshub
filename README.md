@@ -44,8 +44,8 @@ coshub/
 │   └── config/             # 配置文件
 ├── infra/                  # 基础设施
 │   └── docker/             # Docker 配置
-├── ops/                    # 运维
-│   └── ci/                 # CI/CD 配置
+├── .github/
+│   └── workflows/          # CI 工作流（GitHub Actions）
 └── legacy/                 # 旧版本代码
 ```
 
@@ -73,13 +73,12 @@ docker-compose -f infra/docker/docker-compose.yml -f infra/docker/docker-compose
 ```
 
 **服务访问信息**：
-- **PostgreSQL**: `postgresql://coshub_user:dev123@localhost:5432/coshub`
-- **Redis**: `redis://:dev123@localhost:6379`  
-- **MinIO**: http://localhost:9000 (用户名: `dev123`, 密码: `dev123456`)
+- 请参考 `.env.example` 与 `apps/*/.env.example` 中的占位配置，自行填写本地开发凭据
+- 本地默认端口：PostgreSQL 5432、Redis 6379、MinIO 9000/9001
 
 **管理界面**:
 - MinIO Console: http://localhost:9001
-- PgAdmin: http://localhost:5050 (admin@coshub.local / dev123)
+- PgAdmin: http://localhost:5050
 - Redis Commander: http://localhost:8081
 
 ### 安装依赖
@@ -107,7 +106,7 @@ cd apps/api
 pnpm install
 
 # 生成 Prisma 客户端
-npm run db:generate
+pnpm db:generate
 
 # 启动开发服务
 pnpm dev
@@ -233,34 +232,23 @@ pnpm build:mini # 构建小程序 (输出到 apps/mini/dist)
 ### 🔗 服务连接信息
 
 #### 数据库连接 (PostgreSQL)
+请在 `.env` 或 `apps/api/.env` 中配置：
 ```bash
-# 开发环境
-DATABASE_URL="postgresql://coshub_user:dev123@localhost:5432/coshub"
-
-# 生产环境  
-DATABASE_URL="postgresql://coshub_user:coshub_password@localhost:5432/coshub"
+DATABASE_URL="postgresql://<USER>:<PASSWORD>@localhost:5432/coshub"
 ```
 
 #### 缓存连接 (Redis)
+请在 `.env` 或 `apps/api/.env` 中配置：
 ```bash
-# 开发环境
-REDIS_URL="redis://:dev123@localhost:6379"
-
-# 生产环境
-REDIS_URL="redis://:coshub_redis_password@localhost:6379"
+REDIS_URL="redis://:<PASSWORD>@localhost:6379"
 ```
 
 #### 对象存储 (MinIO)
+请在 `.env` 或 `apps/api/.env` 中配置：
 ```bash
-# 开发环境
 MINIO_ENDPOINT="localhost:9000"
-MINIO_ACCESS_KEY="dev123"
-MINIO_SECRET_KEY="dev123456"
-
-# 生产环境
-MINIO_ENDPOINT="localhost:9000"
-MINIO_ACCESS_KEY="coshub_minio_user"
-MINIO_SECRET_KEY="coshub_minio_password"
+MINIO_ACCESS_KEY="<YOUR_ACCESS_KEY>"
+MINIO_SECRET_KEY="<YOUR_SECRET_KEY>"
 ```
 
 ### 🌐 管理界面
@@ -418,9 +406,9 @@ pnpm build:mini
 ```bash
 # 首次运行需要初始化数据库
 cd apps/api
-npm run db:generate  # 生成 Prisma 客户端
-npm run db:migrate   # 运行数据库迁移
-npm run db:seed      # 填充示例数据
+pnpm db:generate  # 生成 Prisma 客户端
+pnpm db:migrate   # 运行数据库迁移
+pnpm db:seed      # 填充示例数据
 ```
 
 ## 联系方式

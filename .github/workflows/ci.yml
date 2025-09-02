@@ -36,13 +36,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile=false
+      - name: Install dependencies (workspace)
+        run: pnpm -w install --frozen-lockfile
+
+      - name: Build (turbo pipeline)
+        run: pnpm -w build
 
       - name: Lint
         run: pnpm -w lint
-
-      - name: Build
-        run: pnpm -w build
 
 
