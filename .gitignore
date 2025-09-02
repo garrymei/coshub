@@ -61,6 +61,11 @@ Thumbs.db
 tmp/
 temp/
 
+# SWC/Taro build artifacts
+.swc/
+apps/mini/.swc/
+apps/mini/dist/
+
 # Cache
 .cache/
 .parcel-cache/

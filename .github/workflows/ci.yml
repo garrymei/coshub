@@ -39,6 +39,9 @@ jobs:
       - name: Install dependencies (workspace)
         run: pnpm -w install --frozen-lockfile
 
+      - name: Prisma generate (API)
+        run: pnpm -w --filter @coshub/api db:generate
+
       - name: Lint
         run: pnpm -w lint
 
@@ -48,14 +51,13 @@ jobs:
       - name: Test
         run: pnpm -w test
 
-      - name: Changesets version
+      - name: Changesets version PR
         if: github.ref == 'refs/heads/main'
+        id: changesets
         uses: changesets/action@v1
         with:
+          version: pnpm -w changeset version
           title: "Version Packages"
           commit: "chore: version packages"
-          tag: "v${{ steps.changesets.outputs.publishedPackages }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-
