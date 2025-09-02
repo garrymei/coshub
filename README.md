@@ -273,13 +273,44 @@ DATABASE_URL="postgresql://<USER>:<PASSWORD>@localhost:5432/coshub"
 REDIS_URL="redis://:<PASSWORD>@localhost:6379"
 ```
 
-#### 对象存储 (MinIO)
-请在 `.env` 或 `apps/api/.env` 中配置：
-```bash
-MINIO_ENDPOINT="localhost:9000"
-MINIO_ACCESS_KEY="<YOUR_ACCESS_KEY>"
-MINIO_SECRET_KEY="<YOUR_SECRET_KEY>"
-```
+#### 对象存储（MinIO / COS / 七牛）
+请在 `.env` 或 `apps/api/.env` 中配置对象存储参数。
+
+- MinIO（默认，本地开发）：
+  ```bash
+  STORAGE_TYPE=minio
+  MINIO_ENDPOINT=http://localhost:9000
+  MINIO_ACCESS_KEY=<YOUR_ACCESS_KEY>
+  MINIO_SECRET_KEY=<YOUR_SECRET_KEY>
+  MINIO_BUCKET=coshub-uploads
+  MINIO_REGION=us-east-1
+  ```
+
+- 腾讯云 COS（S3 兼容接口）：
+  ```bash
+  STORAGE_TYPE=cos
+  S3_ENDPOINT=https://<your-cos-s3-endpoint>
+  S3_ACCESS_KEY=<COS_SECRET_ID>
+  S3_SECRET_KEY=<COS_SECRET_KEY>
+  S3_BUCKET=<your-bucket>
+  S3_REGION=ap-shanghai
+  S3_USE_SSL=true
+  ```
+
+- 七牛云 Kodo（S3 兼容接口）：
+  ```bash
+  STORAGE_TYPE=qiniu
+  S3_ENDPOINT=https://s3.<region>.qiniucs.com
+  S3_ACCESS_KEY=<AK>
+  S3_SECRET_KEY=<SK>
+  S3_BUCKET=<your-bucket>
+  S3_REGION=<region>
+  S3_USE_SSL=true
+  ```
+
+上传配置与健康检查：
+- `GET /api/upload/config` 返回上传限制与当前存储 Provider 信息（type/endpoint/bucket）
+- `GET /api/upload/health` 返回上传子系统状态与 `storage` 类型（minio/cos/s3/qiniu）
 
 ### 🌐 管理界面
 
@@ -331,6 +362,46 @@ pnpm lint          # 代码质量检查
 ```
 
 **自动化流程**: GitHub Actions 会在每次提交时自动运行构建、测试和代码检查，确保代码质量。
+
+## 任务完成状态
+
+### 🎯 P0 任务已完成
+- ✅ **统一锁文件**: 使用 pnpm 作为统一包管理器，确保依赖版本一致性
+- ✅ **CI/CD 配置**: 完整的 GitHub Actions 工作流，支持自动化构建、测试和部署
+- ✅ **开发凭据隔离**: 环境变量模板化，支持本地开发和生产环境配置
+- ✅ **工程化统一**: Turbo 构建管道与根脚本完全对齐，支持 build/dev/test/lint 等任务
+- ✅ **代码质量**: ESLint + Prettier 配置，确保代码风格一致性
+- ✅ **CI 工作流**: 确保 CI 已在 .github/workflows/ 生效，包含 lint/build/test/changesets
+- ✅ **环境变量安全**: 进一步检查并统一所有敏感凭据到 .env.example
+- ✅ **脚本一致性**: 根脚本与 Turbo 完全对齐，支持多端启动和包过滤
+- ✅ **API 中间件**: 启用 Helmet、CORS、RateLimit、ValidationPipe 和 Swagger
+- ✅ **API 分页**: 统一为 keyset pagination，实现 DTO 校验和错误响应结构
+- ✅ **内容审核**: 新增 POST /reports 端点，审核队列页面，内容安全检查钩子
+- ✅ **缓存策略**: Redis 缓存热门技能帖和城市榜单，支持失效和预热
+- ✅ **日志监控**: 结构化日志系统，Loki/Promtail + Grafana 监控栈
+- ✅ **部署镜像**: 多阶段 Dockerfile，生产 Docker Compose，Vercel 配置
+- ✅ **权限控制**: 角色权限系统，细粒度速率限制，资源所有权检查
+
+## 缓存策略
+
+### Redis 缓存配置
+- **热门技能帖**: TTL 30分钟，按浏览量、评分、时间排序
+- **城市榜单**: TTL 1小时，统计各城市技能帖数量
+- **缓存键**: `hot_skill_posts:{limit}`, `city_ranking:{limit}`
+- **失效策略**: 键失效 + 手动失效（内容更新时）
+
+### 缓存观测点
+- **命中率**: `/api/cache/stats` 接口监控缓存状态
+- **性能指标**: 响应时间、数据库查询次数
+- **预热机制**: 系统启动时自动预热热点数据
+- **手动失效**: 支持按模式手动失效缓存
+
+### 缓存API接口
+- `GET /api/cache/hot-skill-posts?limit=10` - 获取热门技能帖
+- `GET /api/cache/city-ranking?limit=20` - 获取城市榜单
+- `GET /api/cache/stats` - 获取缓存统计信息
+- `POST /api/cache/warmup` - 预热缓存
+- `POST /api/cache/invalidate/:pattern` - 手动失效缓存
 
 ## 子包说明
 
