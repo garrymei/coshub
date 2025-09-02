@@ -1,6 +1,6 @@
-import { Injectable, BadRequestException } from "@nestjs/common";
-import * as Minio from "minio";
+import { Injectable, BadRequestException, Inject } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import { STORAGE_PROVIDER, type StorageProvider } from "./storage.provider";
 
 export interface PresignedPostData {
   uploadUrl: string;
@@ -19,22 +19,13 @@ export interface UploadConfig {
 
 @Injectable()
 export class UploadService {
-  private minioClient: Minio.Client;
   private bucketName: string;
   private config: UploadConfig;
 
-  constructor(private configService: ConfigService) {
-    // 初始化 MinIO 客户端
-    this.minioClient = new Minio.Client({
-      endPoint: this.configService
-        .get("MINIO_ENDPOINT", "localhost:9000")
-        .replace("http://", "")
-        .replace("https://", ""),
-      port: this.configService.get("MINIO_PORT", 9000),
-      useSSL: this.configService.get("MINIO_USE_SSL", false),
-      accessKey: this.configService.get("MINIO_ACCESS_KEY", "minioadmin"),
-      secretKey: this.configService.get("MINIO_SECRET_KEY", "minioadmin"),
-    });
+  constructor(
+    private readonly configService: ConfigService,
+    @Inject(STORAGE_PROVIDER) private readonly storage: StorageProvider,
+  ) {
 
     this.bucketName = this.configService.get("MINIO_BUCKET", "coshub-uploads");
 
@@ -53,36 +44,14 @@ export class UploadService {
       ), // 1小时
     };
 
+    // 初始化存储桶
     this.initBucket();
   }
 
   // 初始化存储桶
   private async initBucket() {
     try {
-      const exists = await this.minioClient.bucketExists(this.bucketName);
-      if (!exists) {
-        await this.minioClient.makeBucket(this.bucketName, "us-east-1");
-        console.log(`✅ 创建存储桶: ${this.bucketName}`);
-
-        // 设置桶策略，允许公开读取
-        const policy = {
-          Version: "2012-10-17",
-          Statement: [
-            {
-              Effect: "Allow",
-              Principal: { AWS: ["*"] },
-              Action: ["s3:GetObject"],
-              Resource: [`arn:aws:s3:::${this.bucketName}/*`],
-            },
-          ],
-        };
-
-        await this.minioClient.setBucketPolicy(
-          this.bucketName,
-          JSON.stringify(policy),
-        );
-        console.log(`✅ 设置存储桶公开读取策略: ${this.bucketName}`);
-      }
+      await this.storage.ensureBucket(this.bucketName, "us-east-1", true);
     } catch (error) {
       console.error("❌ 初始化存储桶失败:", error);
     }
@@ -121,14 +90,15 @@ export class UploadService {
 
     try {
       // 生成预签名 PUT URL
-      const uploadUrl = await this.minioClient.presignedPutObject(
+      const uploadUrl = await this.storage.presignedPut(
         this.bucketName,
         objectKey,
         this.config.expiresIn,
+        mimeType,
       );
 
       // 生成文件访问 URL
-      const fileUrl = `${this.configService.get("MINIO_ENDPOINT", "http://localhost:9000")}/${this.bucketName}/${objectKey}`;
+      const fileUrl = this.storage.getPublicUrl(this.bucketName, objectKey);
 
       return {
         uploadUrl,
@@ -187,7 +157,7 @@ export class UploadService {
         throw new BadRequestException("无权限删除此文件");
       }
 
-      await this.minioClient.removeObject(this.bucketName, objectKey);
+      await this.storage.removeObject(this.bucketName, objectKey);
       return true;
     } catch (error) {
       console.error("删除文件失败:", error);
@@ -199,14 +169,11 @@ export class UploadService {
   async getFileInfo(fileUrl: string): Promise<any> {
     try {
       const objectKey = this.extractObjectKeyFromUrl(fileUrl);
-      const stat = await this.minioClient.statObject(
-        this.bucketName,
-        objectKey,
-      );
+      const stat = await this.storage.statObject(this.bucketName, objectKey);
       return {
         size: stat.size,
         lastModified: stat.lastModified,
-        contentType: stat.metaData?.["content-type"],
+        contentType: stat.contentType,
         etag: stat.etag,
       };
     } catch (error) {
@@ -237,7 +204,8 @@ export class UploadService {
   // 健康检查
   async healthCheck(): Promise<boolean> {
     try {
-      await this.minioClient.bucketExists(this.bucketName);
+      // 简化：确保 bucket 不抛错即视为健康
+      await this.storage.ensureBucket(this.bucketName);
       return true;
     } catch {
       return false;
