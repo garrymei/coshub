@@ -1,31 +1,3 @@
-"use client";
-import { useEffect, useState } from "react";
-import { api, type Skill } from "@/lib/api";
-
-export default function SkillDetailPage({ params }: { params: { id: string } }) {
-  const [item, setItem] = useState<Skill | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    (async () => {
-      const res = await api.skills.getSkill(params.id);
-      setItem(res.success ? (res.data as any) : null);
-      setLoading(false);
-    })();
-  }, [params.id]);
-
-  if (loading) return <div>Loading...</div>;
-  if (!item) return <div>Not found</div>;
-
-  return (
-    <main className="p-6 space-y-4">
-      <h1 className="text-2xl font-bold">{item.title}</h1>
-      <div className="text-sm text-gray-500">{item.city} · {item.role}</div>
-      <p>{(item as any).description}</p>
-    </main>
-  );
-}
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -50,7 +22,7 @@ export default function SkillPostDetailPage({ params }: SkillPostDetailPageProps
     const fetchSkillPost = async () => {
       try {
         setLoading(true);
-        const response = await api.client.get(`/skill-posts/${params.id}`);
+      const response = await api.skillPosts.get(params.id as string);
         
         if (response.success && response.data) {
           setSkillPost(response.data);

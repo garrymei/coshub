@@ -116,7 +116,7 @@ pnpm dev
 ```
 
 **验收标准**: 
-- 健康检查: http://localhost:3001/api/health
+- 健康检查: http://localhost:3001/api/healthz
 - 上传配置: http://localhost:3001/api/upload/config
 - 技能帖列表: http://localhost:3001/api/skill-posts
 
@@ -415,4 +415,3 @@ pnpm db:seed      # 填充示例数据
 
 - 项目主页: https://github.com/garrymei/coshub
 - 问题反馈: https://github.com/garrymei/coshub/issues
-

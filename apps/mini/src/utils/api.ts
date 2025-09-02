@@ -64,7 +64,7 @@ export const showToast = (title: string, icon: 'success' | 'error' | 'loading' |
 };
 
 // 显示加载中
-export const showLoading = (title: string = '加载中...') => {
+export const showLoading = (title = '加载中...') => {
   Taro.showLoading({ title });
 };
 

@@ -12,7 +12,8 @@ import {
   RequestService,
   SkillService,
   AuthService,
-  UploadService
+  UploadService,
+  SkillPostsService
 } from './services';
 import {
   CoshubError,
@@ -66,6 +67,7 @@ export class CoshubSDK {
   public readonly skills: SkillService;
   public readonly auth: AuthService;
   public readonly upload: UploadService;
+  public readonly skillPosts: SkillPostsService;
 
   constructor(baseURL: string, config?: Partial<import('./client').ClientConfig>) {
     this.client = new CoshubClient({
@@ -80,6 +82,7 @@ export class CoshubSDK {
     this.skills = new SkillService(this.client);
     this.auth = new AuthService(this.client);
     this.upload = new UploadService(this.client);
+    this.skillPosts = new SkillPostsService(this.client);
   }
 
   /**

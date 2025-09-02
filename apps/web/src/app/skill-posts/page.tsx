@@ -1,63 +1,3 @@
-"use client";
-import { useEffect, useState } from "react";
-import { api, type Skill, type PaginatedResponse } from "@/lib/api";
-
-export default function SkillPostsPage() {
-  const [data, setData] = useState<PaginatedResponse<Skill> | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  const [lat, setLat] = useState<string>("");
-  const [lng, setLng] = useState<string>("");
-  const [radius, setRadius] = useState<string>("");
-
-  async function load() {
-    setLoading(true);
-    const params: any = { page: 1 };
-    if (lat) params.lat = parseFloat(lat);
-    if (lng) params.lng = parseFloat(lng);
-    if (radius) params.radius = parseFloat(radius);
-    const res = await api.skills.getSkills(params);
-    setData(res.success ? res.data : null);
-    setLoading(false);
-  }
-
-  useEffect(() => { load(); }, []);
-
-  if (loading) return <div>Loading...</div>;
-  if (!data) return <div>Failed to load</div>;
-
-  return (
-    <main className="p-6 space-y-4">
-      <h1 className="text-2xl font-bold">技能帖列表</h1>
-      <div className="flex gap-2 items-end">
-        <div>
-          <label className="block text-sm">纬度(lat)</label>
-          <input className="border p-1" value={lat} onChange={e=>setLat(e.target.value)} placeholder="31.2304" />
-        </div>
-        <div>
-          <label className="block text-sm">经度(lng)</label>
-          <input className="border p-1" value={lng} onChange={e=>setLng(e.target.value)} placeholder="121.4737" />
-        </div>
-        <div>
-          <label className="block text-sm">半径(km)</label>
-          <input className="border p-1" value={radius} onChange={e=>setRadius(e.target.value)} placeholder="50" />
-        </div>
-        <button className="px-3 py-2 bg-black text-white" onClick={load}>筛选</button>
-      </div>
-      <ul className="space-y-3">
-        {data.items.map((item: any) => (
-          <li key={item.id} className="p-4 border rounded">
-            <a href={`/skill-posts/${item.id}`} className="font-medium hover:underline">
-              {item.title}
-            </a>
-            <div className="text-sm text-gray-500">{item.city} · {item.role}</div>
-          </li>
-        ))}
-      </ul>
-    </main>
-  );
-}
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -79,7 +19,7 @@ export default function SkillPostsPage() {
   const fetchSkillPosts = async () => {
     try {
       setLoading(true);
-      const response = await api.client.get('/skill-posts', filters);
+      const response = await api.skillPosts.list(filters);
       
       if (response.success && response.data) {
         setSkillPosts(response.data.items);
