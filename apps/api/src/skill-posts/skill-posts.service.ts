@@ -1,12 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
 import {
   SkillPost,
   CreateSkillPostDTO,
   SkillPostQueryDTO,
-  SkillPostListResponse
-} from '@coshub/types';
-import { Prisma } from '../../generated/prisma';
+  SkillPostListResponse,
+} from "@coshub/types";
+import { Prisma } from "../../generated/prisma";
 
 @Injectable()
 export class SkillPostsService {
@@ -17,7 +17,7 @@ export class SkillPostsService {
     // 暂时使用第一个用户作为作者，后续集成认证后从JWT获取
     const firstUser = await this.prisma.user.findFirst();
     if (!firstUser) {
-      throw new Error('未找到用户，请先运行种子数据');
+      throw new Error("未找到用户，请先运行种子数据");
     }
 
     const skillPost = await this.prisma.skillPost.create({
@@ -47,7 +47,7 @@ export class SkillPostsService {
   async findAll(query: SkillPostQueryDTO): Promise<SkillPostListResponse> {
     const where: Prisma.SkillPostWhereInput = {
       deletedAt: null,
-      status: 'ACTIVE',
+      status: "ACTIVE",
     };
 
     // 应用筛选条件
@@ -62,7 +62,7 @@ export class SkillPostsService {
     if (query.city) {
       where.city = {
         contains: query.city,
-        mode: 'insensitive',
+        mode: "insensitive",
       };
     }
 
@@ -71,13 +71,13 @@ export class SkillPostsService {
         {
           title: {
             contains: query.keyword,
-            mode: 'insensitive',
+            mode: "insensitive",
           },
         },
         {
           description: {
             contains: query.keyword,
-            mode: 'insensitive',
+            mode: "insensitive",
           },
         },
         {
@@ -91,17 +91,17 @@ export class SkillPostsService {
     // 排序
     const orderBy: Prisma.SkillPostOrderByWithRelationInput = {};
     switch (query.sortBy) {
-      case 'createdAt':
-        orderBy.createdAt = 'desc';
+      case "createdAt":
+        orderBy.createdAt = "desc";
         break;
-      case 'viewCount':
-        orderBy.viewCount = 'desc';
+      case "viewCount":
+        orderBy.viewCount = "desc";
         break;
-      case 'rating':
-        orderBy.avgRating = 'desc';
+      case "rating":
+        orderBy.avgRating = "desc";
         break;
       default:
-        orderBy.updatedAt = 'desc';
+        orderBy.updatedAt = "desc";
     }
 
     // 分页
@@ -123,7 +123,7 @@ export class SkillPostsService {
     ]);
 
     return {
-      items: skillPosts.map(post => this.transformSkillPost(post)),
+      items: skillPosts.map((post) => this.transformSkillPost(post)),
       total,
       page,
       limit,
@@ -139,7 +139,7 @@ export class SkillPostsService {
       where: {
         id,
         deletedAt: null,
-        status: 'ACTIVE',
+        status: "ACTIVE",
       },
       include: {
         author: true,
@@ -170,18 +170,18 @@ export class SkillPostsService {
     const cities = await this.prisma.skillPost.findMany({
       where: {
         deletedAt: null,
-        status: 'ACTIVE',
+        status: "ACTIVE",
       },
       select: {
         city: true,
       },
-      distinct: ['city'],
+      distinct: ["city"],
       orderBy: {
-        city: 'asc',
+        city: "asc",
       },
     });
 
-    return cities.map(item => item.city);
+    return cities.map((item) => item.city);
   }
 
   // 获取热门标签
@@ -189,18 +189,21 @@ export class SkillPostsService {
     const skillPosts = await this.prisma.skillPost.findMany({
       where: {
         deletedAt: null,
-        status: 'ACTIVE',
+        status: "ACTIVE",
       },
       select: {
         tags: true,
       },
     });
 
-    const allTags = skillPosts.flatMap(post => post.tags);
-    const tagCounts = allTags.reduce((acc, tag) => {
-      acc[tag] = (acc[tag] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const allTags = skillPosts.flatMap((post) => post.tags);
+    const tagCounts = allTags.reduce(
+      (acc, tag) => {
+        acc[tag] = (acc[tag] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
 
     return Object.entries(tagCounts)
       .sort(([, a], [, b]) => (b as number) - (a as number))
@@ -238,13 +241,28 @@ export class SkillPostsService {
 
   // 转换数据库模型到API模型
   private transformSkillPost(skillPost: any): SkillPost {
+    const mapStatus = (s: string) => {
+      switch (s) {
+        case 'DRAFT':
+          return 'draft';
+        case 'ACTIVE':
+          return 'published';
+        case 'INACTIVE':
+          return 'paused';
+        case 'DELETED':
+          return 'closed';
+        default:
+          return 'published';
+      }
+    };
+
     return {
       id: skillPost.id,
       title: skillPost.title,
       description: skillPost.description,
-      category: skillPost.category,
-      role: skillPost.role,
-      experience: skillPost.experience,
+      category: String(skillPost.category).toLowerCase(),
+      role: String(skillPost.role).toLowerCase(),
+      experience: String(skillPost.experience).toLowerCase(),
       city: skillPost.city,
       price: skillPost.price as any,
       images: skillPost.images,
@@ -253,7 +271,9 @@ export class SkillPostsService {
       contactInfo: skillPost.contactInfo as any,
       authorId: skillPost.authorId,
       authorName: skillPost.author.nickname || skillPost.author.username,
-      authorAvatar: skillPost.author.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${skillPost.author.username}`,
+      authorAvatar:
+        skillPost.author.avatar ||
+        `https://api.dicebear.com/7.x/avataaars/svg?seed=${skillPost.author.username}`,
       stats: {
         viewCount: skillPost.viewCount,
         favoriteCount: skillPost.favoriteCount,
@@ -263,9 +283,9 @@ export class SkillPostsService {
         reviewCount: skillPost.reviewCount,
         responseRate: skillPost.responseRate,
       },
-      status: skillPost.status,
-      createdAt: skillPost.createdAt.toISOString(),
-      updatedAt: skillPost.updatedAt.toISOString(),
-    };
+      status: mapStatus(String(skillPost.status)),
+      createdAt: skillPost.createdAt,
+      updatedAt: skillPost.updatedAt,
+    } as any;
   }
 }

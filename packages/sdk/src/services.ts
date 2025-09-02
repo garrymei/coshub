@@ -13,6 +13,12 @@ import type {
   PaginationParams 
 } from '@coshub/types';
 import { CoshubClient } from './client';
+import type {
+  SkillPost,
+  CreateSkillPostDTO,
+  SkillPostQueryDTO,
+  SkillPostListResponse,
+} from '@coshub/types';
 
 export class UserService {
   constructor(private client: CoshubClient) {}
@@ -199,21 +205,56 @@ export class UploadService {
   constructor(private client: CoshubClient) {}
 
   /**
-   * 上传文件（占位实现）
+   * 申请预签名并直传（PUT）单文件
    */
-  async uploadFile(file: File, type: 'image' | 'video' | 'document' = 'image'): Promise<ApiResponse<{ url: string; id: string }>> {
-    // TODO: 实现文件上传逻辑
-    // 这里只是占位，后续需要实现真正的文件上传
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('type', type);
-    
-    // 注意：这里需要特殊处理，因为是 FormData
-    return this.client.request('/upload', {
-      method: 'POST',
-      data: formData,
-      headers: {} // 移除 Content-Type，让浏览器自动设置
+  async uploadFile(file: File): Promise<ApiResponse<{ url: string; filename: string }>> {
+    // 1) 申请预签名
+    const presign = await this.client.request<{ uploadUrl: string; fields: Record<string, string>; fileUrl: string }>(
+      '/upload/presign',
+      {
+        method: 'POST',
+        data: { filename: file.name, mimeType: file.type, fileSize: file.size },
+      }
+    );
+    if (!presign.success || !presign.data) return presign as any;
+
+    const { uploadUrl, fields, fileUrl } = presign.data;
+
+    // 2) 直传到对象存储（PUT）
+    const putResp = await fetch(uploadUrl, {
+      method: 'PUT',
+      headers: { 'Content-Type': fields['Content-Type'] || file.type },
+      body: file,
     });
+    if (!putResp.ok) {
+      return {
+        success: false,
+        error: { code: String(putResp.status), message: 'Upload failed' },
+        timestamp: new Date().toISOString(),
+      };
+    }
+
+    return {
+      success: true,
+      data: { url: fileUrl, filename: file.name },
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  /**
+   * 批量上传（串行，返回成功的 URL 列表）
+   */
+  async uploadFiles(files: FileList | File[]): Promise<ApiResponse<{ urls: string[] }>> {
+    const list = Array.isArray(files) ? files : Array.from(files);
+    const urls: string[] = [];
+    for (const f of list) {
+      const r = await this.uploadFile(f);
+      if (!r.success || !r.data) {
+        return r as any;
+      }
+      urls.push(r.data.url);
+    }
+    return { success: true, data: { urls }, timestamp: new Date().toISOString() };
   }
 
   /**
@@ -221,5 +262,21 @@ export class UploadService {
    */
   async deleteFile(fileId: string): Promise<ApiResponse<void>> {
     return this.client.delete(`/upload/${fileId}`);
+  }
+}
+
+export class SkillPostsService {
+  constructor(private client: CoshubClient) {}
+
+  async list(params?: SkillPostQueryDTO): Promise<ApiResponse<SkillPostListResponse>> {
+    return this.client.get('/skill-posts', params as any);
+  }
+
+  async get(id: string): Promise<ApiResponse<SkillPost>> {
+    return this.client.get(`/skill-posts/${id}`);
+  }
+
+  async create(payload: CreateSkillPostDTO): Promise<ApiResponse<SkillPost>> {
+    return this.client.post('/skill-posts', payload);
   }
 }
