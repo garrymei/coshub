@@ -2,9 +2,10 @@ import Taro from "@tarojs/taro";
 import { STORAGE_KEYS, STATUS_CODES } from "./constants";
 
 // API基础URL - 开发环境使用Mock服务
-const BASE_URL = process.env.NODE_ENV === 'production' 
-  ? "https://api.coshub.com" 
-  : "http://localhost:3000/mock";
+const BASE_URL =
+  process.env.NODE_ENV === "production"
+    ? "https://api.coshub.com"
+    : "http://localhost:3000/mock";
 
 // 请求方法类型
 type Method = "GET" | "POST" | "PUT" | "DELETE";
