@@ -66,7 +66,7 @@ export async function getUserFavorites(params: {
 }
 
 // 添加getUserCollections函数，与collections.tsx页面兼容
-export async function getUserCollections(page: number = 1): Promise<{
+export async function getUserCollections(page = 1): Promise<{
   list: any[];
   hasMore: boolean;
 }> {

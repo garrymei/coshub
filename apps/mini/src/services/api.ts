@@ -13,7 +13,7 @@ interface RequestOptions {
 }
 
 // 通用请求函数
-const request = async function<T>(options: RequestOptions): Promise<T> {
+const request = async function <T>(options: RequestOptions): Promise<T> {
   const token = Taro.getStorageSync("token");
 
   const defaultHeader: Record<string, string> = {
