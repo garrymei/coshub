@@ -18,7 +18,11 @@ interface ISkill {
 
 export default function SkillsIndex() {
   const [skills, setSkills] = useState<ISkill[]>([]);
-  const [banners, setBanners] = useState([]);
+  const [banners, setBanners] = useState<Array<{
+    id: string
+    imageUrl: string
+    linkUrl: string
+  }>>([]);
 
   useEffect(() => {
     fetchSkills();
@@ -45,7 +49,7 @@ export default function SkillsIndex() {
       });
       setBanners(res.data.data);
     } catch (error) {
-      console.error("Banner加载失败", error);
+      Taro.showToast({ title: "轮播图加载失败", icon: "none" });
     }
   };
 
@@ -54,11 +58,9 @@ export default function SkillsIndex() {
       {banners.map((banner) => (
         <Banner
           key={banner.id}
-          data={{
-            id: banner.id,
-            imageUrl: banner.imageUrl,
-            linkUrl: banner.linkUrl,
-          }}
+          id={banner.id}
+          imageUrl={banner.imageUrl} 
+          linkUrl={banner.linkUrl}
         />
       ))}
 
