@@ -1,169 +1,178 @@
-import { useState } from 'react'
-import { View, Text, Input, Textarea, Image, Button, Switch, Picker } from '@tarojs/components'
-import { getUploadConfig } from '@/services/upload'
-import { createPost } from '@/services/post'
-import './index.scss'
+import { useState } from "react";
+import {
+  View,
+  Text,
+  Input,
+  Textarea,
+  Image,
+  Button,
+  Switch,
+  Picker,
+} from "@tarojs/components";
+import { getUploadConfig } from "@/services/upload";
+import { createPost } from "@/services/post";
+import "./index.scss";
 
 // 帖子类型
-const POST_TYPES = ['share', 'skill']
-const POST_TYPE_LABELS = ['作品分享', '技能出售']
+const POST_TYPES = ["share", "skill"];
+const POST_TYPE_LABELS = ["作品分享", "技能出售"];
 
 // 技能角色选项
-const ROLES = ['设计师', '程序员', '摄影师', '教师', '其他']
+const ROLES = ["设计师", "程序员", "摄影师", "教师", "其他"];
 
 // 城市选项
-const CITIES = ['北京', '上海', '广州', '深圳', '杭州', '成都', '其他']
+const CITIES = ["北京", "上海", "广州", "深圳", "杭州", "成都", "其他"];
 
 export default function NewPostPage() {
   // 基础表单数据
-  const [postType, setPostType] = useState<'share' | 'skill'>('share')
-  const [title, setTitle] = useState('')
-  const [content, setContent] = useState('')
-  const [tags, setTags] = useState<string[]>([])
-  const [tagInput, setTagInput] = useState('')
-  const [images, setImages] = useState<string[]>([])
-  const [videos, setVideos] = useState<string[]>([])
-  
+  const [postType, setPostType] = useState<"share" | "skill">("share");
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState("");
+  const [images, setImages] = useState<string[]>([]);
+  const [videos, setVideos] = useState<string[]>([]);
+
   // 技能帖特有数据
-  const [price, setPrice] = useState('')
-  const [city, setCity] = useState('')
-  const [role, setRole] = useState('')
-  
+  const [price, setPrice] = useState("");
+  const [city, setCity] = useState("");
+  const [role, setRole] = useState("");
+
   // 上传状态
-  const [uploading, setUploading] = useState(false)
-  
+  const [uploading, setUploading] = useState(false);
+
   // 提交状态
-  const [submitting, setSubmitting] = useState(false)
+  const [submitting, setSubmitting] = useState(false);
 
   // 切换帖子类型
   const handleTypeChange = (index: number) => {
-    setPostType(POST_TYPES[index] as 'share' | 'skill')
-  }
-  
+    setPostType(POST_TYPES[index] as "share" | "skill");
+  };
+
   // 添加标签
   const addTag = () => {
     if (tagInput && !tags.includes(tagInput) && tags.length < 5) {
-      setTags([...tags, tagInput])
-      setTagInput('')
+      setTags([...tags, tagInput]);
+      setTagInput("");
     }
-  }
-  
+  };
+
   // 删除标签
   const removeTag = (index: number) => {
-    setTags(tags.filter((_, i) => i !== index))
-  }
-  
+    setTags(tags.filter((_, i) => i !== index));
+  };
+
   // 上传图片
   const uploadImage = async () => {
-    if (images.length >= 9) return
-    
+    if (images.length >= 9) return;
+
     try {
       // 选择图片
       const res = await wx.chooseImage({
         count: 9 - images.length,
-        sizeType: ['compressed'],
-        sourceType: ['album', 'camera']
-      })
-      
-      setUploading(true)
-      
+        sizeType: ["compressed"],
+        sourceType: ["album", "camera"],
+      });
+
+      setUploading(true);
+
       // 获取上传配置
-      const config = await getUploadConfig()
-      
+      const config = await getUploadConfig();
+
       // 上传图片
       const uploadedImages = await Promise.all(
         res.tempFilePaths.map(async (path) => {
           const uploadRes = await wx.uploadFile({
             url: config.uploadUrl,
             filePath: path,
-            name: 'file',
-            formData: config.formData
-          })
-          
-          const result = JSON.parse(uploadRes.data)
-          return result.url
-        })
-      )
-      
-      setImages([...images, ...uploadedImages])
+            name: "file",
+            formData: config.formData,
+          });
+
+          const result = JSON.parse(uploadRes.data);
+          return result.url;
+        }),
+      );
+
+      setImages([...images, ...uploadedImages]);
     } catch (error) {
       wx.showToast({
-        title: '上传失败',
-        icon: 'none'
-      })
+        title: "上传失败",
+        icon: "none",
+      });
     } finally {
-      setUploading(false)
+      setUploading(false);
     }
-  }
-  
+  };
+
   // 上传视频
   const uploadVideo = async () => {
-    if (videos.length >= 1) return
-    
+    if (videos.length >= 1) return;
+
     try {
       // 选择视频
       const res = await wx.chooseVideo({
-        sourceType: ['album', 'camera'],
-        maxDuration: 60
-      })
-      
-      setUploading(true)
-      
+        sourceType: ["album", "camera"],
+        maxDuration: 60,
+      });
+
+      setUploading(true);
+
       // 获取上传配置
-      const config = await getUploadConfig()
-      
+      const config = await getUploadConfig();
+
       // 上传视频
       const uploadRes = await wx.uploadFile({
         url: config.uploadUrl,
         filePath: res.tempFilePath,
-        name: 'file',
-        formData: config.formData
-      })
-      
-      const result = JSON.parse(uploadRes.data)
-      setVideos([result.url])
+        name: "file",
+        formData: config.formData,
+      });
+
+      const result = JSON.parse(uploadRes.data);
+      setVideos([result.url]);
     } catch (error) {
       wx.showToast({
-        title: '上传失败',
-        icon: 'none'
-      })
+        title: "上传失败",
+        icon: "none",
+      });
     } finally {
-      setUploading(false)
+      setUploading(false);
     }
-  }
-  
+  };
+
   // 提交表单
   const handleSubmit = async () => {
     // 表单验证
     if (!title) {
-      return wx.showToast({ title: '请输入标题', icon: 'none' })
+      return wx.showToast({ title: "请输入标题", icon: "none" });
     }
-    
+
     if (!content) {
-      return wx.showToast({ title: '请输入内容', icon: 'none' })
+      return wx.showToast({ title: "请输入内容", icon: "none" });
     }
-    
+
     if (images.length === 0 && videos.length === 0) {
-      return wx.showToast({ title: '请上传至少一张图片或视频', icon: 'none' })
+      return wx.showToast({ title: "请上传至少一张图片或视频", icon: "none" });
     }
-    
-    if (postType === 'skill') {
+
+    if (postType === "skill") {
       if (!price) {
-        return wx.showToast({ title: '请输入价格', icon: 'none' })
+        return wx.showToast({ title: "请输入价格", icon: "none" });
       }
-      
+
       if (!city) {
-        return wx.showToast({ title: '请选择城市', icon: 'none' })
+        return wx.showToast({ title: "请选择城市", icon: "none" });
       }
-      
+
       if (!role) {
-        return wx.showToast({ title: '请选择角色', icon: 'none' })
+        return wx.showToast({ title: "请选择角色", icon: "none" });
       }
     }
-    
+
     try {
-      setSubmitting(true)
-      
+      setSubmitting(true);
+
       // 构建提交数据
       const postData = {
         type: postType,
@@ -172,36 +181,38 @@ export default function NewPostPage() {
         tags,
         images,
         videos,
-        ...(postType === 'skill' ? {
-          price: Number(price),
-          city,
-          role
-        } : {})
-      }
-      
+        ...(postType === "skill"
+          ? {
+              price: Number(price),
+              city,
+              role,
+            }
+          : {}),
+      };
+
       // 提交数据
-      const result = await createPost(postData)
-      
+      const result = await createPost(postData);
+
       wx.showToast({
-        title: '发布成功',
-        icon: 'success'
-      })
-      
+        title: "发布成功",
+        icon: "success",
+      });
+
       // 跳转到详情页
       setTimeout(() => {
         wx.navigateTo({
-          url: `/pages/${postType === 'share' ? 'feed' : 'skills'}/detail?id=${result.id}`
-        })
-      }, 1500)
+          url: `/pages/${postType === "share" ? "feed" : "skills"}/detail?id=${result.id}`,
+        });
+      }, 1500);
     } catch (error) {
       wx.showToast({
-        title: '发布失败',
-        icon: 'none'
-      })
+        title: "发布失败",
+        icon: "none",
+      });
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
-  }
+  };
 
   return (
     <View className="new-post-page">
@@ -209,14 +220,14 @@ export default function NewPostPage() {
         {POST_TYPE_LABELS.map((label, index) => (
           <Text
             key={index}
-            className={`type-option ${postType === POST_TYPES[index] ? 'active' : ''}`}
+            className={`type-option ${postType === POST_TYPES[index] ? "active" : ""}`}
             onClick={() => handleTypeChange(index)}
           >
             {label}
           </Text>
         ))}
       </View>
-      
+
       <View className="form-item">
         <Input
           className="title-input"
@@ -226,7 +237,7 @@ export default function NewPostPage() {
           maxlength={30}
         />
       </View>
-      
+
       <View className="form-item">
         <Textarea
           className="content-textarea"
@@ -236,31 +247,38 @@ export default function NewPostPage() {
           maxlength={2000}
         />
       </View>
-      
+
       <View className="form-item">
         <View className="section-title">添加图片/视频</View>
         <View className="media-upload">
           {images.map((img, index) => (
             <View key={`img-${index}`} className="media-item">
               <Image className="media-preview" src={img} mode="aspectFill" />
-              <Text className="delete-btn" onClick={() => setImages(images.filter((_, i) => i !== index))}>×</Text>
+              <Text
+                className="delete-btn"
+                onClick={() => setImages(images.filter((_, i) => i !== index))}
+              >
+                ×
+              </Text>
             </View>
           ))}
-          
+
           {videos.map((video, index) => (
             <View key={`video-${index}`} className="media-item video">
               <View className="video-icon">▶</View>
-              <Text className="delete-btn" onClick={() => setVideos([])}>×</Text>
+              <Text className="delete-btn" onClick={() => setVideos([])}>
+                ×
+              </Text>
             </View>
           ))}
-          
+
           {images.length < 9 && videos.length === 0 && (
             <View className="upload-btn" onClick={uploadImage}>
               <Text className="plus">+</Text>
               <Text className="text">图片</Text>
             </View>
           )}
-          
+
           {videos.length === 0 && (
             <View className="upload-btn" onClick={uploadVideo}>
               <Text className="plus">+</Text>
@@ -269,18 +287,20 @@ export default function NewPostPage() {
           )}
         </View>
       </View>
-      
+
       <View className="form-item">
         <View className="section-title">添加标签 (最多5个)</View>
         <View className="tags-container">
           {tags.map((tag, index) => (
             <View key={index} className="tag">
               #{tag}
-              <Text className="delete-tag" onClick={() => removeTag(index)}>×</Text>
+              <Text className="delete-tag" onClick={() => removeTag(index)}>
+                ×
+              </Text>
             </View>
           ))}
         </View>
-        
+
         {tags.length < 5 && (
           <View className="tag-input-container">
             <Input
@@ -290,12 +310,14 @@ export default function NewPostPage() {
               onInput={(e) => setTagInput(e.detail.value)}
               maxlength={10}
             />
-            <Text className="add-tag-btn" onClick={addTag}>添加</Text>
+            <Text className="add-tag-btn" onClick={addTag}>
+              添加
+            </Text>
           </View>
         )}
       </View>
-      
-      {postType === 'skill' && (
+
+      {postType === "skill" && (
         <>
           <View className="form-item">
             <View className="section-title">价格 (元)</View>
@@ -307,7 +329,7 @@ export default function NewPostPage() {
               onInput={(e) => setPrice(e.detail.value)}
             />
           </View>
-          
+
           <View className="form-item">
             <View className="section-title">城市</View>
             <Picker
@@ -315,12 +337,10 @@ export default function NewPostPage() {
               range={CITIES}
               onChange={(e) => setCity(CITIES[e.detail.value as number])}
             >
-              <View className="picker">
-                {city || '请选择城市'}
-              </View>
+              <View className="picker">{city || "请选择城市"}</View>
             </Picker>
           </View>
-          
+
           <View className="form-item">
             <View className="section-title">角色</View>
             <Picker
@@ -328,22 +348,20 @@ export default function NewPostPage() {
               range={ROLES}
               onChange={(e) => setRole(ROLES[e.detail.value as number])}
             >
-              <View className="picker">
-                {role || '请选择角色'}
-              </View>
+              <View className="picker">{role || "请选择角色"}</View>
             </Picker>
           </View>
         </>
       )}
-      
+
       <Button
         className="submit-btn"
         loading={submitting}
         disabled={uploading || submitting}
         onClick={handleSubmit}
       >
-        {uploading ? '上传中...' : '发布'}
+        {uploading ? "上传中..." : "发布"}
       </Button>
     </View>
-  )
+  );
 }

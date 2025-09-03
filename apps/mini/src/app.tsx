@@ -26,7 +26,7 @@ class App extends Component<{ children?: ReactNode }> {
         console.log("用户已登录");
         // 已登录用户重定向到分享页
         wx.switchTab({
-          url: '/pages/feed/index'
+          url: "/pages/feed/index",
         });
       }
     } catch (error) {
