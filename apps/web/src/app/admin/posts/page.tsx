@@ -219,7 +219,7 @@ export default function PostModerationPage() {
                   <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
                     {post.type === "SHARE"
                       ? "作品展示"
-                                              : post.type === "TUTORIAL"
+                      : post.type === "TUTORIAL"
                         ? "教程"
                         : "其他"}
                   </span>

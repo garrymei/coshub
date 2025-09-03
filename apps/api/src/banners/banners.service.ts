@@ -75,7 +75,9 @@ export class BannersService {
       updateData.imageUrl = updateBannerDto.imageUrl;
     }
     if (updateBannerDto.linkType !== undefined) {
-      updateData.linkType = { set: updateBannerDto.linkType.toUpperCase() as any };
+      updateData.linkType = {
+        set: updateBannerDto.linkType.toUpperCase() as any,
+      };
     }
     if (updateBannerDto.linkUrl !== undefined) {
       updateData.linkUrl = updateBannerDto.linkUrl;
