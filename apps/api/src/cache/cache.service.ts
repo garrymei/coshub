@@ -13,7 +13,7 @@ export class CacheService {
   // 热门技能帖缓存
   async getHotSkillPosts(limit: number = 10) {
     const cacheKey = `hot_skill_posts:${limit}`;
-    
+
     try {
       // 尝试从缓存获取
       const cached = await this.cacheManager.get(cacheKey);
@@ -57,7 +57,7 @@ export class CacheService {
   // 城市榜单缓存
   async getCityRanking(limit: number = 20) {
     const cacheKey = `city_ranking:${limit}`;
-    
+
     try {
       const cached = await this.cacheManager.get(cacheKey);
       if (cached) {
@@ -69,7 +69,7 @@ export class CacheService {
     }
 
     console.log("城市榜单缓存未命中，从数据库获取");
-    
+
     // 统计各城市的技能帖数量
     const cityStats = await this.prisma.skillPost.groupBy({
       by: ["city"],
@@ -137,14 +137,14 @@ export class CacheService {
       // 这里需要根据具体的缓存实现来失效
       // 对于Redis，可以使用SCAN命令查找匹配的键
       console.log(`手动失效缓存模式: ${pattern}`);
-      
+
       // 示例：失效热门技能帖缓存
       if (pattern.includes("hot_skill_posts")) {
         await this.cacheManager.del("hot_skill_posts:10");
         await this.cacheManager.del("hot_skill_posts:20");
         console.log("热门技能帖缓存已失效");
       }
-      
+
       // 示例：失效城市榜单缓存
       if (pattern.includes("city_ranking")) {
         await this.cacheManager.del("city_ranking:20");
@@ -178,15 +178,15 @@ export class CacheService {
   // 预热缓存
   async warmupCache() {
     console.log("开始预热缓存...");
-    
+
     try {
       // 预热热门技能帖缓存
       await this.getHotSkillPosts(10);
       await this.getHotSkillPosts(20);
-      
+
       // 预热城市榜单缓存
       await this.getCityRanking(20);
-      
+
       console.log("缓存预热完成");
     } catch (error) {
       console.error("缓存预热失败:", error);

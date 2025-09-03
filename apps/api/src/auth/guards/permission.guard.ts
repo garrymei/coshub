@@ -40,9 +40,12 @@ export class PermissionGuard implements CanActivate {
     return true;
   }
 
-  private checkPermission(userRole: UserRole, requiredPermissions: Permission[]): boolean {
+  private checkPermission(
+    userRole: UserRole,
+    requiredPermissions: Permission[],
+  ): boolean {
     const rolePermission = ROLE_PERMISSIONS.find((rp) => rp.role === userRole);
-    
+
     if (!rolePermission) {
       return false;
     }

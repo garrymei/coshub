@@ -30,7 +30,7 @@ export class LoggerService implements NestLoggerService {
 
   private formatLog(data: LogData): string {
     const { level, message, context, data: extraData, timestamp } = data;
-    
+
     const baseLog = {
       timestamp,
       level: level.toUpperCase(),
@@ -134,7 +134,12 @@ export class LoggerService implements NestLoggerService {
   }
 
   // 请求完成日志
-  logRequestEnd(requestId: string, duration: number, statusCode: number, userId?: string) {
+  logRequestEnd(
+    requestId: string,
+    duration: number,
+    statusCode: number,
+    userId?: string,
+  ) {
     const context: LogContext = {
       requestId,
       userId,
@@ -170,7 +175,12 @@ export class LoggerService implements NestLoggerService {
   }
 
   // 性能日志
-  logPerformance(operation: string, duration: number, context: LogContext, data?: any) {
+  logPerformance(
+    operation: string,
+    duration: number,
+    context: LogContext,
+    data?: any,
+  ) {
     const performanceContext: LogContext = {
       ...context,
       duration,

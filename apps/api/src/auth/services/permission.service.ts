@@ -26,7 +26,7 @@ export class PermissionService {
         };
       }
 
-      const userRole = user.role as UserRole || UserRole.USER;
+      const userRole = (user.role as UserRole) || UserRole.USER;
       const hasPermission = this.hasPermission(userRole, check.permission);
 
       if (!hasPermission) {
@@ -69,7 +69,7 @@ export class PermissionService {
 
   private hasPermission(userRole: UserRole, permission: Permission): boolean {
     const rolePermission = ROLE_PERMISSIONS.find((rp) => rp.role === userRole);
-    
+
     if (!rolePermission) {
       return false;
     }
@@ -133,8 +133,10 @@ export class PermissionService {
   async getUserPermissions(userId: string): Promise<Permission[]> {
     try {
       const userRole = await this.getUserRole(userId);
-      const rolePermission = ROLE_PERMISSIONS.find((rp) => rp.role === userRole);
-      
+      const rolePermission = ROLE_PERMISSIONS.find(
+        (rp) => rp.role === userRole,
+      );
+
       return rolePermission?.permissions || [];
     } catch (error) {
       console.error("获取用户权限失败:", error);

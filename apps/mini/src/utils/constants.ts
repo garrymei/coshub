@@ -1,90 +1,124 @@
-import {
-  SkillCategory,
-  SkillRole,
-  ExperienceLevel,
-  PriceType,
-  ContactMethod,
-} from "@coshub/types";
-
-// 技能分类选项
+// 技能分类
 export const SKILL_CATEGORIES = [
-  { value: SkillCategory.COSPLAY, label: "Cosplay 表演" },
-  { value: SkillCategory.PHOTOGRAPHY, label: "摄影" },
-  { value: SkillCategory.MAKEUP, label: "化妆" },
-  { value: SkillCategory.PROP_MAKING, label: "道具制作" },
-  { value: SkillCategory.COSTUME_MAKING, label: "服装制作" },
-  { value: SkillCategory.POST_PROCESSING, label: "后期处理" },
-  { value: SkillCategory.VIDEO_EDITING, label: "视频剪辑" },
-  { value: SkillCategory.VOICE_ACTING, label: "配音" },
-  { value: SkillCategory.DRAWING, label: "绘画" },
-  { value: SkillCategory.WRITING, label: "写作" },
-  { value: SkillCategory.DANCING, label: "舞蹈" },
-  { value: SkillCategory.SINGING, label: "歌唱" },
+  { label: "Cosplay", value: "cosplay" },
+  { label: "摄影", value: "photography" },
+  { label: "妆容", value: "makeup" },
+  { label: "道具制作", value: "props" },
+  { label: "服装定制", value: "costume" },
+  { label: "后期修图", value: "editing" },
+  { label: "其他", value: "other" },
 ];
 
-// 角色类型选项
+// 角色标签
 export const SKILL_ROLES = [
-  { value: SkillRole.COSER, label: "Cos 模特" },
-  { value: SkillRole.PHOTOGRAPHER, label: "摄影师" },
-  { value: SkillRole.MAKEUP_ARTIST, label: "化妆师" },
-  { value: SkillRole.PROP_MAKER, label: "道具师" },
-  { value: SkillRole.COSTUME_MAKER, label: "服装师" },
-  { value: SkillRole.LOCATION_OWNER, label: "场地方" },
-  { value: SkillRole.POST_PROCESSOR, label: "后期师" },
-  { value: SkillRole.VIDEOGRAPHER, label: "摄像师" },
-  { value: SkillRole.ORGANIZER, label: "活动组织者" },
+  { label: "Coser", value: "coser" },
+  { label: "摄影师", value: "photographer" },
+  { label: "妆娘", value: "makeup_artist" },
+  { label: "毛娘", value: "wig_stylist" },
+  { label: "道具师", value: "prop_maker" },
+  { label: "后期师", value: "editor" },
+  { label: "服装师", value: "costume_designer" },
 ];
 
-// 经验等级选项
+// 经验等级
 export const EXPERIENCE_LEVELS = [
-  { value: ExperienceLevel.NEWBIE, label: "新手" },
-  { value: ExperienceLevel.BEGINNER, label: "初级" },
-  { value: ExperienceLevel.INTERMEDIATE, label: "中级" },
-  { value: ExperienceLevel.ADVANCED, label: "高级" },
-  { value: ExperienceLevel.PROFESSIONAL, label: "专业" },
+  { label: "新手", value: "beginner" },
+  { label: "业余", value: "amateur" },
+  { label: "专业", value: "professional" },
+  { label: "大师", value: "master" },
 ];
 
-// 价格类型选项
+// 价格类型
 export const PRICE_TYPES = [
-  { value: PriceType.FREE, label: "免费" },
-  { value: PriceType.FIXED, label: "固定价格" },
-  { value: PriceType.RANGE, label: "价格区间" },
-  { value: PriceType.NEGOTIABLE, label: "面议" },
+  { label: "免费", value: "free" },
+  { label: "固定价格", value: "fixed" },
+  { label: "起步价", value: "starting" },
+  { label: "面议", value: "negotiable" },
 ];
 
-// 联系方式选项
+// 联系方式
 export const CONTACT_METHODS = [
-  { value: ContactMethod.WECHAT, label: "微信" },
-  { value: ContactMethod.QQ, label: "QQ" },
-  { value: ContactMethod.PHONE, label: "电话" },
-  { value: ContactMethod.EMAIL, label: "邮箱" },
-  { value: ContactMethod.PLATFORM, label: "站内联系" },
+  { label: "微信", value: "wechat" },
+  { label: "QQ", value: "qq" },
+  { label: "电话", value: "phone" },
+  { label: "邮箱", value: "email" },
 ];
 
-// 常用城市列表
+// 热门城市
 export const POPULAR_CITIES = [
-  "北京",
   "上海",
+  "北京",
   "广州",
   "深圳",
-  "杭州",
-  "南京",
-  "武汉",
   "成都",
+  "杭州",
+  "武汉",
+  "南京",
   "重庆",
   "西安",
-  "苏州",
-  "天津",
-  "青岛",
-  "长沙",
-  "大连",
-  "厦门",
 ];
 
-// 获取标签
-export const getLabel = (
-  value: string,
-  options: { value: string; label: string }[],
-): string => {
-  return options.find((option) => option.value === value)?.label || value;
+// 帖子类型
+export const POST_TYPES = [
+  { label: "技能", value: "skill" },
+  { label: "分享", value: "share" },
+];
+
+// 标签推荐
+export const RECOMMENDED_TAGS = [
+  "二次元",
+  "Cosplay",
+  "动漫",
+  "摄影",
+  "妆容",
+  "道具",
+  "服装",
+  "后期",
+  "漫展",
+  "同人",
+];
+
+// 内容审核类型
+export const CONTENT_REVIEW_TYPES = {
+  TEXT: "text",
+  IMAGE: "image",
+};
+
+// 互动类型
+export const INTERACTION_TYPES = {
+  LIKE: "like",
+  COMMENT: "comment",
+  COLLECT: "collect",
+  SHARE: "share",
+};
+
+// 通知类型
+export const NOTIFICATION_TYPES = {
+  LIKE: "like",
+  COMMENT: "comment",
+  FOLLOW: "follow",
+  SYSTEM: "system",
+};
+
+// 用户角色
+export const USER_ROLES = {
+  USER: "user",
+  ADMIN: "admin",
+};
+
+// 状态码
+export const STATUS_CODES = {
+  SUCCESS: 200,
+  BAD_REQUEST: 400,
+  UNAUTHORIZED: 401,
+  FORBIDDEN: 403,
+  NOT_FOUND: 404,
+  SERVER_ERROR: 500,
+};
+
+// 本地存储键
+export const STORAGE_KEYS = {
+  TOKEN: "token",
+  USER_INFO: "userInfo",
+  SETTINGS: "settings",
 };

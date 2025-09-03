@@ -1,9 +1,12 @@
-import { INestApplication, ValidationPipe } from '@nestjs/common';
-import { Test } from '@nestjs/testing';
-import request from 'supertest';
-import { AppModule } from '../app.module';
-import { PrismaService } from '../prisma/prisma.service';
-import { STORAGE_PROVIDER, type StorageProvider } from '../upload/storage.provider';
+import { INestApplication, ValidationPipe } from "@nestjs/common";
+import { Test } from "@nestjs/testing";
+import request from "supertest";
+import { AppModule } from "../app.module";
+import { PrismaService } from "../prisma/prisma.service";
+import {
+  STORAGE_PROVIDER,
+  type StorageProvider,
+} from "../upload/storage.provider";
 
 class FakePrismaService {
   users: any[] = [];
@@ -11,7 +14,7 @@ class FakePrismaService {
 
   constructor() {
     // seed one user for authorId
-    this.users.push({ id: 'u1', username: 'demo', nickname: 'Demo' });
+    this.users.push({ id: "u1", username: "demo", nickname: "Demo" });
   }
 
   user = {
@@ -39,11 +42,22 @@ class FakePrismaService {
       return { ...rec, author: this.users[0] };
     },
     findMany: async ({ where }: any) => {
-      let list = this.skillPostsTable.filter((p) => !p.deletedAt && p.status === 'ACTIVE');
-      if (where?.city) list = list.filter((p) => p.city.includes(where.city.contains ? where.city.contains : where.city));
+      let list = this.skillPostsTable.filter(
+        (p) => !p.deletedAt && p.status === "ACTIVE",
+      );
+      if (where?.city)
+        list = list.filter((p) =>
+          p.city.includes(
+            where.city.contains ? where.city.contains : where.city,
+          ),
+        );
       if (where?.role) list = list.filter((p) => p.role === where.role);
-      if (where?.category) list = list.filter((p) => p.category === where.category);
-      if (where?.geohash?.startsWith) list = list.filter((p) => (p.geohash || '').startsWith(where.geohash.startsWith));
+      if (where?.category)
+        list = list.filter((p) => p.category === where.category);
+      if (where?.geohash?.startsWith)
+        list = list.filter((p) =>
+          (p.geohash || "").startsWith(where.geohash.startsWith),
+        );
       return list;
     },
     count: async ({ where }: any) => {
@@ -51,7 +65,9 @@ class FakePrismaService {
       return list.length;
     },
     findFirst: async ({ where, include }: any) => {
-      const found = this.skillPostsTable.find((p) => p.id === where.id && !p.deletedAt && p.status === 'ACTIVE');
+      const found = this.skillPostsTable.find(
+        (p) => p.id === where.id && !p.deletedAt && p.status === "ACTIVE",
+      );
       if (!found) return null;
       return include?.author ? { ...found, author: this.users[0] } : found;
     },
@@ -60,7 +76,7 @@ class FakePrismaService {
     },
     update: async ({ where, data, include }: any) => {
       const idx = this.skillPostsTable.findIndex((p) => p.id === where.id);
-      if (idx === -1) throw new Error('not found');
+      if (idx === -1) throw new Error("not found");
       const current = this.skillPostsTable[idx];
       const next = { ...current, ...data };
       if (data?.viewCount?.increment) {
@@ -75,13 +91,13 @@ class FakePrismaService {
 const FakeStorage: StorageProvider = {
   ensureBucket: async () => {},
   bucketExists: async () => true,
-  presignedPut: async () => 'http://localhost:9000/coshub-uploads/demo',
+  presignedPut: async () => "http://localhost:9000/coshub-uploads/demo",
   removeObject: async () => {},
   statObject: async () => ({ size: 0, lastModified: new Date() }),
   getPublicUrl: (b, k) => `http://localhost:9000/${b}/${k}`,
 };
 
-describe('API Smoke (skill-posts)', () => {
+describe("API Smoke (skill-posts)", () => {
   let app: INestApplication;
 
   beforeAll(async () => {
@@ -93,8 +109,10 @@ describe('API Smoke (skill-posts)', () => {
       .compile();
 
     app = moduleRef.createNestApplication();
-    app.setGlobalPrefix('api');
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+    app.setGlobalPrefix("api");
+    app.useGlobalPipes(
+      new ValidationPipe({ whitelist: true, transform: true }),
+    );
     await app.init();
   });
 
@@ -102,23 +120,29 @@ describe('API Smoke (skill-posts)', () => {
     await app.close();
   });
 
-  it('POST /api/skill-posts -> create', async () => {
+  it("POST /api/skill-posts -> create", async () => {
     const payload = {
-      title: '专业摄影师提供二次元人像拍摄服务',
-      description: '拥有5年经验，设备齐全，风格多样，欢迎各类Cos约拍。',
-      category: 'photography',
-      role: 'photographer',
-      experience: 'professional',
-      city: '上海',
-      price: { type: 'fixed', amount: 300, negotiable: false },
-      images: ['https://example.com/1.jpg'],
-      tags: ['人像摄影'],
-      availability: { weekdays: true, weekends: true, holidays: false, timeSlots: [{ start: '09:00', end: '18:00' }], advance: 3 },
-      contactInfo: { preferred: 'wechat', wechat: 'alice_photo' },
+      title: "专业摄影师提供二次元人像拍摄服务",
+      description: "拥有5年经验，设备齐全，风格多样，欢迎各类Cos约拍。",
+      category: "photography",
+      role: "photographer",
+      experience: "professional",
+      city: "上海",
+      price: { type: "fixed", amount: 300, negotiable: false },
+      images: ["https://example.com/1.jpg"],
+      tags: ["人像摄影"],
+      availability: {
+        weekdays: true,
+        weekends: true,
+        holidays: false,
+        timeSlots: [{ start: "09:00", end: "18:00" }],
+        advance: 3,
+      },
+      contactInfo: { preferred: "wechat", wechat: "alice_photo" },
     };
 
     const res = await request(app.getHttpServer())
-      .post('/api/skill-posts')
+      .post("/api/skill-posts")
       .send(payload)
       .expect(201);
 
@@ -126,18 +150,20 @@ describe('API Smoke (skill-posts)', () => {
     expect(res.body.data?.id).toBeTruthy();
   });
 
-  it('GET /api/skill-posts?city=上海 -> list contains created', async () => {
+  it("GET /api/skill-posts?city=上海 -> list contains created", async () => {
     const res = await request(app.getHttpServer())
-      .get('/api/skill-posts')
-      .query({ city: '上海', page: 1, limit: 10 })
+      .get("/api/skill-posts")
+      .query({ city: "上海", page: 1, limit: 10 })
       .expect(200);
     expect(res.body.success).toBeTruthy();
     expect(Array.isArray(res.body.data?.items)).toBeTruthy();
     expect((res.body.data?.items || []).length).toBeGreaterThan(0);
   });
 
-  it('GET /api/skill-posts/:id -> detail', async () => {
-    const list = await request(app.getHttpServer()).get('/api/skill-posts').query({ page: 1, limit: 10 });
+  it("GET /api/skill-posts/:id -> detail", async () => {
+    const list = await request(app.getHttpServer())
+      .get("/api/skill-posts")
+      .query({ page: 1, limit: 10 });
     const id = list.body.data.items[0].id;
     const res = await request(app.getHttpServer())
       .get(`/api/skill-posts/${id}`)
@@ -146,4 +172,3 @@ describe('API Smoke (skill-posts)', () => {
     expect(res.body.data?.id).toBe(id);
   });
 });
-

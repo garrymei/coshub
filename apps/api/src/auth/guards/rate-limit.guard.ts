@@ -37,7 +37,7 @@ export class RateLimitGuard implements CanActivate {
     }
 
     const key = `rate_limit:${rateLimitType}:${clientId}`;
-    const currentCount = await this.cacheManager.get<number>(key) || 0;
+    const currentCount = (await this.cacheManager.get<number>(key)) || 0;
 
     if (currentCount >= config.max) {
       throw new HttpException(
@@ -61,8 +61,14 @@ export class RateLimitGuard implements CanActivate {
     if (config.headers) {
       const response = context.switchToHttp().getResponse();
       response.set("X-RateLimit-Limit", config.max.toString());
-      response.set("X-RateLimit-Remaining", (config.max - currentCount - 1).toString());
-      response.set("X-RateLimit-Reset", new Date(Date.now() + config.windowMs).toISOString());
+      response.set(
+        "X-RateLimit-Remaining",
+        (config.max - currentCount - 1).toString(),
+      );
+      response.set(
+        "X-RateLimit-Reset",
+        new Date(Date.now() + config.windowMs).toISOString(),
+      );
     }
 
     return true;
@@ -73,13 +79,14 @@ export class RateLimitGuard implements CanActivate {
     if (request.user?.id) {
       return `user:${request.user.id}`;
     }
-    
-    const ip = request.ip || 
-               request.connection?.remoteAddress || 
-               request.socket?.remoteAddress ||
-               request.connection?.socket?.remoteAddress ||
-               "unknown";
-    
+
+    const ip =
+      request.ip ||
+      request.connection?.remoteAddress ||
+      request.socket?.remoteAddress ||
+      request.connection?.socket?.remoteAddress ||
+      "unknown";
+
     return `ip:${ip}`;
   }
 }

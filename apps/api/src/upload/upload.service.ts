@@ -28,14 +28,18 @@ export class UploadService {
     private readonly configService: ConfigService,
     @Inject(STORAGE_PROVIDER) private readonly storage: StorageProvider,
   ) {
-
     // 根据存储类型决定桶名配置项
-    const providerType = (this.configService.get('STORAGE_TYPE', 'minio') || 'minio').toString();
-    const minioBucket = this.configService.get('MINIO_BUCKET', 'coshub-uploads');
+    const providerType = (
+      this.configService.get("STORAGE_TYPE", "minio") || "minio"
+    ).toString();
+    const minioBucket = this.configService.get(
+      "MINIO_BUCKET",
+      "coshub-uploads",
+    );
     this.bucketName =
-      providerType === 'minio'
+      providerType === "minio"
         ? minioBucket
-        : this.configService.get('S3_BUCKET', minioBucket);
+        : this.configService.get("S3_BUCKET", minioBucket);
 
     // 上传配置
     this.config = {
@@ -53,10 +57,15 @@ export class UploadService {
     };
 
     // provider 与公共访问端点
-    this.providerType = (this.configService.get('STORAGE_TYPE', 'minio') || 'minio').toString();
-    const minioEp = this.configService.get('MINIO_ENDPOINT', 'http://localhost:9000');
-    const s3Ep = this.configService.get('S3_ENDPOINT', minioEp);
-    this.publicEndpoint = this.providerType === 'minio' ? minioEp : s3Ep;
+    this.providerType = (
+      this.configService.get("STORAGE_TYPE", "minio") || "minio"
+    ).toString();
+    const minioEp = this.configService.get(
+      "MINIO_ENDPOINT",
+      "http://localhost:9000",
+    );
+    const s3Ep = this.configService.get("S3_ENDPOINT", minioEp);
+    this.publicEndpoint = this.providerType === "minio" ? minioEp : s3Ep;
 
     // 初始化存储桶
     this.initBucket();

@@ -170,6 +170,12 @@ model Post {
   // 标签
   tags        String[]
   
+  // 地理信息
+  city        String?  @db.VarChar(50)
+  lat         Float?
+  lng         Float?
+  geohash     String?  @db.VarChar(12)
+  
   // 状态和统计
   status      PostStatus @default(ACTIVE)
   viewCount   Int      @default(0)
@@ -189,6 +195,7 @@ model Post {
   @@map("posts")
   @@index([type])
   @@index([category])
+  @@index([city])
   @@index([status])
   @@index([createdAt])
 }
@@ -232,6 +239,27 @@ model Report {
   @@index([type])
   @@index([targetType])
   @@index([status])
+  @@index([createdAt])
+}
+
+// Banner表
+model Banner {
+  id          String   @id @default(cuid())
+  scene       BannerScene
+  imageUrl    String   @db.VarChar(500)
+  linkType    BannerLinkType
+  linkUrl     String   @db.VarChar(500)
+  priority    Int      @default(0)
+  online      Boolean  @default(true)
+  
+  // 系统字段
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("banners")
+  @@index([scene])
+  @@index([online])
+  @@index([priority])
   @@index([createdAt])
 }
 
@@ -430,6 +458,18 @@ enum ReportStatus {
   RESOLVED       // 已解决
   REJECTED       // 已驳回
   CLOSED         // 已关闭
+}
+
+// Banner相关枚举
+enum BannerScene {
+  FEED           // 交流区
+  SKILLS         // 技能区
+  HOME           // 首页
+}
+
+enum BannerLinkType {
+  EXTERNAL       // 外部链接
+  INTERNAL       // 内部链接
 }
 
 // 评论相关枚举

@@ -8,6 +8,8 @@ import { HealthController } from "./health/health.controller";
 import { HealthService } from "./health/health.service";
 import { SkillPostsModule } from "./skill-posts/skill-posts.module";
 import { SkillsModule } from "./skills/skills.module";
+import { PostsModule } from "./posts/posts.module";
+import { BannersModule } from "./banners/banners.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { UploadModule } from "./upload/upload.module";
 import { ReportsModule } from "./reports/reports.module";
@@ -27,6 +29,8 @@ import { AuthModule } from "./auth/auth.module";
     }),
     PrismaModule,
     SkillPostsModule,
+    PostsModule,
+    BannersModule,
     UploadModule,
     SkillsModule,
     ReportsModule,
@@ -43,8 +47,6 @@ import { AuthModule } from "./auth/auth.module";
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(LoggerMiddleware)
-      .forRoutes("*");
+    consumer.apply(LoggerMiddleware).forRoutes("*");
   }
 }

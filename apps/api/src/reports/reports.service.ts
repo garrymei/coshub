@@ -107,9 +107,9 @@ export class ReportsService {
           violations: checkResult.violations,
           riskLevel: checkResult.riskLevel,
           timestamp: new Date().toISOString(),
-          checkType: "ai_content_safety"
-        }
-      }
+          checkType: "ai_content_safety",
+        },
+      },
     });
   }
 

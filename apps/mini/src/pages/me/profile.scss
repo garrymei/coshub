@@ -1,0 +1,78 @@
+.profile-page {
+  padding: 16px;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  
+  .form-section {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    
+    .section-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 12px;
+      display: block;
+    }
+    
+    .avatar-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      
+      .avatar-image {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        margin-bottom: 8px;
+      }
+      
+      .avatar-tip {
+        font-size: 14px;
+        color: #999;
+      }
+    }
+    
+    .input-field {
+      width: 100%;
+      height: 40px;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      padding: 0 12px;
+      font-size: 14px;
+    }
+    
+    .textarea-field {
+      width: 100%;
+      height: 100px;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+  }
+  
+  .save-button {
+    width: 100%;
+    height: 44px;
+    background-color: #FF6B9D;
+    color: #fff;
+    font-size: 16px;
+    border-radius: 22px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 24px;
+    margin-bottom: 24px;
+  }
+  
+  .loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    color: #999;
+  }
+}

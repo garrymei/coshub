@@ -9,7 +9,12 @@ import {
   Switch,
 } from "@tarojs/components";
 import Taro from "@tarojs/taro";
-import { skillsApi, showToast, hideLoading, showLoading } from "../../utils/api";
+import {
+  skillsApi,
+  showToast,
+  hideLoading,
+  showLoading,
+} from "../../utils/api";
 import {
   SKILL_CATEGORIES,
   SKILL_ROLES,
@@ -18,9 +23,7 @@ import {
   CONTACT_METHODS,
   POPULAR_CITIES,
 } from "../../utils/constants";
-import type {
-  CreateSkillPostDTO,
-} from "@coshub/types";
+import type { CreateSkillPostDTO } from "@coshub/types";
 import {
   SkillCategory,
   SkillRole,
@@ -173,7 +176,7 @@ export default class CreateSkillPost extends Component<{}, State> {
           negotiable:
             PRICE_TYPES[index].value === PriceType.NEGOTIABLE
               ? true
-              : this.state.formData.price.negotiable ?? false,
+              : (this.state.formData.price.negotiable ?? false),
         },
       },
     });
@@ -245,23 +248,23 @@ export default class CreateSkillPost extends Component<{}, State> {
   // 表单验证
   validateForm = (): string | null => {
     const { formData } = this.state;
-    
+
     if (!formData.title?.trim()) {
       return "请输入标题";
     }
-    
+
     if (!formData.description?.trim()) {
       return "请输入描述";
     }
-    
+
     if (!formData.city?.trim()) {
       return "请输入城市";
     }
-    
+
     if (formData.price.amount <= 0) {
       return "请输入有效的价格";
     }
-    
+
     return null;
   };
 

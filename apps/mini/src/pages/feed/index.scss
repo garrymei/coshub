@@ -1,0 +1,49 @@
+.feed-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #f8f9fa;
+  padding: 16px;
+  
+  .feed-container {
+    flex: 1;
+    
+    .waterfall-container {
+      display: flex;
+      justify-content: space-between;
+      
+      .waterfall-column {
+        width: 48%;
+      }
+    }
+    
+    .empty-state {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 200px;
+      color: #999;
+      font-size: 14px;
+    }
+  }
+  
+  .add-button {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: #FF6B9D;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(255, 107, 157, 0.3);
+    
+    .add-icon {
+      color: #fff;
+      font-size: 28px;
+      font-weight: bold;
+    }
+  }
+}

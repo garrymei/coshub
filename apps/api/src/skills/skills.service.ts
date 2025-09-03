@@ -31,7 +31,7 @@ export class SkillsService {
         title: data.title,
         description: data.description || "",
         category: "COSPLAY",
-        role: (data.role ? String(data.role).toUpperCase() : 'COSER') as any,
+        role: (data.role ? String(data.role).toUpperCase() : "COSER") as any,
         experience: "BEGINNER",
         city: data.city,
         lat: data.lat ?? null,
@@ -64,9 +64,9 @@ export class SkillsService {
     const { city, role, page = 1, pageSize = 10, lat, lng, radius } = params;
     const where: any = {};
     if (city) where.city = city;
-    if (role) where.role = (String(role).toUpperCase()) as any;
+    if (role) where.role = String(role).toUpperCase() as any;
     // 使用 geohash 前缀进行粗筛
-    let coarseWhere: any = { ...where };
+    const coarseWhere: any = { ...where };
     if (lat != null && lng != null && radius != null && radius > 0) {
       const prefixLength = this.pickGeohashPrecision(radius);
       const prefix = this.encodeGeohash(lat, lng, prefixLength);
@@ -106,31 +106,47 @@ export class SkillsService {
     let bit = 0;
     let evenBit = true;
     let geohash = "";
-    let latMin = -90, latMax = 90;
-    let lonMin = -180, lonMax = 180;
+    let latMin = -90,
+      latMax = 90;
+    let lonMin = -180,
+      lonMax = 180;
     while (geohash.length < precision) {
       if (evenBit) {
         const lonMid = (lonMin + lonMax) / 2;
-        if (lng >= lonMid) { idx = idx * 2 + 1; lonMin = lonMid; }
-        else { idx = idx * 2; lonMax = lonMid; }
+        if (lng >= lonMid) {
+          idx = idx * 2 + 1;
+          lonMin = lonMid;
+        } else {
+          idx = idx * 2;
+          lonMax = lonMid;
+        }
       } else {
         const latMid = (latMin + latMax) / 2;
-        if (lat >= latMid) { idx = idx * 2 + 1; latMin = latMid; }
-        else { idx = idx * 2; latMax = latMid; }
+        if (lat >= latMid) {
+          idx = idx * 2 + 1;
+          latMin = latMid;
+        } else {
+          idx = idx * 2;
+          latMax = latMid;
+        }
       }
       evenBit = !evenBit;
-      if (++bit == 5) { geohash += base32.charAt(idx); bit = 0; idx = 0; }
+      if (++bit == 5) {
+        geohash += base32.charAt(idx);
+        bit = 0;
+        idx = 0;
+      }
     }
     return geohash;
   }
 
   // 根据半径（km）选择 geohash 前缀长度
   private pickGeohashPrecision(radiusKm: number): number {
-    if (radiusKm >= 78) return 3;   // ~156km
-    if (radiusKm >= 20) return 4;   // ~39km
-    if (radiusKm >= 2.5) return 5;  // ~4.9km
-    if (radiusKm >= 0.6) return 6;  // ~1.2km
-    return 7;                       // ~0.15km
+    if (radiusKm >= 78) return 3; // ~156km
+    if (radiusKm >= 20) return 4; // ~39km
+    if (radiusKm >= 2.5) return 5; // ~4.9km
+    if (radiusKm >= 0.6) return 6; // ~1.2km
+    return 7; // ~0.15km
   }
 
   private haversineDistance(

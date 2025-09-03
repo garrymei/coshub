@@ -1,0 +1,300 @@
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import {
+  Post,
+  CreatePostDTO,
+  UpdatePostDTO,
+  PostQueryDTO,
+  PostListResponse,
+} from "@coshub/types";
+import { Prisma } from "../../generated/prisma";
+
+@Injectable()
+export class PostsService {
+  constructor(private prisma: PrismaService) {}
+
+  // 创建帖子
+  async create(createPostDto: CreatePostDTO): Promise<Post> {
+    // 暂时使用第一个用户作为作者，后续集成认证后从JWT获取
+    const firstUser = await this.prisma.user.findFirst();
+    if (!firstUser) {
+      throw new Error("未找到用户，请先运行种子数据");
+    }
+
+    const post = await this.prisma.post.create({
+      data: {
+        title: createPostDto.title,
+        content: createPostDto.content,
+        type: createPostDto.type as any,
+        category: createPostDto.category as any,
+        images: createPostDto.images || [],
+        videos: createPostDto.videos || [],
+        tags: createPostDto.tags || [],
+        authorId: firstUser.id,
+      },
+      include: {
+        author: true,
+      },
+    });
+
+    return this.transformPost(post);
+  }
+
+  // 获取帖子列表（支持筛选和排序）
+  async findAll(query: PostQueryDTO): Promise<PostListResponse> {
+    const where: Prisma.PostWhereInput = {
+      deletedAt: null,
+      status: "ACTIVE",
+    };
+
+    // 应用筛选条件
+    if (query.type) {
+      where.type = query.type as any;
+    }
+
+    if (query.category) {
+      where.category = query.category as any;
+    }
+
+    if (query.city) {
+      // 如果帖子有城市字段，可以在这里筛选
+      // 目前Post模型没有city字段，需要扩展
+    }
+
+    if (query.tags && query.tags.length > 0) {
+      where.tags = {
+        hasSome: query.tags,
+      };
+    }
+
+    if (query.author) {
+      where.author = {
+        OR: [
+          { username: { contains: query.author, mode: "insensitive" } },
+          { nickname: { contains: query.author, mode: "insensitive" } },
+        ],
+      };
+    }
+
+    if (query.keyword) {
+      where.OR = [
+        {
+          title: {
+            contains: query.keyword,
+            mode: "insensitive",
+          },
+        },
+        {
+          content: {
+            contains: query.keyword,
+            mode: "insensitive",
+          },
+        },
+        {
+          tags: {
+            has: query.keyword,
+          },
+        },
+      ];
+    }
+
+    // 排序
+    const orderBy: Prisma.PostOrderByWithRelationInput = {};
+    switch (query.sortBy) {
+      case "createdAt":
+        orderBy.createdAt = query.sortOrder || "desc";
+        break;
+      case "updatedAt":
+        orderBy.updatedAt = query.sortOrder || "desc";
+        break;
+      case "viewCount":
+        orderBy.viewCount = query.sortOrder || "desc";
+        break;
+      case "likeCount":
+        orderBy.likeCount = query.sortOrder || "desc";
+        break;
+      case "commentCount":
+        orderBy.commentCount = query.sortOrder || "desc";
+        break;
+      default:
+        orderBy.createdAt = "desc";
+    }
+
+    // Keyset pagination 实现
+    const limit = query.limit || 10;
+
+    // 如果提供了游标，添加游标条件
+    if (query.cursor) {
+      const cursorField = query.sortBy || "createdAt";
+      try {
+        const cursorData = JSON.parse(
+          Buffer.from(query.cursor, "base64").toString(),
+        );
+        if (cursorData[cursorField]) {
+          where[cursorField] = {
+            [orderBy[cursorField] === "desc" ? "lt" : "gt"]:
+              cursorData[cursorField],
+          };
+        }
+      } catch (error) {
+        console.warn("Invalid cursor format:", error);
+      }
+    }
+
+    // 获取数据（多取一条用于判断是否有下一页）
+    const take = limit + 1;
+
+    const posts = await this.prisma.post.findMany({
+      where,
+      orderBy,
+      take,
+      include: {
+        author: true,
+      },
+    });
+
+    // 判断是否有下一页
+    const hasNext = posts.length > limit;
+    const items = posts.slice(0, limit);
+
+    // 计算下一页游标
+    let nextCursor: string | undefined;
+    if (hasNext && items.length > 0) {
+      const lastItem = items[items.length - 1];
+      const cursorField = query.sortBy || "createdAt";
+      const cursorData = {
+        [cursorField]: lastItem[cursorField],
+        id: lastItem.id,
+      };
+      nextCursor = Buffer.from(JSON.stringify(cursorData)).toString("base64");
+    }
+
+    // 获取总数
+    const total = await this.prisma.post.count({ where });
+
+    return {
+      items: items.map((post) => this.transformPost(post)),
+      total,
+      nextCursor,
+      hasNext,
+      page: query.page || 1,
+      limit,
+      totalPages: Math.ceil(total / limit),
+      hasPrev: query.page ? query.page > 1 : false,
+    };
+  }
+
+  // 获取帖子详情
+  async findOne(id: string): Promise<Post> {
+    const post = await this.prisma.post.findFirst({
+      where: {
+        id,
+        deletedAt: null,
+        status: "ACTIVE",
+      },
+      include: {
+        author: true,
+      },
+    });
+
+    if (!post) {
+      throw new NotFoundException(`帖子 ID ${id} 不存在`);
+    }
+
+    // 增加浏览量
+    await this.prisma.post.update({
+      where: { id },
+      data: {
+        viewCount: {
+          increment: 1,
+        },
+      },
+    });
+
+    post.viewCount += 1;
+
+    return this.transformPost(post);
+  }
+
+  // 更新帖子
+  async update(id: string, updatePostDto: UpdatePostDTO): Promise<Post> {
+    const post = await this.prisma.post.update({
+      where: { id },
+      data: {
+        ...updatePostDto,
+        updatedAt: new Date(),
+      },
+      include: {
+        author: true,
+      },
+    });
+
+    return this.transformPost(post);
+  }
+
+  // 删除帖子（软删除）
+  async remove(id: string): Promise<boolean> {
+    await this.prisma.post.update({
+      where: { id },
+      data: {
+        deletedAt: new Date(),
+      },
+    });
+
+    return true;
+  }
+
+  // 获取热门标签
+  async getTags(): Promise<string[]> {
+    const posts = await this.prisma.post.findMany({
+      where: {
+        deletedAt: null,
+        status: "ACTIVE",
+      },
+      select: {
+        tags: true,
+      },
+    });
+
+    const allTags = posts.flatMap((post) => post.tags);
+    const tagCounts = allTags.reduce(
+      (acc, tag) => {
+        acc[tag] = (acc[tag] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
+
+    return Object.entries(tagCounts)
+      .sort(([, a], [, b]) => (b as number) - (a as number))
+      .slice(0, 20)
+      .map(([tag]) => tag);
+  }
+
+  // 转换数据库模型到API模型
+  private transformPost(post: any): Post {
+    return {
+      id: post.id,
+      title: post.title,
+      content: post.content,
+      type: String(post.type).toLowerCase(),
+      category: post.category ? String(post.category).toLowerCase() : undefined,
+      images: post.images || [],
+      videos: post.videos || [],
+      tags: post.tags || [],
+      authorId: post.authorId,
+      authorName: post.author.nickname || post.author.username,
+      authorAvatar:
+        post.author.avatar ||
+        `https://api.dicebear.com/7.x/avataaars/svg?seed=${post.author.username}`,
+      stats: {
+        viewCount: post.viewCount,
+        likeCount: post.likeCount,
+        commentCount: post.commentCount,
+        shareCount: post.shareCount,
+      },
+      createdAt: post.createdAt,
+      updatedAt: post.updatedAt,
+    } as any;
+  }
+}

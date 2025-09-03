@@ -13,12 +13,12 @@ export default function CreateSkillPostPage() {
     title: "",
     description: "",
     city: "",
-    price: 0
+    price: 0,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.title?.trim()) {
       setError("请输入标题");
       return;
@@ -81,7 +81,7 @@ export default function CreateSkillPostPage() {
                   type="text"
                   value={formData.title}
                   onChange={(e) =>
-                    setFormData(prev => ({ ...prev, title: e.target.value }))
+                    setFormData((prev) => ({ ...prev, title: e.target.value }))
                   }
                   placeholder="简明扼要地描述你的技能服务"
                   className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -96,7 +96,10 @@ export default function CreateSkillPostPage() {
                 <textarea
                   value={formData.description}
                   onChange={(e) =>
-                    setFormData(prev => ({ ...prev, description: e.target.value }))
+                    setFormData((prev) => ({
+                      ...prev,
+                      description: e.target.value,
+                    }))
                   }
                   placeholder="详细描述你的技能、经验和服务内容"
                   rows={4}
@@ -112,7 +115,7 @@ export default function CreateSkillPostPage() {
                   type="text"
                   value={formData.city}
                   onChange={(e) =>
-                    setFormData(prev => ({ ...prev, city: e.target.value }))
+                    setFormData((prev) => ({ ...prev, city: e.target.value }))
                   }
                   placeholder="请输入城市名称"
                   className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -127,7 +130,10 @@ export default function CreateSkillPostPage() {
                   type="number"
                   value={formData.price}
                   onChange={(e) =>
-                    setFormData(prev => ({ ...prev, price: Number(e.target.value) }))
+                    setFormData((prev) => ({
+                      ...prev,
+                      price: Number(e.target.value),
+                    }))
                   }
                   placeholder="请输入价格"
                   min="0"

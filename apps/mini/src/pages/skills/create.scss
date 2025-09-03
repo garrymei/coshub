@@ -1,0 +1,140 @@
+.skill-create-page {
+  padding: 16px;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  
+  .form-section {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    
+    .section-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 12px;
+      display: block;
+    }
+    
+    .input-field {
+      width: 100%;
+      height: 40px;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      padding: 0 12px;
+      font-size: 14px;
+    }
+    
+    .textarea-field {
+      width: 100%;
+      height: 120px;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+    
+    .price-input {
+      display: flex;
+      align-items: center;
+      
+      .price-symbol {
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+        margin-right: 8px;
+      }
+    }
+    
+    .tags-container {
+      display: flex;
+      flex-wrap: wrap;
+      
+      .tag-item {
+        padding: 6px 12px;
+        margin-right: 12px;
+        margin-bottom: 12px;
+        background-color: #f0f0f0;
+        border-radius: 16px;
+        font-size: 14px;
+        color: #666;
+        
+        &.active {
+          background-color: #FF6B9D;
+          color: #fff;
+        }
+      }
+    }
+    
+    .images-container {
+      display: flex;
+      flex-wrap: wrap;
+      
+      .image-item {
+        width: 80px;
+        height: 80px;
+        margin-right: 12px;
+        margin-bottom: 12px;
+        position: relative;
+        
+        .preview-image {
+          width: 100%;
+          height: 100%;
+          border-radius: 4px;
+        }
+        
+        .remove-icon {
+          position: absolute;
+          top: -8px;
+          right: -8px;
+          width: 20px;
+          height: 20px;
+          background-color: rgba(0, 0, 0, 0.5);
+          color: #fff;
+          border-radius: 50%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          font-size: 14px;
+        }
+      }
+      
+      .add-image {
+        width: 80px;
+        height: 80px;
+        border: 1px dashed #ccc;
+        border-radius: 4px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        
+        .add-icon {
+          font-size: 24px;
+          color: #999;
+          margin-bottom: 4px;
+        }
+        
+        .add-text {
+          font-size: 12px;
+          color: #999;
+        }
+      }
+    }
+  }
+  
+  .submit-button {
+    width: 100%;
+    height: 44px;
+    background-color: #FF6B9D;
+    color: #fff;
+    font-size: 16px;
+    border-radius: 22px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 24px;
+    margin-bottom: 24px;
+  }
+}

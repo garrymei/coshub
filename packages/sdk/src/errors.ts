@@ -110,7 +110,14 @@ export class ErrorHandler {
    * 记录错误到控制台（开发环境）
    */
   static logError(error: unknown, context?: string): void {
-    if (process.env.NODE_ENV === "development") {
+    // 检查是否在浏览器环境中，并且是本地开发环境
+    const isDevelopment =
+      typeof window !== "undefined"
+        ? window.location.hostname === "localhost" ||
+          window.location.hostname === "127.0.0.1"
+        : false;
+
+    if (isDevelopment) {
       console.group(`🚨 CoshubSDK Error${context ? ` [${context}]` : ""}`);
 
       if (error instanceof CoshubError) {

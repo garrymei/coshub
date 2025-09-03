@@ -22,13 +22,14 @@ export * from "./skill-post";
 // 举报相关类型
 export * from "./report";
 
+// Banner相关类型
+export * from "./banner";
+
 // 认证相关类型
 export * from "./auth";
 
 // 通用类型
 export * from "./common";
-
-
 
 // 版本信息
 export const VERSION = "0.1.0";

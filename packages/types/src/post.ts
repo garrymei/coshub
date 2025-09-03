@@ -15,6 +15,10 @@ export interface Post {
   tags: Tag[];
   images: UploadedFile[];
   videos: UploadedFile[];
+  city?: string;
+  lat?: number;
+  lng?: number;
+  geohash?: string;
   metadata?: PostMetadata;
   stats: PostStats;
   isPublished: boolean;
@@ -80,4 +84,47 @@ export interface PostDraft {
   metadata?: Partial<PostMetadata>;
   lastSavedAt: Date;
   createdAt: Date;
+}
+
+// DTO 类型定义
+export interface CreatePostDTO {
+  title: string;
+  content: string;
+  type: PostType;
+  category?: PostCategory;
+  tags?: string[];
+  images?: string[];
+  videos?: string[];
+  metadata?: Partial<PostMetadata>;
+}
+
+export interface UpdatePostDTO {
+  title?: string;
+  content?: string;
+  type?: PostType;
+  category?: PostCategory;
+  tags?: string[];
+  images?: string[];
+  videos?: string[];
+  metadata?: Partial<PostMetadata>;
+}
+
+export interface PostQueryDTO {
+  type?: PostType;
+  category?: PostCategory;
+  tags?: string[];
+  authorId?: string;
+  keyword?: string;
+  city?: string;
+  sortBy?: "latest" | "popular" | "mostViewed";
+  page?: number;
+  limit?: number;
+  cursor?: string;
+}
+
+export interface PostListResponse {
+  posts: Post[];
+  total: number;
+  hasMore: boolean;
+  nextCursor?: string;
 }
