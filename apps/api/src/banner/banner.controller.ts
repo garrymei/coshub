@@ -13,7 +13,7 @@ export class BannerController {
     return {
       success: true,
       data: banners,
-      message: "获取Banner成功"
+      message: "获取Banner成功",
     } as ApiResponse;
   }
 }

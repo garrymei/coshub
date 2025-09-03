@@ -11,17 +11,11 @@ export class BannerService {
       where: {
         scene,
         online: true,
-        OR: [
-          { startAt: null },
-          { startAt: { lte: new Date() } }
-        ],
-        OR: [
-          { endAt: null },
-          { endAt: { gte: new Date() } }
-        ]
+        OR: [{ startAt: null }, { startAt: { lte: new Date() } }],
+        OR: [{ endAt: null }, { endAt: { gte: new Date() } }],
       },
       orderBy: { priority: "desc" },
-      take: 5
+      take: 5,
     });
   }
 }

@@ -29,7 +29,7 @@ export default function SkillsIndex() {
     try {
       const res = await Taro.request({
         url: "/api/skills",
-        method: "GET"
+        method: "GET",
       });
       setSkills(res.data.data);
     } catch (error) {
@@ -41,7 +41,7 @@ export default function SkillsIndex() {
     try {
       const res = await Taro.request({
         url: "/api/banners?scene=SKILLS",
-        method: "GET"
+        method: "GET",
       });
       setBanners(res.data.data);
     } catch (error) {
@@ -51,19 +51,19 @@ export default function SkillsIndex() {
 
   return (
     <ScrollView className="skills-page">
-      {banners.map(banner => (
-        <Banner 
-          key={banner.id} 
+      {banners.map((banner) => (
+        <Banner
+          key={banner.id}
           data={{
             id: banner.id,
             imageUrl: banner.imageUrl,
-            linkUrl: banner.linkUrl
-          }} 
+            linkUrl: banner.linkUrl,
+          }}
         />
       ))}
-      
+
       <View className="skills-list">
-        {skills.map(skill => (
+        {skills.map((skill) => (
           <SkillCard key={skill.id} data={skill} />
         ))}
       </View>
