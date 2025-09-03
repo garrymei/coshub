@@ -18,11 +18,13 @@ interface ISkill {
 
 export default function SkillsIndex() {
   const [skills, setSkills] = useState<ISkill[]>([]);
-  const [banners, setBanners] = useState<Array<{
-    id: string
-    imageUrl: string
-    linkUrl: string
-  }>>([]);
+  const [banners, setBanners] = useState<
+    Array<{
+      id: string;
+      imageUrl: string;
+      linkUrl: string;
+    }>
+  >([]);
 
   useEffect(() => {
     fetchSkills();
@@ -59,8 +61,9 @@ export default function SkillsIndex() {
         <Banner
           key={banner.id}
           id={banner.id}
-          imageUrl={banner.imageUrl} 
+          imageUrl={banner.imageUrl}
           linkUrl={banner.linkUrl}
+          onClick={() => console.log('Banner clicked')}
         />
       ))}
 
