@@ -3,6 +3,7 @@ import { AppModule } from "./app.module";
 import { ValidationPipe } from "@nestjs/common";
 import helmet from "helmet";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import { LoggerService } from "./logger/logger.service";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -34,9 +35,14 @@ async function bootstrap() {
   const port = process.env.PORT || 3001;
   await app.listen(port);
 
-  console.log(`🚀 Coshub API 服务启动成功！`);
-  console.log(`📡 监听端口: ${port}`);
-  console.log(`🌐 访问地址: http://localhost:${port}/api`);
-  console.log(`💚 健康检查: http://localhost:${port}/api/healthz`);
+  const logger = app.get(LoggerService);
+  logger.log(`🚀 Coshub API 服务启动成功！`);
+  logger.log(`📡 监听端口: ${port}`);
+  logger.log(`🌐 访问地址: http://localhost:${port}/api`);
+  logger.log(`💚 健康检查: http://localhost:${port}/api/healthz`);
 }
-bootstrap();
+bootstrap().catch(err => {
+  // 在启动失败时无法使用依赖注入获取Logger，使用原生console
+  process.stderr.write(`启动失败: ${err.message}\n${err.stack}\n`);
+  process.exit(1);
+});

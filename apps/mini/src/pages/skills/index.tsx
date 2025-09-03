@@ -63,7 +63,7 @@ export default function SkillsIndex() {
           id={banner.id}
           imageUrl={banner.imageUrl}
           linkUrl={banner.linkUrl}
-          onClick={() => console.log('Banner clicked')}
+          onClick={() => Taro.eventCenter.trigger("bannerClick", banner.id)}
         />
       ))}
 

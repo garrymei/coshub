@@ -34,7 +34,7 @@ import { AuthModule } from "./auth/auth.module";
     UploadModule,
     SkillsModule,
     ReportsModule,
-    RedisRedisCacheModule,
+    RedisCacheModule,
     LoggerModule,
     AuthModule,
   ],
