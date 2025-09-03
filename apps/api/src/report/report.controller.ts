@@ -6,7 +6,7 @@ import {
   Query,
   UseGuards,
   HttpException,
-  HttpStatus
+  HttpStatus,
 } from "@nestjs/common";
 import { ReportService } from "./report.service";
 import { CreateReportDTO, ReportQueryDTO } from "@coshub/types";
@@ -27,7 +27,7 @@ export class ReportController {
     } catch (error) {
       throw new HttpException(
         "Failed to create report",
-        HttpStatus.BAD_REQUEST
+        HttpStatus.BAD_REQUEST,
       );
     }
   }

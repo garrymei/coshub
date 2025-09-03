@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { Cache } from 'cache-manager';
+import { Injectable } from "@nestjs/common";
+import { Cache } from "cache-manager";
 
 @Injectable()
 export class CacheService {
@@ -17,11 +17,7 @@ export class CacheService {
     return this.cacheManager.del(key);
   }
 
-  async wrap<T>(
-    key: string,
-    fn: () => Promise<T>,
-    ttl?: number,
-  ): Promise<T> {
+  async wrap<T>(key: string, fn: () => Promise<T>, ttl?: number): Promise<T> {
     return this.cacheManager.wrap(key, fn, ttl);
   }
 }

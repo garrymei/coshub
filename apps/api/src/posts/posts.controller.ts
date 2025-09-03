@@ -73,7 +73,7 @@ export class PostsController {
 
   @Get()
   async findAll(
-    @Query() query: PostQueryDTO & { type?: 'share' | 'skill' },
+    @Query() query: PostQueryDTO & { type?: "share" | "skill" },
   ): Promise<ApiResponse<PostListResponse>> {
     // 直接使用 query.type，不需要额外处理
     try {
@@ -130,6 +130,103 @@ export class PostsController {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+
+  // 点赞
+  @HttpPost(":id/like")
+  async like(
+    @Param("id") id: string,
+  ): Promise<ApiResponse<{ likeCount: number }>> {
+    await this.postsService.createInteraction(id, "LIKE");
+    const post = await this.postsService.findOne(id);
+    return {
+      success: true,
+      data: { likeCount: post.stats.likeCount },
+      message: "点赞成功",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  // 取消点赞
+  @Delete(":id/like")
+  async unlike(
+    @Param("id") id: string,
+  ): Promise<ApiResponse<{ likeCount: number }>> {
+    await this.postsService.deleteInteraction(id, "LIKE");
+    const post = await this.postsService.findOne(id);
+    return {
+      success: true,
+      data: { likeCount: post.stats.likeCount },
+      message: "取消点赞成功",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  // 收藏（复用shareCount计数）
+  @HttpPost(":id/collect")
+  async collect(
+    @Param("id") id: string,
+  ): Promise<ApiResponse<{ collectCount: number }>> {
+    await this.postsService.createInteraction(id, "COLLECT");
+    const post = await this.postsService.findOne(id);
+    return {
+      success: true,
+      data: { collectCount: post.stats.shareCount },
+      message: "收藏成功",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  // 取消收藏
+  @Delete(":id/collect")
+  async uncollect(
+    @Param("id") id: string,
+  ): Promise<ApiResponse<{ collectCount: number }>> {
+    await this.postsService.deleteInteraction(id, "COLLECT");
+    const post = await this.postsService.findOne(id);
+    return {
+      success: true,
+      data: { collectCount: post.stats.shareCount },
+      message: "取消收藏成功",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  // 获取评论
+  @Get(":id/comments")
+  async getComments(@Param("id") id: string): Promise<ApiResponse<any[]>> {
+    const data = await this.postsService.getComments(id);
+    return {
+      success: true,
+      data,
+      message: "获取评论成功",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  // 发表评论
+  @HttpPost(":id/comments")
+  async addComment(
+    @Param("id") id: string,
+    @Body("content") content: string,
+  ): Promise<ApiResponse<any>> {
+    if (!content || !content.trim()) {
+      throw new HttpException(
+        {
+          success: false,
+          error: { code: "VALIDATION_ERROR", message: "评论内容不能为空" },
+          timestamp: new Date().toISOString(),
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const comment = await this.postsService.createComment(id, content.trim());
+    return {
+      success: true,
+      data: comment,
+      message: "评论成功",
+      timestamp: new Date().toISOString(),
+    };
   }
 
   @Put(":id")
@@ -307,7 +404,10 @@ export class PostsController {
     @Body() dto: CreateCommentDto,
   ): Promise<ApiResponse<Comment>> {
     try {
-      const comment = await this.postsService.createComment(postId, dto.content);
+      const comment = await this.postsService.createComment(
+        postId,
+        dto.content,
+      );
       return {
         success: true,
         data: comment,

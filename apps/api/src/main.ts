@@ -41,7 +41,7 @@ async function bootstrap() {
   logger.log(`🌐 访问地址: http://localhost:${port}/api`);
   logger.log(`💚 健康检查: http://localhost:${port}/api/healthz`);
 }
-bootstrap().catch(err => {
+bootstrap().catch((err) => {
   // 在启动失败时无法使用依赖注入获取Logger，使用原生console
   process.stderr.write(`启动失败: ${err.message}\n${err.stack}\n`);
   process.exit(1);

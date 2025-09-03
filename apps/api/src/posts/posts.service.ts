@@ -46,7 +46,9 @@ export class PostsService {
   }
 
   // 获取帖子列表（支持筛选和排序）
-  async findAll(query: PostQueryDTO & { city?: string; radiusKm?: number }): Promise<PostListResponse> {
+  async findAll(
+    query: PostQueryDTO & { city?: string; radiusKm?: number },
+  ): Promise<PostListResponse> {
     const where: Prisma.PostWhereInput = {
       deletedAt: null,
       status: "ACTIVE",
@@ -56,7 +58,7 @@ export class PostsService {
     if (query.city) {
       where.city = query.city;
     }
-    
+
     // 地理范围筛选 (后续实现geohash)
     if (query.radiusKm && query.lat && query.lng) {
       // 临时实现 - 后续替换为geohash查询
@@ -64,7 +66,7 @@ export class PostsService {
         { lat: { gte: query.lat - 0.1 } },
         { lat: { lte: query.lat + 0.1 } },
         { lng: { gte: query.lng - 0.1 } },
-        { lng: { lte: query.lng + 0.1 } }
+        { lng: { lte: query.lng + 0.1 } },
       ];
     }
 
@@ -248,10 +250,10 @@ export class PostsService {
 
     post.viewCount += 1;
     const transformed = this.transformPost(post);
-    
+
     // 缓存帖子详情
     await this.cacheManager.set(`post_${id}`, transformed, 300);
-    
+
     return transformed;
   }
 
@@ -335,18 +337,27 @@ export class PostsService {
 
   // 转换数据库模型到API模型
   // 批量点赞/收藏操作（减少数据库往返）
-  private pendingInteractions: Map<string, {type: 'LIKE' | 'COLLECT', delta: number}> = new Map();
+  private pendingInteractions: Map<
+    string,
+    { type: "LIKE" | "COLLECT"; delta: number }
+  > = new Map();
   private interactionFlushTimeout: NodeJS.Timeout | null = null;
 
-  async createInteraction(postId: string, type: InteractionType): Promise<void> {
+  async createInteraction(
+    postId: string,
+    type: "LIKE" | "COLLECT",
+  ): Promise<void> {
     const key = `${postId}-${type}`;
-    const current = this.pendingInteractions.get(key) || {type, delta: 0};
+    const current = this.pendingInteractions.get(key) || { type, delta: 0 };
     current.delta += 1;
     this.pendingInteractions.set(key, current);
 
     // 延迟批量更新
     if (!this.interactionFlushTimeout) {
-      this.interactionFlushTimeout = setTimeout(() => this.flushInteractions(), 500);
+      this.interactionFlushTimeout = setTimeout(
+        () => this.flushInteractions(),
+        500,
+      );
     }
   }
 
@@ -356,26 +367,31 @@ export class PostsService {
       this.interactionFlushTimeout = null;
     }
 
-    const updates = Array.from(this.pendingInteractions.entries()).map(([key, {type, delta}]) => {
-      const [postId] = key.split('-');
-      const field = type === 'LIKE' ? 'likeCount' : 'collectCount';
-      return this.prisma.post.update({
-        where: { id: postId },
-        data: {
-          [field]: {
-            increment: delta,
+    const updates = Array.from(this.pendingInteractions.entries()).map(
+      ([key, { type, delta }]) => {
+        const [postId] = key.split("-");
+        const field = type === "LIKE" ? "likeCount" : "shareCount"; // reuse shareCount for collect
+        return this.prisma.post.update({
+          where: { id: postId },
+          data: {
+            [field]: {
+              increment: delta,
+            },
           },
-        },
-      });
-    });
+        });
+      },
+    );
 
     await Promise.all(updates);
     this.pendingInteractions.clear();
   }
 
   // 取消点赞/收藏
-  async deleteInteraction(postId: string, type: InteractionType): Promise<void> {
-    const field = type === 'LIKE' ? 'likeCount' : 'collectCount';
+  async deleteInteraction(
+    postId: string,
+    type: "LIKE" | "COLLECT",
+  ): Promise<void> {
+    const field = type === "LIKE" ? "likeCount" : "shareCount";
     await this.prisma.post.update({
       where: { id: postId },
       data: {
@@ -384,6 +400,37 @@ export class PostsService {
         },
       },
     });
+  }
+
+  // 获取帖子评论列表
+  async getComments(postId: string) {
+    const comments = await this.prisma.comment.findMany({
+      where: {
+        targetType: "POST",
+        targetId: postId,
+        status: "ACTIVE",
+      },
+      orderBy: { createdAt: "asc" },
+      include: {
+        author: true,
+      },
+    });
+
+    return comments.map((c) => ({
+      id: c.id,
+      postId,
+      userId: c.authorId,
+      user: {
+        id: c.author.id,
+        nickname: c.author.nickname || c.author.username,
+        avatar:
+          c.author.avatar ||
+          `https://api.dicebear.com/7.x/avataaars/svg?seed=${c.author.username}`,
+      },
+      content: c.content,
+      likeCount: c.likeCount,
+      createdAt: c.createdAt,
+    }));
   }
 
   // 添加评论
@@ -398,7 +445,7 @@ export class PostsService {
     const comment = await this.prisma.comment.create({
       data: {
         content,
-        targetType: 'POST',
+        targetType: "POST",
         targetId: postId,
         authorId: firstUser.id,
       },
@@ -418,11 +465,14 @@ export class PostsService {
   }
 
   // 记录事件
-  async trackEvent(postId: string, type: 'VIEW' | 'CLICK' | 'SHARE' | 'PUBLISH'): Promise<void> {
+  async trackEvent(
+    postId: string,
+    type: "VIEW" | "CLICK" | "SHARE" | "PUBLISH",
+  ): Promise<void> {
     await this.prisma.event.create({
       data: {
         type,
-        targetType: 'POST',
+        targetType: "POST",
         targetId: postId,
         metadata: {},
       },

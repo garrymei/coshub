@@ -6,18 +6,15 @@ import { UpdateUserDTO } from "@coshub/types";
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
-  async updateUserPreferences(
-    userId: string,
-    dto: UpdateUserDTO
-  ) {
+  async updateUserPreferences(userId: string, dto: UpdateUserDTO) {
     return this.prisma.user.update({
       where: { id: userId },
       data: {
         city: dto.city,
         lat: dto.lat,
         lng: dto.lng,
-        preferredCity: dto.preferredCity
-      }
+        preferredCity: dto.preferredCity,
+      },
     });
   }
 
@@ -28,8 +25,8 @@ export class UserService {
         city: true,
         lat: true,
         lng: true,
-        preferredCity: true
-      }
+        preferredCity: true,
+      },
     });
   }
 }

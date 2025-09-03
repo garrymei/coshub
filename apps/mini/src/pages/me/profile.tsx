@@ -8,7 +8,7 @@ export default function ProfilePage() {
     nickname: "",
     avatar: "",
     bio: "",
-    city: ""
+    city: "",
   });
 
   useEffect(() => {
@@ -18,7 +18,7 @@ export default function ProfilePage() {
   const fetchProfile = async () => {
     const res = await Taro.request({
       url: "/api/users/current",
-      method: "GET"
+      method: "GET",
     });
     setProfile(res.data.data);
   };
@@ -28,7 +28,7 @@ export default function ProfilePage() {
       await Taro.request({
         url: "/api/users/current",
         method: "PUT",
-        data: profile
+        data: profile,
       });
       Taro.showToast({ title: "保存成功", icon: "success" });
     } catch (error) {
@@ -40,7 +40,7 @@ export default function ProfilePage() {
     const res = await Taro.chooseImage({
       count: 1,
       sizeType: ["compressed"],
-      sourceType: ["album"]
+      sourceType: ["album"],
     });
     setProfile({ ...profile, avatar: res.tempFilePaths[0] });
   };
@@ -49,7 +49,10 @@ export default function ProfilePage() {
     <View className="profile-page">
       <Form onSubmit={handleSubmit}>
         <View className="avatar-section" onClick={chooseAvatar}>
-          <Image src={profile.avatar || "/assets/default-avatar.png"} className="avatar" />
+          <Image
+            src={profile.avatar || "/assets/default-avatar.png"}
+            className="avatar"
+          />
           <View className="change-text">点击更换头像</View>
         </View>
 
@@ -57,7 +60,9 @@ export default function ProfilePage() {
           <Input
             placeholder="昵称"
             value={profile.nickname}
-            onChange={e => setProfile({ ...profile, nickname: e.detail.value })}
+            onChange={(e) =>
+              setProfile({ ...profile, nickname: e.detail.value })
+            }
           />
         </View>
 
@@ -65,7 +70,7 @@ export default function ProfilePage() {
           <Input
             placeholder="城市"
             value={profile.city}
-            onChange={e => setProfile({ ...profile, city: e.detail.value })}
+            onChange={(e) => setProfile({ ...profile, city: e.detail.value })}
           />
         </View>
 
@@ -73,7 +78,7 @@ export default function ProfilePage() {
           <Input
             placeholder="个人简介"
             value={profile.bio}
-            onChange={e => setProfile({ ...profile, bio: e.detail.value })}
+            onChange={(e) => setProfile({ ...profile, bio: e.detail.value })}
           />
         </View>
 

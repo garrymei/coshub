@@ -10,7 +10,7 @@ import {
   Picker,
 } from "@tarojs/components";
 import { getUploadConfig } from "@/services/upload";
-import { createPost } from "@/services/post";
+import { feedApi, skillApi } from "@/services/api";
 import "./index.scss";
 
 // 帖子类型
@@ -173,25 +173,43 @@ export default function NewPostPage() {
     try {
       setSubmitting(true);
 
-      // 构建提交数据
-      const postData = {
-        type: postType,
-        title,
-        content,
-        tags,
-        images,
-        videos,
-        ...(postType === "skill"
-          ? {
-              price: Number(price),
-              city,
-              role,
-            }
-          : {}),
-      };
-
       // 提交数据
-      const result = await createPost(postData);
+      let result: any;
+      if (postType === "share") {
+        // 分享帖走 /posts，后端使用大写枚举
+        result = await feedApi.createPost({
+          title,
+          content,
+          type: "SHARE" as any,
+          tags,
+          images,
+          videos,
+        });
+      } else {
+        // 技能帖走 /skills
+        result = await skillApi.createSkill({
+          title,
+          description: content,
+          images,
+          tags,
+          city,
+          role: role as any,
+          price: {
+            type: "fixed",
+            amount: Number(price),
+            currency: "CNY",
+            negotiable: false,
+          } as any,
+          contactInfo: { preferred: "wechat" } as any,
+          availability: {
+            weekdays: true,
+            weekends: true,
+            holidays: false,
+            timeSlots: [],
+            advance: 1,
+          },
+        });
+      }
 
       wx.showToast({
         title: "发布成功",
@@ -200,8 +218,9 @@ export default function NewPostPage() {
 
       // 跳转到详情页
       setTimeout(() => {
+        const newId = result?.data?.id || result?.id;
         wx.navigateTo({
-          url: `/pages/${postType === "share" ? "feed" : "skills"}/detail?id=${result.id}`,
+          url: `/pages/${postType === "share" ? "feed" : "skills"}/detail?id=${newId}`,
         });
       }, 1500);
     } catch (error) {

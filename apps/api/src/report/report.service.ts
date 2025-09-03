@@ -16,8 +16,8 @@ export class ReportService {
         description: dto.description,
         content: dto.content,
         reporterId: dto.reporterId,
-        evidence: dto.evidence || []
-      }
+        evidence: dto.evidence || [],
+      },
     });
   }
 
@@ -31,10 +31,10 @@ export class ReportService {
           select: {
             id: true,
             username: true,
-            nickname: true
-          }
-        }
-      }
+            nickname: true,
+          },
+        },
+      },
     });
   }
 }

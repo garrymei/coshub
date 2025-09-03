@@ -15,7 +15,7 @@ export default function PostForm({ type, onSubmit }: IProps) {
     content: "",
     images: [],
     price: type === "SKILL" ? 0 : undefined,
-    skillTags: type === "SKILL" ? [] : undefined
+    skillTags: type === "SKILL" ? [] : undefined,
   });
 
   const handleSubmit = () => {
@@ -32,7 +32,7 @@ export default function PostForm({ type, onSubmit }: IProps) {
         <Input
           placeholder="标题"
           value={form.title}
-          onChange={e => setForm({ ...form, title: e.detail.value })}
+          onChange={(e) => setForm({ ...form, title: e.detail.value })}
         />
       </View>
 
@@ -40,7 +40,7 @@ export default function PostForm({ type, onSubmit }: IProps) {
         <Textarea
           placeholder="详细描述"
           value={form.content}
-          onChange={e => setForm({ ...form, content: e.detail.value })}
+          onChange={(e) => setForm({ ...form, content: e.detail.value })}
         />
       </View>
 
@@ -51,7 +51,9 @@ export default function PostForm({ type, onSubmit }: IProps) {
               type="number"
               placeholder="价格"
               value={form.price?.toString()}
-              onChange={e => setForm({ ...form, price: Number(e.detail.value) })}
+              onChange={(e) =>
+                setForm({ ...form, price: Number(e.detail.value) })
+              }
             />
           </View>
 
@@ -59,11 +61,11 @@ export default function PostForm({ type, onSubmit }: IProps) {
             <Picker
               mode="selector"
               range={["摄影", "化妆", "道具"]}
-              onChange={e => {
+              onChange={(e) => {
                 const selected = ["摄影", "化妆", "道具"][e.detail.value];
                 setForm({
                   ...form,
-                  skillTags: [...(form.skillTags || []), selected]
+                  skillTags: [...(form.skillTags || []), selected],
                 });
               }}
             >

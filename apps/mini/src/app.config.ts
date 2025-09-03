@@ -6,6 +6,7 @@ export default defineAppConfig({
     "pages/skills/detail",
     "pages/skills/create",
     "pages/feed/create",
+    "pages/webview/index",
     "pages/post/new/index",
     "pages/me/index",
     "pages/me/profile",
@@ -17,11 +18,8 @@ export default defineAppConfig({
   subPackages: [
     {
       root: "packageA",
-      pages: [
-        "pages/settings/account",
-        "pages/settings/notifications"
-      ]
-    }
+      pages: ["pages/settings/account", "pages/settings/notifications"],
+    },
   ],
   window: {
     backgroundTextStyle: "light",
@@ -36,8 +34,8 @@ export default defineAppConfig({
       request: 60000,
       connectSocket: 60000,
       uploadFile: 60000,
-      downloadFile: 60000
-    }
+      downloadFile: 60000,
+    },
   },
   tabBar: {
     color: "#888",
@@ -67,14 +65,14 @@ export default defineAppConfig({
   },
   permission: {
     "scope.userLocation": {
-      desc: "你的位置信息将用于推荐附近的内容"
+      desc: "你的位置信息将用于推荐附近的内容",
     },
     "scope.writePhotosAlbum": {
-      desc: "需要保存图片到相册"
+      desc: "需要保存图片到相册",
     },
     "scope.record": {
-      desc: "需要录制音频"
-    }
+      desc: "需要录制音频",
+    },
   },
   requiredBackgroundModes: ["location", "audio"],
   navigateToMiniProgramAppIdList: [
@@ -84,11 +82,11 @@ export default defineAppConfig({
   preloadRule: {
     "pages/feed/index": {
       network: "all",
-      packages: ["packageA"]
-    }
+      packages: ["packageA"],
+    },
   },
   debug: false,
-  functionalPages: true
+  functionalPages: true,
 });
 
 function defineAppConfig(config: any) {

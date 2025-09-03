@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Get,
-  Put,
-  Body,
-  Param,
-  UseGuards,
-} from "@nestjs/common";
+import { Controller, Get, Put, Body, Param, UseGuards } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { UpdateUserDTO } from "@coshub/types";
 import { PermissionGuard } from "../auth/guards/permission.guard";
@@ -21,7 +14,7 @@ export class UserController {
   @RequirePermissions(Permission.EDIT_PROFILE)
   async updatePreferences(
     @Param("id") userId: string,
-    @Body() dto: UpdateUserDTO
+    @Body() dto: UpdateUserDTO,
   ) {
     return this.userService.updateUserPreferences(userId, dto);
   }
