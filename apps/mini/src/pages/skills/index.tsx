@@ -1,129 +1,133 @@
-import { View, Input, ScrollView } from "@tarojs/components";
-import Taro, { useLoad } from "@tarojs/taro";
-import React, { useState, useEffect } from "react";
-import { SkillPost } from "../../types";
-import { skillApi } from "../../services/api";
-import { showToast, showLoading, hideLoading } from "../../utils/common";
-import SkillCard from "../../components/SkillCard";
-import Banner from "../../components/Banner";
-import "./index.scss";
+import { useState, useEffect } from 'react'
+import { View, ScrollView, Picker } from '@tarojs/components'
+import SkillCard from '@/components/SkillCard'
+import Banner from '@/components/Banner'
+import { skillApi } from '@/services/api'
+import './index.scss'
 
-const SkillsPage: React.FC = () => {
-  const [skills, setSkills] = useState<SkillPost[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+interface SkillPost {
+  id: string
+  title: string
+  price: number
+  city: string
+  tags: string[]
+  coverImage: string
+  role: string
+}
 
-  const tags = [
-    "摄影",
-    "妆娘",
-    "毛娘",
-    "道具师",
-    "后期",
-    "修图",
-    "场地",
-    "服装",
-  ];
+export default function SkillsPage() {
+  const [posts, setPosts] = useState<SkillPost[]>([])
+  const [loading, setLoading] = useState(false)
+  const [hasMore, setHasMore] = useState(true)
+  const [page, setPage] = useState<number>(1)
+  const PAGE_SIZE = 10
+  const [filters, setFilters] = useState({
+    city: '',
+    role: '',
+    priceMin: '',
+    priceMax: ''
+  })
 
-  useLoad(() => {
-    fetchSkills();
-  });
-
-  const fetchSkills = async () => {
+  // 获取技能帖数据
+  const fetchPosts = async (refresh = false) => {
+    if (loading) return
+    
+    setLoading(true)
     try {
-      if (!refreshing) {
-        showLoading();
-      }
-
-      const data = await skillApi.getSkills({
-        tags: selectedTags.length > 0 ? selectedTags : undefined,
-      });
-
-      setSkills(data);
-    } catch (error) {
-      console.error("获取技能列表失败:", error);
-      showToast("获取技能列表失败", "error");
+      const currentPage = refresh ? 1 : page
+      const res: any = await skillApi.getSkills({
+        page: currentPage,
+        limit: PAGE_SIZE,
+        city: filters.city || undefined,
+        role: filters.role || undefined,
+      })
+      const list = Array.isArray(res?.data) ? res.data : (res?.data?.items || [])
+      const more = list.length === PAGE_SIZE || (res?.data?.meta?.hasNext ?? false)
+      setPosts(prev => (refresh ? list : [...prev, ...list]))
+      setHasMore(more)
+      setPage(currentPage + 1)
     } finally {
-      hideLoading();
-      setLoading(false);
-      setRefreshing(false);
+      setLoading(false)
     }
-  };
+  }
 
-  const handleRefresh = () => {
-    setRefreshing(true);
-    fetchSkills();
-  };
+  // 初始化加载
+  useEffect(() => {
+    fetchPosts(true)
+  }, [])
 
-  const handleSearch = (value: string) => {
-    setSearchValue(value);
-    // 实际项目中可能需要调用搜索API
-  };
+  // 筛选条件变化时重新加载
+  useEffect(() => {
+    fetchPosts(true)
+  }, [filters])
 
-  const handleTagSelect = (tag: string) => {
-    if (selectedTags.includes(tag)) {
-      setSelectedTags(selectedTags.filter((t) => t !== tag));
-    } else {
-      setSelectedTags([...selectedTags, tag]);
+  // 下拉刷新
+  const onRefresh = async () => {
+    await fetchPosts(true)
+  }
+
+  // 上拉加载更多
+  const onScrollToLower = async () => {
+    if (hasMore && !loading) {
+      await fetchPosts()
     }
-  };
-
-  const handleAddSkill = () => {
-    Taro.navigateTo({
-      url: "/pages/skills/create",
-    });
-  };
+  }
 
   return (
-    <View className="skills-page">
-      <View className="search-bar">
-        <Input
-          className="search-input"
-          placeholder="搜索技能"
-          value={searchValue}
-          onInput={(e) => handleSearch(e.detail.value)}
-        />
-      </View>
-
-      <Banner type="skill" />
-
-      <View className="tags-container">
-        <ScrollView scrollX className="tags-scroll">
-          {tags.map((tag) => (
-            <View
-              key={tag}
-              className={`tag-item ${selectedTags.includes(tag) ? "active" : ""}`}
-              onClick={() => handleTagSelect(tag)}
-            >
-              {tag}
-            </View>
-          ))}
-        </ScrollView>
-      </View>
-
-      <ScrollView
-        className="skills-container"
-        scrollY
-        enableBackToTop
-        refresherEnabled
-        refresherTriggered={refreshing}
-        onRefresherRefresh={handleRefresh}
-      >
-        {skills.length > 0 ? (
-          skills.map((skill) => <SkillCard key={skill.id} skill={skill} />)
-        ) : (
-          <View className="empty-state">
-            {loading ? "加载中..." : "暂无技能，快来发布吧！"}
+    <ScrollView
+      className="skills-page"
+      scrollY
+      refresherEnabled
+      onRefresherRefresh={onRefresh}
+      onScrollToLower={onScrollToLower}
+    >
+      <Banner scene="skills" />
+      
+      <View className="filters">
+        <Picker
+          mode="selector"
+          range={['北京', '上海', '广州', '深圳', '杭州', '成都']}
+          onChange={(e) => setFilters({...filters, city: e.detail.value as string})}
+        >
+          <View className="filter">
+            {filters.city || '城市'}
           </View>
-        )}
-      </ScrollView>
-
-      <View className="add-button" onClick={handleAddSkill}>
-        <View className="add-icon">+</View>
+        </Picker>
+        
+        <Picker
+          mode="selector"
+          range={['设计师', '程序员', '摄影师', '教师', '其他']}
+          onChange={(e) => setFilters({...filters, role: e.detail.value as string})}
+        >
+          <View className="filter">
+            {filters.role || '角色'}
+          </View>
+        </Picker>
+        
+        <Picker
+          mode="selector"
+          range={['0-100', '100-300', '300-500', '500-1000', '1000+']}
+          onChange={(e) => {
+            const [min, max] = (e.detail.value as string).split('-')
+            setFilters({
+              ...filters,
+              priceMin: min,
+              priceMax: max === '+' ? '1000' : max
+            })
+          }}
+        >
+          <View className="filter">
+            {filters.priceMin ? `${filters.priceMin}-${filters.priceMax}` : '价格'}
+          </View>
+        </Picker>
       </View>
-    </View>
-  );
-};
-
-export default SkillsPage;
+      
+      {posts.map(post => (
+        <SkillCard key={post.id} {...post} />
+      ))}
+      
+      {loading && <View className="loading">加载中...</View>}
+      {!hasMore && <View className="no-more">没有更多内容了</View>}
+    </ScrollView>
+  )
+}

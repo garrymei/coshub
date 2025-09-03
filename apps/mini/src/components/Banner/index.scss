@@ -1,11 +1,14 @@
-.banner-swiper {
-  width: 100%;
-  height: 160px;
+.banner {
   margin-bottom: 16px;
   
-  .banner-image {
-    width: 100%;
-    height: 100%;
+  .swiper {
+    height: 180px;
     border-radius: 8px;
+    overflow: hidden;
+    
+    .image {
+      width: 100%;
+      height: 100%;
+    }
   }
 }

@@ -1,20 +1,38 @@
 .collections-page {
-  display: flex;
-  flex-direction: column;
   height: 100vh;
-  background-color: #f8f9fa;
+  background-color: #f8f8f8;
   
-  .collections-container {
-    flex: 1;
-    padding: 16px;
-    
-    .empty-state {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 200px;
-      color: #999;
-      font-size: 14px;
+  &.loading, &.empty {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  .empty {
+    .empty-icon {
+      width: 120px;
+      height: 120px;
+      margin-bottom: 20px;
     }
+    
+    .empty-text {
+      font-size: 16px;
+      color: #999;
+      margin-bottom: 20px;
+    }
+  }
+  
+  .collection-list {
+    padding: 10px;
+  }
+  
+  .loading-more, .no-more {
+    display: flex;
+    justify-content: center;
+    padding: 15px 0;
+    font-size: 14px;
+    color: #999;
   }
 }

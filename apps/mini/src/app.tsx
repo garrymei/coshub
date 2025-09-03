@@ -1,7 +1,13 @@
-import { Component } from "react";
+import { Component, ReactNode } from "react";
 import "./app.scss";
 
-class App extends Component {
+// 声明wx对象
+declare const wx: {
+  getStorageSync(key: string): any;
+  switchTab(options: { url: string }): void;
+};
+
+class App extends Component<{ children?: ReactNode }> {
   componentDidMount() {
     // 检查登录状态
     this.checkLoginStatus();
@@ -18,7 +24,10 @@ class App extends Component {
         console.log("用户未登录");
       } else {
         console.log("用户已登录");
-        // 可以在这里做一些已登录用户的初始化工作
+        // 已登录用户重定向到分享页
+        wx.switchTab({
+          url: '/pages/feed/index'
+        });
       }
     } catch (error) {
       console.error("检查登录状态失败:", error);

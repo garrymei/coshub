@@ -1,11 +1,12 @@
 export default defineAppConfig({
   pages: [
+    "pages/feed/index",
+    "pages/feed/detail",
     "pages/skills/index",
     "pages/skills/detail",
     "pages/skills/create",
-    "pages/feed/index",
-    "pages/feed/detail",
     "pages/feed/create",
+    "pages/post/new/index",
     "pages/me/index",
     "pages/me/profile",
     "pages/me/collections",

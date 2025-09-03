@@ -1,105 +1,85 @@
-import { View, ScrollView } from "@tarojs/components";
-import Taro, { useLoad } from "@tarojs/taro";
-import React, { useState, useEffect } from "react";
-import { Post } from "../../types";
-import { feedApi } from "../../services/api";
-import { showToast, showLoading, hideLoading } from "../../utils/common";
-import FeedCard from "../../components/FeedCard";
-import Banner from "../../components/Banner";
-import "./index.scss";
+import { useState, useEffect } from 'react'
+import { View, ScrollView } from '@tarojs/components'
+import PostCard from '@/components/PostCard'
+import Banner from '@/components/Banner'
+import { feedApi } from '@/services/api'
+import './index.scss'
 
-const FeedPage: React.FC = () => {
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [column1, setColumn1] = useState<Post[]>([]);
-  const [column2, setColumn2] = useState<Post[]>([]);
+interface Post {
+  id: string
+  avatar: string
+  nickname: string
+  time: string
+  content: string
+  images?: string[]
+  likeCount: number
+  commentCount: number
+  collectCount: number
+  isLiked: boolean
+  isCollected: boolean
+}
 
-  useLoad(() => {
-    fetchPosts();
-  });
+export default function FeedPage() {
+  const [posts, setPosts] = useState<Post[]>([])
+  const [loading, setLoading] = useState(false)
+  const [hasMore, setHasMore] = useState(true)
+  const [cursor, setCursor] = useState<string | null>(null)
 
-  const fetchPosts = async () => {
+  // 获取帖子数据
+  const fetchPosts = async (refresh = false) => {
+    if (loading) return
+    
+    setLoading(true)
     try {
-      if (!refreshing) {
-        showLoading();
-      }
+      const res: any = await feedApi.getPosts({
+        type: 'SHARE',
+        cursor: refresh ? null : cursor,
+      })
+      const list = res?.data?.data || []
+      const nextCursor = res?.data?.cursor ?? null
+      const more = res?.data?.meta?.hasNext ?? (list.length > 0)
 
-      const data = await feedApi.getPosts();
-      setPosts(data);
-
-      // 将帖子分成两列（瀑布流布局）
-      const col1: Post[] = [];
-      const col2: Post[] = [];
-
-      data.forEach((post, index) => {
-        if (index % 2 === 0) {
-          col1.push(post);
-        } else {
-          col2.push(post);
-        }
-      });
-
-      setColumn1(col1);
-      setColumn2(col2);
-    } catch (error) {
-      console.error("获取分享列表失败:", error);
-      showToast("获取分享列表失败", "error");
+      setPosts(prev => (refresh ? list : [...prev, ...list]))
+      setCursor(nextCursor)
+      setHasMore(more)
     } finally {
-      hideLoading();
-      setLoading(false);
-      setRefreshing(false);
+      setLoading(false)
     }
-  };
+  }
 
-  const handleRefresh = () => {
-    setRefreshing(true);
-    fetchPosts();
-  };
+  // 初始化加载
+  useEffect(() => {
+    fetchPosts(true)
+  }, [])
 
-  const handleAddPost = () => {
-    Taro.navigateTo({
-      url: "/pages/feed/create",
-    });
-  };
+  // 下拉刷新
+  const onRefresh = async () => {
+    await fetchPosts(true)
+  }
+
+  // 上拉加载更多
+  const onScrollToLower = async () => {
+    if (hasMore && !loading) {
+      await fetchPosts()
+    }
+  }
 
   return (
-    <View className="feed-page">
-      <Banner type="share" />
-
-      <ScrollView
-        className="feed-container"
-        scrollY
-        enableBackToTop
-        refresherEnabled
-        refresherTriggered={refreshing}
-        onRefresherRefresh={handleRefresh}
-      >
-        {posts.length > 0 ? (
-          <View className="waterfall-container">
-            <View className="waterfall-column">
-              {column1.map((post) => (
-                <FeedCard key={post.id} post={post} />
-              ))}
-            </View>
-            <View className="waterfall-column">
-              {column2.map((post) => (
-                <FeedCard key={post.id} post={post} />
-              ))}
-            </View>
-          </View>
-        ) : (
-          <View className="empty-state">
-            {loading ? "加载中..." : "暂无分享，快来发布吧！"}
-          </View>
-        )}
-      </ScrollView>
-
-      <View className="add-button" onClick={handleAddPost}>
-        <View className="add-icon">+</View>
-      </View>
-    </View>
-  );
-};
-
-export default FeedPage;
+    <ScrollView
+      className="feed-page"
+      scrollY
+      refresherEnabled
+      onRefresherRefresh={onRefresh}
+      onScrollToLower={onScrollToLower}
+    >
+      <Banner scene="feed" />
+      
+      {posts.map(post => (
+        <PostCard key={post.id} {...post} />
+      ))}
+      
+      {loading && <View className="loading">加载中...</View>}
+      {!hasMore && <View className="no-more">没有更多内容了</View>}
+    </ScrollView>
+  )
+}

@@ -33,7 +33,7 @@ const LoginPage: React.FC = () => {
           Taro.navigateBack();
         } else {
           Taro.switchTab({
-            url: "/pages/skills/index",
+            url: "/pages/feed/index",
           });
         }
       }, 1500);

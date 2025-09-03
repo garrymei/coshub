@@ -162,14 +162,16 @@ export class PostsService {
     const total = await this.prisma.post.count({ where });
 
     const response: PostListResponse = {
-      items: items.map((post) => this.transformPost(post)),
-      total,
-      nextCursor,
-      hasNext,
-      page: query.page || 1,
-      limit,
-      totalPages: Math.ceil(total / limit),
-      hasPrev: query.page ? query.page > 1 : false,
+      data: items.map((post) => this.transformPost(post)),
+      meta: {
+        total,
+        page: query.page || 1,
+        limit,
+        totalPages: Math.ceil(total / limit),
+        hasNext,
+        hasPrev: query.page ? query.page > 1 : false,
+      },
+      cursor: nextCursor,
     };
 
     return response;

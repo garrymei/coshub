@@ -1,172 +1,151 @@
-import { View, Image, Text, Button } from "@tarojs/components";
-import Taro, { useRouter, useLoad } from "@tarojs/taro";
-import React, { useState, useEffect } from "react";
-import { User, Post } from "../../types";
-import { userApi } from "../../services/api";
-import {
-  showToast,
-  showLoading,
-  hideLoading,
-  checkLogin,
-  goToLogin,
-} from "../../utils/common";
-import "./index.scss";
+import { useState, useEffect } from 'react'
+import { View, Text, Image, Button } from '@tarojs/components'
+import { getUserProfile } from '@/services/user'
+import './index.scss'
 
-const MePage: React.FC = () => {
-  const router = useRouter();
-  const { userId } = router.params;
+interface UserProfile {
+  id: string
+  nickname: string
+  avatar: string
+  bio: string
+  gender: string
+  city: string
+}
 
-  const [user, setUser] = useState<User | null>(null);
-  const [isCurrentUser, setIsCurrentUser] = useState(false);
-  const [loading, setLoading] = useState(true);
+export default function MePage() {
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
+  const [loading, setLoading] = useState(true)
 
-  useLoad(() => {
-    if (!checkLogin() && !userId) {
-      goToLogin();
-      return;
-    }
-
-    fetchUserInfo();
-  });
-
-  const fetchUserInfo = async () => {
+  // 获取用户资料
+  const fetchUserProfile = async () => {
     try {
-      showLoading();
-
-      let userData: User;
-
-      if (userId) {
-        // 查看其他用户的个人中心
-        userData = await userApi.getUserInfo(userId);
-        setIsCurrentUser(false);
-      } else {
-        // 查看自己的个人中心
-        const currentUser = Taro.getStorageSync("userInfo");
-        if (currentUser) {
-          userData = currentUser;
-        } else {
-          // 如果本地没有用户信息，则获取当前用户信息
-          userData = await userApi.getUserInfo("me");
-          Taro.setStorageSync("userInfo", userData);
-        }
-        setIsCurrentUser(true);
-      }
-
-      setUser(userData);
+      setLoading(true)
+      const profile = await getUserProfile()
+      setUserProfile(profile)
     } catch (error) {
-      console.error("获取用户信息失败:", error);
-      showToast("获取用户信息失败", "error");
+      console.error('获取用户资料失败', error)
     } finally {
-      hideLoading();
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
-  const handleEditProfile = () => {
-    Taro.navigateTo({
-      url: "/pages/me/profile",
-    });
-  };
+  // 检查登录状态
+  const checkLoginStatus = () => {
+    try {
+      const token = wx.getStorageSync('token')
+      const userInfo = wx.getStorageSync('userInfo')
+      
+      if (!token || !userInfo) {
+        // 未登录，跳转到登录页
+        wx.navigateTo({
+          url: '/pages/login/index'
+        })
+      } else {
+        // 已登录，获取用户资料
+        fetchUserProfile()
+      }
+    } catch (error) {
+      console.error('检查登录状态失败', error)
+    }
+  }
 
-  const handleViewPosts = () => {
-    Taro.navigateTo({
-      url: `/pages/me/posts?userId=${user?.id || ""}`,
-    });
-  };
+  // 跳转到资料编辑页
+  const goToProfile = () => {
+    wx.navigateTo({
+      url: '/pages/me/profile'
+    })
+  }
 
-  const handleViewCollections = () => {
-    Taro.navigateTo({
-      url: "/pages/me/collections",
-    });
-  };
+  // 跳转到我的发布页
+  const goToPosts = () => {
+    wx.navigateTo({
+      url: '/pages/me/posts'
+    })
+  }
 
-  const handleSettings = () => {
-    Taro.navigateTo({
-      url: "/pages/me/settings",
-    });
-  };
+  // 跳转到我的收藏页
+  const goToCollections = () => {
+    wx.navigateTo({
+      url: '/pages/me/collections'
+    })
+  }
+
+  // 退出登录
+  const logout = () => {
+    wx.showModal({
+      title: '提示',
+      content: '确定要退出登录吗？',
+      success: (res) => {
+        if (res.confirm) {
+          wx.removeStorageSync('token')
+          wx.removeStorageSync('userInfo')
+          wx.reLaunch({
+            url: '/pages/login/index'
+          })
+        }
+      }
+    })
+  }
+
+  useEffect(() => {
+    checkLoginStatus()
+  }, [])
 
   if (loading) {
     return (
-      <View className="loading-container">
+      <View className="me-page loading">
         <Text>加载中...</Text>
       </View>
-    );
+    )
   }
 
-  if (!user) {
+  if (!userProfile) {
     return (
-      <View className="error-container">
-        <Text>用户不存在或已被删除</Text>
+      <View className="me-page error">
+        <Text>获取用户信息失败</Text>
+        <Button onClick={checkLoginStatus}>重试</Button>
       </View>
-    );
+    )
   }
 
   return (
     <View className="me-page">
       <View className="user-header">
-        <Image
-          className="user-background"
-          src="https://via.placeholder.com/750x300"
-          mode="aspectFill"
-        />
+        <Image className="avatar" src={userProfile.avatar} />
         <View className="user-info">
-          <Image
-            className="user-avatar"
-            src={user.avatar || "https://via.placeholder.com/100"}
-            mode="aspectFill"
-          />
-          <Text className="user-name">{user.nickname}</Text>
-          <Text className="user-bio">
-            {user.bio || "这个人很懒，什么都没留下"}
-          </Text>
-
-          <View className="user-stats">
-            <View className="stat-item">
-              <Text className="stat-count">{user.followingCount}</Text>
-              <Text className="stat-label">关注</Text>
-            </View>
-            <View className="stat-item">
-              <Text className="stat-count">{user.followersCount}</Text>
-              <Text className="stat-label">粉丝</Text>
-            </View>
-          </View>
-
-          {isCurrentUser ? (
-            <Button className="edit-button" onClick={handleEditProfile}>
-              编辑资料
-            </Button>
-          ) : (
-            <Button className="follow-button">关注</Button>
-          )}
+          <Text className="nickname">{userProfile.nickname}</Text>
+          <Text className="bio">{userProfile.bio || '这个人很懒，什么都没留下~'}</Text>
         </View>
+        <Button className="edit-btn" onClick={goToProfile}>编辑资料</Button>
       </View>
 
       <View className="menu-list">
-        <View className="menu-item" onClick={handleViewPosts}>
+        <View className="menu-item" onClick={goToPosts}>
           <Text className="menu-icon">📝</Text>
           <Text className="menu-text">我的发布</Text>
-          <Text className="menu-arrow">›</Text>
+          <Text className="menu-arrow">{'>'}</Text>
         </View>
-
-        {isCurrentUser && (
-          <View className="menu-item" onClick={handleViewCollections}>
-            <Text className="menu-icon">⭐</Text>
-            <Text className="menu-text">我的收藏</Text>
-            <Text className="menu-arrow">›</Text>
-          </View>
-        )}
-
-        {isCurrentUser && (
-          <View className="menu-item" onClick={handleSettings}>
-            <Text className="menu-icon">⚙️</Text>
-            <Text className="menu-text">设置</Text>
-            <Text className="menu-arrow">›</Text>
-          </View>
-        )}
+        
+        <View className="menu-item" onClick={goToCollections}>
+          <Text className="menu-icon">⭐</Text>
+          <Text className="menu-text">我的收藏</Text>
+          <Text className="menu-arrow">{'>'}</Text>
+        </View>
+        
+        <View className="menu-item">
+          <Text className="menu-icon">🔔</Text>
+          <Text className="menu-text">消息通知</Text>
+          <Text className="menu-arrow">{'>'}</Text>
+        </View>
+        
+        <View className="menu-item">
+          <Text className="menu-icon">⚙️</Text>
+          <Text className="menu-text">设置</Text>
+          <Text className="menu-arrow">{'>'}</Text>
+        </View>
       </View>
+      
+      <Button className="logout-btn" onClick={logout}>退出登录</Button>
     </View>
-  );
-};
-
-export default MePage;
+  )
+}

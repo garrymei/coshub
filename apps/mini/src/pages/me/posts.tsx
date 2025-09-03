@@ -1,139 +1,131 @@
-import { View, Text, ScrollView, Picker } from "@tarojs/components";
-import Taro, { useRouter, useLoad } from "@tarojs/taro";
-import React, { useState, useEffect } from "react";
-import { Post, SkillPost } from "../../types";
-import { userApi } from "../../services/api";
-import {
-  showToast,
-  showLoading,
-  hideLoading,
-  checkLogin,
-  goToLogin,
-} from "../../utils/common";
-import FeedCard from "../../components/FeedCard";
-import SkillCard from "../../components/SkillCard";
-import "./posts.scss";
+import { useState, useEffect } from 'react'
+import { View, Text, ScrollView, Image } from '@tarojs/components'
+import Taro from '@tarojs/taro'
+import { getUserPosts } from '@/services/user'
+import PostCard from '@/components/PostCard'
+import './posts.scss'
 
-const PostsPage: React.FC = () => {
-  const router = useRouter();
-  const { userId } = router.params;
+interface Post {
+  id: string
+  title: string
+  content: string
+  images: string[]
+  likes: number
+  comments: number
+  createdAt: string
+}
 
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [postType, setPostType] = useState<"all" | "skill" | "share">("all");
-  const [isCurrentUser, setIsCurrentUser] = useState(false);
+interface PostCardProps {
+  post: Post
+  onClick: (postId: string) => void
+}
 
-  const typeOptions = [
-    { label: "全部", value: "all" },
-    { label: "技能", value: "skill" },
-    { label: "分享", value: "share" },
-  ];
+export default function MyPostsPage() {
+  const [posts, setPosts] = useState<Post[]>([])
+  const [loading, setLoading] = useState(true)
+  const [page, setPage] = useState(1)
+  const [hasMore, setHasMore] = useState(true)
 
-  useLoad(() => {
-    if (!checkLogin() && !userId) {
-      goToLogin();
-      return;
-    }
-
-    // 判断是否是查看自己的发布
-    const currentUser = Taro.getStorageSync("userInfo");
-    if (currentUser && (!userId || userId === currentUser.id)) {
-      setIsCurrentUser(true);
-    }
-
-    fetchPosts();
-  });
-
-  const fetchPosts = async () => {
+  // 获取用户发布的内容
+  const fetchUserPosts = async (currentPage: number) => {
     try {
-      if (!refreshing) {
-        showLoading();
+      setLoading(true)
+      const res = await getUserPosts(currentPage)
+      
+      if (currentPage === 1) {
+        setPosts(res.list)
+      } else {
+        setPosts(prev => [...prev, ...res.list])
       }
-
-      let targetUserId = userId;
-
-      if (!targetUserId) {
-        const currentUser = Taro.getStorageSync("userInfo");
-        if (!currentUser) {
-          throw new Error("用户未登录");
-        }
-        targetUserId = currentUser.id;
-      }
-
-      const type = postType === "all" ? undefined : postType;
-      const data = await userApi.getUserPosts(targetUserId, type);
-      setPosts(data);
+      
+      setHasMore(res.hasMore)
     } catch (error) {
-      console.error("获取发布列表失败:", error);
-      showToast("获取发布列表失败", "error");
+      console.error('获取用户发布内容失败', error)
+      Taro.showToast({
+        title: '获取内容失败',
+        icon: 'none'
+      })
     } finally {
-      hideLoading();
-      setLoading(false);
-      setRefreshing(false);
+      setLoading(false)
     }
-  };
+  }
 
-  const handleRefresh = () => {
-    setRefreshing(true);
-    fetchPosts();
-  };
+  // 下拉刷新
+  const onRefresh = async () => {
+    setPage(1)
+    await fetchUserPosts(1)
+  }
 
-  const handleTypeChange = (e) => {
-    const value = typeOptions[e.detail.value].value as
-      | "all"
-      | "skill"
-      | "share";
-    setPostType(value);
-    fetchPosts();
-  };
+  // 上拉加载更多
+  const onReachBottom = async () => {
+    if (!hasMore || loading) return
+    
+    const nextPage = page + 1
+    setPage(nextPage)
+    await fetchUserPosts(nextPage)
+  }
+
+  // 跳转到详情页
+  const goToDetail = (postId: string) => {
+    Taro.navigateTo({
+      url: `/pages/post/detail?id=${postId}`
+    })
+  }
+
+  useEffect(() => {
+    fetchUserPosts(1)
+  }, [])
+
+  if (loading && posts.length === 0) {
+    return (
+      <View className="posts-page loading">
+        <Text>加载中...</Text>
+      </View>
+    )
+  }
+
+  if (posts.length === 0 && !loading) {
+    return (
+      <View className="posts-page empty">
+        <Image className="empty-icon" src="/assets/images/empty.png" />
+        <Text className="empty-text">暂无发布内容</Text>
+        <Button className="create-btn" onClick={() => Taro.navigateTo({ url: '/pages/post/new' })}>
+          去发布
+        </Button>
+      </View>
+    )
+  }
 
   return (
-    <View className="posts-page">
-      <View className="filter-bar">
-        <Picker
-          mode="selector"
-          range={typeOptions}
-          rangeKey="label"
-          onChange={handleTypeChange}
-        >
-          <View className="picker">
-            <Text className="picker-text">
-              {typeOptions.find((item) => item.value === postType)?.label}
-            </Text>
-            <Text className="picker-arrow">▼</Text>
-          </View>
-        </Picker>
+    <ScrollView 
+      className="posts-page"
+      scrollY
+      refresherEnabled
+      refresherTriggered={loading && page === 1}
+      onRefresherRefresh={() => onRefresh()}
+      onScrollToLower={() => onReachBottom()}
+    >
+      <View className="post-list">
+        {posts.map(post => (
+          <PostCard 
+            key={post.id}
+            post={post}
+            onClick={() => goToDetail(post.id)}
+          />
+        ))}
       </View>
-
-      <ScrollView
-        className="posts-container"
-        scrollY
-        enableBackToTop
-        refresherEnabled
-        refresherTriggered={refreshing}
-        onRefresherRefresh={handleRefresh}
-      >
-        {posts.length > 0 ? (
-          posts.map((post) =>
-            post.type === "skill" ? (
-              <SkillCard key={post.id} skill={post as SkillPost} />
-            ) : (
-              <FeedCard key={post.id} post={post} />
-            ),
-          )
-        ) : (
-          <View className="empty-state">
-            {loading
-              ? "加载中..."
-              : isCurrentUser
-                ? "你还没有发布内容"
-                : "该用户暂无发布内容"}
-          </View>
-        )}
-      </ScrollView>
-    </View>
-  );
-};
-
-export default PostsPage;
+      
+      {loading && page > 1 && (
+        <View className="loading-more">
+          <Text>加载中...</Text>
+        </View>
+      )}
+      
+      {!hasMore && (
+        <View className="no-more">
+          <Text>没有更多内容了</Text>
+        </View>
+      )}
+    </ScrollView>
+  )
+}
