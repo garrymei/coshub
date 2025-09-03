@@ -94,7 +94,7 @@ export default function PostCard({ post }: PostCardProps) {
       {/* 媒体内容 */}
       <div className="relative">
         {renderMedia()}
-        {post.type === "tutorial" && (
+        {post.type === "TUTORIAL" && (
           <div className="absolute top-2 left-2 bg-blue-500 text-white px-2 py-1 rounded text-xs">
             📚 教程
           </div>

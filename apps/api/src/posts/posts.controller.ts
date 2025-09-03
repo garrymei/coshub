@@ -1,7 +1,7 @@
 import {
   Controller,
   Get,
-  Post,
+  Post as HttpPost,
   Body,
   Param,
   Query,
@@ -18,7 +18,7 @@ import {
   CreatePostDTO,
   UpdatePostDTO,
   PostQueryDTO,
-  Post,
+  Post as PostModel,
   PostListResponse,
   ApiResponse,
 } from "@coshub/types";
@@ -32,14 +32,14 @@ import { Permission, RateLimitType } from "@coshub/types";
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
-  @Post()
+  @HttpPost()
   @UsePipes(new ValidationPipe({ transform: true }))
   @UseGuards(PermissionGuard, RateLimitGuard)
   @RequirePermissions(Permission.CREATE_POST)
   @RateLimit(RateLimitType.CREATE_POST)
   async create(
     @Body() createPostDto: CreatePostDTO,
-  ): Promise<ApiResponse<Post>> {
+  ): Promise<ApiResponse<PostModel>> {
     try {
       const post = await this.postsService.create(createPostDto);
 
@@ -95,7 +95,7 @@ export class PostsController {
   }
 
   @Get(":id")
-  async findOne(@Param("id") id: string): Promise<ApiResponse<Post>> {
+  async findOne(@Param("id") id: string): Promise<ApiResponse<PostModel>> {
     try {
       const post = await this.postsService.findOne(id);
 
@@ -133,7 +133,7 @@ export class PostsController {
   async update(
     @Param("id") id: string,
     @Body() updatePostDto: UpdatePostDTO,
-  ): Promise<ApiResponse<Post>> {
+  ): Promise<ApiResponse<PostModel>> {
     try {
       const post = await this.postsService.update(id, updatePostDto);
 

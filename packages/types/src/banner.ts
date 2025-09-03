@@ -35,7 +35,7 @@ export interface CreateBannerDTO {
   online?: boolean;
 }
 
-export interface UpdateBannerDTO extends Partial<CreateBannerDTO> {}
+export type UpdateBannerDTO = Partial<CreateBannerDTO>
 
 export interface BannerQueryDTO {
   scene?: BannerScene;

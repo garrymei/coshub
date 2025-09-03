@@ -13,7 +13,7 @@ export const showToast = (
 };
 
 // 显示加载中
-export const showLoading = (title: string = "加载中...") => {
+export const showLoading = (title = "加载中...") => {
   Taro.showLoading({
     title,
     mask: true,
@@ -95,7 +95,7 @@ export const uploadImage = (): Promise<string> => {
 };
 
 // 上传多张图片
-export const uploadImages = (count: number = 9): Promise<string[]> => {
+export const uploadImages = (count = 9): Promise<string[]> => {
   return new Promise((resolve, reject) => {
     Taro.chooseImage({
       count,

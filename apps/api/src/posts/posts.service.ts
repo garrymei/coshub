@@ -67,13 +67,8 @@ export class PostsService {
       };
     }
 
-    if (query.author) {
-      where.author = {
-        OR: [
-          { username: { contains: query.author, mode: "insensitive" } },
-          { nickname: { contains: query.author, mode: "insensitive" } },
-        ],
-      };
+    if (query.authorId) {
+      where.authorId = query.authorId;
     }
 
     if (query.keyword) {
@@ -101,20 +96,14 @@ export class PostsService {
     // 排序
     const orderBy: Prisma.PostOrderByWithRelationInput = {};
     switch (query.sortBy) {
-      case "createdAt":
-        orderBy.createdAt = query.sortOrder || "desc";
+      case "latest":
+        orderBy.createdAt = "desc";
         break;
-      case "updatedAt":
-        orderBy.updatedAt = query.sortOrder || "desc";
+      case "popular":
+        orderBy.likeCount = "desc";
         break;
-      case "viewCount":
-        orderBy.viewCount = query.sortOrder || "desc";
-        break;
-      case "likeCount":
-        orderBy.likeCount = query.sortOrder || "desc";
-        break;
-      case "commentCount":
-        orderBy.commentCount = query.sortOrder || "desc";
+      case "mostViewed":
+        orderBy.viewCount = "desc";
         break;
       default:
         orderBy.createdAt = "desc";
@@ -172,16 +161,20 @@ export class PostsService {
     // 获取总数
     const total = await this.prisma.post.count({ where });
 
-    return {
-      items: items.map((post) => this.transformPost(post)),
-      total,
-      nextCursor,
-      hasNext,
-      page: query.page || 1,
-      limit,
-      totalPages: Math.ceil(total / limit),
-      hasPrev: query.page ? query.page > 1 : false,
+    const response: PostListResponse = {
+      data: items.map((post) => this.transformPost(post)),
+      meta: {
+        total,
+        page: query.page || 1,
+        limit,
+        totalPages: Math.ceil(total / limit),
+        hasNext,
+        hasPrev: query.page ? query.page > 1 : false,
+      },
+      cursor: nextCursor,
     };
+    
+    return response;
   }
 
   // 获取帖子详情
@@ -218,12 +211,35 @@ export class PostsService {
 
   // 更新帖子
   async update(id: string, updatePostDto: UpdatePostDTO): Promise<Post> {
+    const updateData: Prisma.PostUpdateInput = {
+      updatedAt: new Date(),
+    };
+
+    if (updatePostDto.title !== undefined) {
+      updateData.title = updatePostDto.title;
+    }
+    if (updatePostDto.content !== undefined) {
+      updateData.content = updatePostDto.content;
+    }
+    if (updatePostDto.type !== undefined) {
+      updateData.type = { set: updatePostDto.type };
+    }
+    if (updatePostDto.category !== undefined) {
+      updateData.category = { set: updatePostDto.category };
+    }
+    if (updatePostDto.images !== undefined) {
+      updateData.images = updatePostDto.images;
+    }
+    if (updatePostDto.videos !== undefined) {
+      updateData.videos = updatePostDto.videos;
+    }
+    if (updatePostDto.tags !== undefined) {
+      updateData.tags = updatePostDto.tags;
+    }
+
     const post = await this.prisma.post.update({
       where: { id },
-      data: {
-        ...updatePostDto,
-        updatedAt: new Date(),
-      },
+      data: updateData,
       include: {
         author: true,
       },

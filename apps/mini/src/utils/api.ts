@@ -68,7 +68,7 @@ export const request = async ({
 };
 
 // 显示加载提示
-export const showLoading = (title: string = "加载中...") => {
+export const showLoading = (title = "加载中...") => {
   Taro.showLoading({
     title,
     mask: true,
@@ -84,7 +84,7 @@ export const hideLoading = () => {
 export const showToast = (
   title: string,
   icon: "success" | "error" | "loading" | "none" = "none",
-  duration: number = 2000,
+  duration = 2000,
 ) => {
   Taro.showToast({
     title,

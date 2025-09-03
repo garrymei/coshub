@@ -17,8 +17,8 @@ export default function PostModerationPage() {
         id: "1",
         title: "我的第一个Cosplay作品",
         content: "分享我的第一个Cosplay作品，希望大家喜欢...",
-        type: "showcase",
-        category: "cosplay",
+        type: "SHARE",
+        category: "COSPLAY_SHOW",
         images: ["/api/posts/1.jpg"],
         videos: [],
         tags: ["cosplay", "初音未来"],
@@ -38,8 +38,8 @@ export default function PostModerationPage() {
         id: "2",
         title: "摄影技巧分享",
         content: "分享一些Cosplay摄影的技巧和经验...",
-        type: "tutorial",
-        category: "tips_tricks",
+        type: "TUTORIAL",
+        category: "TUTORIAL",
         images: ["/api/posts/2.jpg"],
         videos: [],
         tags: ["摄影", "技巧", "分享"],
@@ -217,9 +217,9 @@ export default function PostModerationPage() {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
-                    {post.type === "showcase"
+                    {post.type === "SHARE"
                       ? "作品展示"
-                      : post.type === "tutorial"
+                                              : post.type === "TUTORIAL"
                         ? "教程"
                         : "其他"}
                   </span>

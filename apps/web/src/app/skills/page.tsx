@@ -36,8 +36,8 @@ export default function SkillsPage() {
           title: "专业Cosplay摄影服务",
           content:
             "提供专业的Cosplay摄影服务，包括室内外拍摄、后期修图等。有5年摄影经验，擅长各种风格。",
-          type: "showcase",
-          category: "photography",
+          type: "SHARE",
+          category: "RESOURCE",
           city: "北京",
           images: ["/mock-skill-1.jpg"],
           videos: [],
@@ -59,8 +59,8 @@ export default function SkillsPage() {
           title: "道具制作定制服务",
           content:
             "承接各种道具制作定制，包括武器、装备、装饰品等。使用高质量材料，做工精细。",
-          type: "showcase",
-          category: "prop_making",
+          type: "SHARE",
+          category: "RESOURCE",
           city: "上海",
           images: ["/mock-skill-2.jpg", "/mock-skill-2-2.jpg"],
           videos: [],
@@ -82,8 +82,8 @@ export default function SkillsPage() {
           title: "Cosplay化妆教学",
           content:
             "提供Cosplay化妆教学服务，一对一指导，从基础到高级技巧。适合新手和有经验的coser。",
-          type: "tutorial",
-          category: "makeup",
+          type: "TUTORIAL",
+          category: "TUTORIAL",
           city: "广州",
           images: ["/mock-skill-3.jpg"],
           videos: [],
@@ -105,8 +105,8 @@ export default function SkillsPage() {
           title: "服装制作与修改",
           content:
             "专业服装制作与修改服务，包括设计、裁剪、缝制等。可根据角色图片定制服装。",
-          type: "showcase",
-          category: "costume_making",
+          type: "SHARE",
+          category: "RESOURCE",
           city: "深圳",
           images: ["/mock-skill-4.jpg"],
           videos: [],

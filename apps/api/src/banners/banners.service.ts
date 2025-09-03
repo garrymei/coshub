@@ -16,9 +16,9 @@ export class BannersService {
   async create(createBannerDto: CreateBannerDTO): Promise<Banner> {
     const banner = await this.prisma.banner.create({
       data: {
-        scene: createBannerDto.scene as any,
+        scene: createBannerDto.scene.toUpperCase() as any,
         imageUrl: createBannerDto.imageUrl,
-        linkType: createBannerDto.linkType as any,
+        linkType: createBannerDto.linkType.toUpperCase() as any,
         linkUrl: createBannerDto.linkUrl,
         priority: createBannerDto.priority || 0,
         online: createBannerDto.online !== false, // 默认上线
@@ -34,7 +34,7 @@ export class BannersService {
 
     // 应用筛选条件
     if (query.scene) {
-      where.scene = query.scene as any;
+      where.scene = query.scene.toUpperCase() as any;
     }
 
     if (query.online !== undefined) {
@@ -64,12 +64,32 @@ export class BannersService {
 
   // 更新Banner
   async update(id: string, updateBannerDto: UpdateBannerDTO): Promise<Banner> {
+    const updateData: Prisma.BannerUpdateInput = {
+      updatedAt: new Date(),
+    };
+
+    if (updateBannerDto.scene !== undefined) {
+      updateData.scene = { set: updateBannerDto.scene.toUpperCase() as any };
+    }
+    if (updateBannerDto.imageUrl !== undefined) {
+      updateData.imageUrl = updateBannerDto.imageUrl;
+    }
+    if (updateBannerDto.linkType !== undefined) {
+      updateData.linkType = { set: updateBannerDto.linkType.toUpperCase() as any };
+    }
+    if (updateBannerDto.linkUrl !== undefined) {
+      updateData.linkUrl = updateBannerDto.linkUrl;
+    }
+    if (updateBannerDto.priority !== undefined) {
+      updateData.priority = updateBannerDto.priority;
+    }
+    if (updateBannerDto.online !== undefined) {
+      updateData.online = updateBannerDto.online;
+    }
+
     const banner = await this.prisma.banner.update({
       where: { id },
-      data: {
-        ...updateBannerDto,
-        updatedAt: new Date(),
-      },
+      data: updateData,
     });
 
     return this.transformBanner(banner);

@@ -18,22 +18,20 @@ export interface PostFilters {
 }
 
 const postTypes = [
-  { value: "showcase", label: "作品展示" },
-  { value: "tutorial", label: "教程分享" },
-  { value: "discussion", label: "讨论交流" },
-  { value: "news", label: "新闻资讯" },
-  { value: "event", label: "活动信息" },
+  { value: "SHARE", label: "分享" },
+  { value: "TUTORIAL", label: "教程分享" },
+  { value: "DISCUSSION", label: "讨论交流" },
+  { value: "NEWS", label: "新闻资讯" },
+  { value: "EVENT", label: "活动信息" },
 ];
 
 const postCategories = [
-  { value: "cosplay", label: "Cosplay" },
-  { value: "photography", label: "摄影" },
-  { value: "makeup", label: "化妆" },
-  { value: "prop_making", label: "道具制作" },
-  { value: "costume_making", label: "服装制作" },
-  { value: "anime_discussion", label: "动漫讨论" },
-  { value: "community", label: "社区" },
-  { value: "tips_tricks", label: "技巧分享" },
+  { value: "COSPLAY_SHOW", label: "Cosplay 展示" },
+  { value: "TUTORIAL", label: "教程分享" },
+  { value: "EVENT_REPORT", label: "活动报告" },
+  { value: "DISCUSSION", label: "话题讨论" },
+  { value: "NEWS", label: "圈内资讯" },
+  { value: "RESOURCE", label: "资源分享" },
 ];
 
 const popularTags = [

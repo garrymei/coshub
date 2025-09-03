@@ -6,16 +6,14 @@ export interface Post {
   authorName: string;
   authorAvatar: string;
   city?: string;
-  type: "showcase" | "tutorial" | "discussion" | "news" | "event";
+  type: "SHARE" | "TUTORIAL" | "DISCUSSION" | "NEWS" | "EVENT";
   category:
-    | "cosplay"
-    | "photography"
-    | "makeup"
-    | "prop_making"
-    | "costume_making"
-    | "anime_discussion"
-    | "community"
-    | "tips_tricks";
+    | "COSPLAY_SHOW"
+    | "TUTORIAL"
+    | "EVENT_REPORT"
+    | "DISCUSSION"
+    | "NEWS"
+    | "RESOURCE";
   tags: string[];
   images: string[];
   videos: string[];

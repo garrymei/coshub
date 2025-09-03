@@ -28,22 +28,20 @@ export interface Post {
 }
 
 export enum PostType {
-  SHOWCASE = "showcase", // 作品展示
-  TUTORIAL = "tutorial", // 教程
-  DISCUSSION = "discussion", // 讨论
-  NEWS = "news", // 资讯
-  EVENT = "event", // 活动
+  SHARE = "SHARE", // 分享
+  DISCUSSION = "DISCUSSION", // 讨论
+  TUTORIAL = "TUTORIAL", // 教程
+  NEWS = "NEWS", // 资讯
+  EVENT = "EVENT", // 活动
 }
 
 export enum PostCategory {
-  COSPLAY = "cosplay",
-  PHOTOGRAPHY = "photography",
-  MAKEUP = "makeup",
-  PROP_MAKING = "prop_making",
-  COSTUME_MAKING = "costume_making",
-  ANIME_DISCUSSION = "anime_discussion",
-  COMMUNITY = "community",
-  TIPS_TRICKS = "tips_tricks",
+  COSPLAY_SHOW = "COSPLAY_SHOW", // Cosplay 展示
+  TUTORIAL = "TUTORIAL", // 教程分享
+  EVENT_REPORT = "EVENT_REPORT", // 活动报告
+  DISCUSSION = "DISCUSSION", // 话题讨论
+  NEWS = "NEWS", // 圈内资讯
+  RESOURCE = "RESOURCE", // 资源分享
 }
 
 export interface PostMetadata {
@@ -123,8 +121,14 @@ export interface PostQueryDTO {
 }
 
 export interface PostListResponse {
-  posts: Post[];
-  total: number;
-  hasMore: boolean;
-  nextCursor?: string;
+  data: Post[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
+  cursor?: string;
 }
