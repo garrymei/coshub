@@ -21,12 +21,18 @@ import {
   Post as PostModel,
   PostListResponse,
   ApiResponse,
+  InteractionType,
+  EventType,
 } from "@coshub/types";
 import { PermissionGuard } from "../auth/guards/permission.guard";
 import { RateLimitGuard } from "../auth/guards/rate-limit.guard";
 import { RequirePermissions } from "../auth/decorators/permissions.decorator";
 import { RateLimit } from "../auth/decorators/rate-limit.decorator";
 import { Permission, RateLimitType } from "@coshub/types";
+import { CreateInteractionDto } from "./dto/interaction.dto";
+import { DeleteInteractionDto } from "./dto/interaction.dto";
+import { CreateCommentDto } from "./dto/comment.dto";
+import { TrackEventDto } from "./dto/event.dto";
 
 @Controller("posts")
 export class PostsController {
@@ -67,8 +73,9 @@ export class PostsController {
 
   @Get()
   async findAll(
-    @Query() query: PostQueryDTO,
+    @Query() query: PostQueryDTO & { type?: 'share' | 'skill' },
   ): Promise<ApiResponse<PostListResponse>> {
+    // 直接使用 query.type，不需要额外处理
     try {
       const result = await this.postsService.findAll(query);
 
@@ -220,6 +227,135 @@ export class PostsController {
           timestamp: new Date().toISOString(),
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  // 点赞/收藏接口
+  @Post(":id/interactions")
+  @UsePipes(new ValidationPipe({ transform: true }))
+  @UseGuards(PermissionGuard, RateLimitGuard)
+  @RequirePermissions(Permission.INTERACT_POST)
+  @RateLimit(RateLimitType.INTERACT_POST)
+  async createInteraction(
+    @Param("id") postId: string,
+    @Body() dto: CreateInteractionDto,
+  ): Promise<ApiResponse<void>> {
+    try {
+      await this.postsService.createInteraction(postId, dto.type);
+      return {
+        success: true,
+        message: "操作成功",
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      throw new HttpException(
+        {
+          success: false,
+          error: {
+            code: "INTERACTION_FAILED",
+            message: "操作失败",
+            details: error.message,
+          },
+          timestamp: new Date().toISOString(),
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  @Delete(":id/interactions")
+  @UsePipes(new ValidationPipe({ transform: true }))
+  @UseGuards(PermissionGuard, RateLimitGuard)
+  @RequirePermissions(Permission.INTERACT_POST)
+  @RateLimit(RateLimitType.INTERACT_POST)
+  async deleteInteraction(
+    @Param("id") postId: string,
+    @Body() dto: DeleteInteractionDto,
+  ): Promise<ApiResponse<void>> {
+    try {
+      await this.postsService.deleteInteraction(postId, dto.type);
+      return {
+        success: true,
+        message: "取消操作成功",
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      throw new HttpException(
+        {
+          success: false,
+          error: {
+            code: "INTERACTION_FAILED",
+            message: "取消操作失败",
+            details: error.message,
+          },
+          timestamp: new Date().toISOString(),
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  // 评论接口
+  @Post(":id/comments")
+  @UsePipes(new ValidationPipe({ transform: true }))
+  @UseGuards(PermissionGuard, RateLimitGuard)
+  @RequirePermissions(Permission.COMMENT_POST)
+  @RateLimit(RateLimitType.COMMENT_POST)
+  async createComment(
+    @Param("id") postId: string,
+    @Body() dto: CreateCommentDto,
+  ): Promise<ApiResponse<Comment>> {
+    try {
+      const comment = await this.postsService.createComment(postId, dto.content);
+      return {
+        success: true,
+        data: comment,
+        message: "评论成功",
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      throw new HttpException(
+        {
+          success: false,
+          error: {
+            code: "COMMENT_FAILED",
+            message: "评论失败",
+            details: error.message,
+          },
+          timestamp: new Date().toISOString(),
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  // 埋点接口
+  @Post(":id/events")
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async trackEvent(
+    @Param("id") postId: string,
+    @Body() dto: TrackEventDto,
+  ): Promise<ApiResponse<void>> {
+    try {
+      await this.postsService.trackEvent(postId, dto.type);
+      return {
+        success: true,
+        message: "事件记录成功",
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      throw new HttpException(
+        {
+          success: false,
+          error: {
+            code: "TRACKING_FAILED",
+            message: "事件记录失败",
+            details: error.message,
+          },
+          timestamp: new Date().toISOString(),
+        },
+        HttpStatus.BAD_REQUEST,
       );
     }
   }

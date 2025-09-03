@@ -13,7 +13,7 @@ import { BannersModule } from "./banners/banners.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { UploadModule } from "./upload/upload.module";
 import { ReportsModule } from "./reports/reports.module";
-import { CacheModule } from "./cache/cache.module";
+import { RedisCacheModule } from "./cache/redis-cache.module";
 import { LoggerModule } from "./logger/logger.module";
 import { LoggerMiddleware } from "./logger/logger.middleware";
 import { AuthModule } from "./auth/auth.module";
@@ -34,7 +34,7 @@ import { AuthModule } from "./auth/auth.module";
     UploadModule,
     SkillsModule,
     ReportsModule,
-    CacheModule,
+    RedisRedisCacheModule,
     LoggerModule,
     AuthModule,
   ],

@@ -1,4 +1,6 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException, Inject } from "@nestjs/common";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { Cache } from "cache-manager";
 import { PrismaService } from "../prisma/prisma.service";
 import {
   Post,
@@ -11,7 +13,10 @@ import { Prisma } from "../../generated/prisma";
 
 @Injectable()
 export class PostsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {}
 
   // 创建帖子
   async create(createPostDto: CreatePostDTO): Promise<Post> {
@@ -41,11 +46,27 @@ export class PostsService {
   }
 
   // 获取帖子列表（支持筛选和排序）
-  async findAll(query: PostQueryDTO): Promise<PostListResponse> {
+  async findAll(query: PostQueryDTO & { city?: string; radiusKm?: number }): Promise<PostListResponse> {
     const where: Prisma.PostWhereInput = {
       deletedAt: null,
       status: "ACTIVE",
     };
+
+    // 城市筛选
+    if (query.city) {
+      where.city = query.city;
+    }
+    
+    // 地理范围筛选 (后续实现geohash)
+    if (query.radiusKm && query.lat && query.lng) {
+      // 临时实现 - 后续替换为geohash查询
+      where.AND = [
+        { lat: { gte: query.lat - 0.1 } },
+        { lat: { lte: query.lat + 0.1 } },
+        { lng: { gte: query.lng - 0.1 } },
+        { lng: { lte: query.lng + 0.1 } }
+      ];
+    }
 
     // 应用筛选条件
     if (query.type) {
@@ -137,8 +158,23 @@ export class PostsService {
       where,
       orderBy,
       take,
-      include: {
-        author: true,
+      select: {
+        id: true,
+        title: true,
+        type: true,
+        images: true,
+        viewCount: true,
+        likeCount: true,
+        commentCount: true,
+        createdAt: true,
+        updatedAt: true,
+        author: {
+          select: {
+            id: true,
+            nickname: true,
+            avatar: true,
+          },
+        },
       },
     });
 
@@ -179,6 +215,12 @@ export class PostsService {
 
   // 获取帖子详情
   async findOne(id: string): Promise<Post> {
+    // 尝试从缓存获取
+    const cachedPost = await this.cacheManager.get<Post>(`post_${id}`);
+    if (cachedPost) {
+      return cachedPost;
+    }
+
     const post = await this.prisma.post.findFirst({
       where: {
         id,
@@ -205,8 +247,12 @@ export class PostsService {
     });
 
     post.viewCount += 1;
-
-    return this.transformPost(post);
+    const transformed = this.transformPost(post);
+    
+    // 缓存帖子详情
+    await this.cacheManager.set(`post_${id}`, transformed, 300);
+    
+    return transformed;
   }
 
   // 更新帖子
@@ -288,6 +334,101 @@ export class PostsService {
   }
 
   // 转换数据库模型到API模型
+  // 批量点赞/收藏操作（减少数据库往返）
+  private pendingInteractions: Map<string, {type: 'LIKE' | 'COLLECT', delta: number}> = new Map();
+  private interactionFlushTimeout: NodeJS.Timeout | null = null;
+
+  async createInteraction(postId: string, type: InteractionType): Promise<void> {
+    const key = `${postId}-${type}`;
+    const current = this.pendingInteractions.get(key) || {type, delta: 0};
+    current.delta += 1;
+    this.pendingInteractions.set(key, current);
+
+    // 延迟批量更新
+    if (!this.interactionFlushTimeout) {
+      this.interactionFlushTimeout = setTimeout(() => this.flushInteractions(), 500);
+    }
+  }
+
+  private async flushInteractions() {
+    if (this.interactionFlushTimeout) {
+      clearTimeout(this.interactionFlushTimeout);
+      this.interactionFlushTimeout = null;
+    }
+
+    const updates = Array.from(this.pendingInteractions.entries()).map(([key, {type, delta}]) => {
+      const [postId] = key.split('-');
+      const field = type === 'LIKE' ? 'likeCount' : 'collectCount';
+      return this.prisma.post.update({
+        where: { id: postId },
+        data: {
+          [field]: {
+            increment: delta,
+          },
+        },
+      });
+    });
+
+    await Promise.all(updates);
+    this.pendingInteractions.clear();
+  }
+
+  // 取消点赞/收藏
+  async deleteInteraction(postId: string, type: InteractionType): Promise<void> {
+    const field = type === 'LIKE' ? 'likeCount' : 'collectCount';
+    await this.prisma.post.update({
+      where: { id: postId },
+      data: {
+        [field]: {
+          decrement: 1,
+        },
+      },
+    });
+  }
+
+  // 添加评论
+  async createComment(postId: string, content: string): Promise<any> {
+    // 暂时使用第一个用户作为评论者
+    const firstUser = await this.prisma.user.findFirst();
+    if (!firstUser) {
+      throw new Error("未找到用户，请先运行种子数据");
+    }
+
+    // 创建评论
+    const comment = await this.prisma.comment.create({
+      data: {
+        content,
+        targetType: 'POST',
+        targetId: postId,
+        authorId: firstUser.id,
+      },
+    });
+
+    // 更新帖子评论数
+    await this.prisma.post.update({
+      where: { id: postId },
+      data: {
+        commentCount: {
+          increment: 1,
+        },
+      },
+    });
+
+    return comment;
+  }
+
+  // 记录事件
+  async trackEvent(postId: string, type: 'VIEW' | 'CLICK' | 'SHARE' | 'PUBLISH'): Promise<void> {
+    await this.prisma.event.create({
+      data: {
+        type,
+        targetType: 'POST',
+        targetId: postId,
+        metadata: {},
+      },
+    });
+  }
+
   private transformPost(post: any): Post {
     return {
       id: post.id,

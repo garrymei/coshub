@@ -1,254 +1,84 @@
+import { View, Form, Input, Button, Image } from "@tarojs/components";
 import { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  Form,
-  Input,
-  Button,
-  Picker,
-  Textarea,
-  Image,
-} from "@tarojs/components";
 import Taro from "@tarojs/taro";
-import { getUserProfile, updateUserProfile } from "@/services/user";
-import { uploadFile } from "@/services/upload";
-import "./profile.scss";
-
-interface UserProfile {
-  id: string;
-  nickname: string;
-  avatar: string;
-  bio: string;
-  gender: string;
-  city: string;
-}
+import "./index.scss";
 
 export default function ProfilePage() {
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [formData, setFormData] = useState({
+  const [profile, setProfile] = useState({
     nickname: "",
     avatar: "",
     bio: "",
-    gender: "",
-    city: "",
+    city: ""
   });
 
-  const genderOptions = ["保密", "男", "女"];
-
-  // 获取用户资料
-  const fetchUserProfile = async () => {
-    try {
-      setLoading(true);
-      const profile = await getUserProfile();
-      setUserProfile(profile);
-      setFormData({
-        nickname: profile.nickname || "",
-        avatar: profile.avatar || "",
-        bio: profile.bio || "",
-        gender: profile.gender || "保密",
-        city: profile.city || "",
-      });
-    } catch (error) {
-      console.error("获取用户资料失败", error);
-      Taro.showToast({
-        title: "获取用户资料失败",
-        icon: "none",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // 上传头像
-  const handleUploadAvatar = async () => {
-    try {
-      const res = await Taro.chooseImage({
-        count: 1,
-        sizeType: ["compressed"],
-        sourceType: ["album", "camera"],
-      });
-
-      const tempFilePath = res.tempFilePaths[0];
-      Taro.showLoading({ title: "上传中..." });
-
-      const uploadResult = await uploadFile(tempFilePath, "avatar");
-
-      setFormData((prev) => ({
-        ...prev,
-        avatar: uploadResult.url,
-      }));
-
-      Taro.hideLoading();
-      Taro.showToast({
-        title: "上传成功",
-        icon: "success",
-      });
-    } catch (error) {
-      console.error("上传头像失败", error);
-      Taro.hideLoading();
-      Taro.showToast({
-        title: "上传头像失败",
-        icon: "none",
-      });
-    }
-  };
-
-  // 处理输入变化
-  const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
-  // 处理性别选择
-  const handleGenderChange = (e: { detail: { value: number } }) => {
-    const genderIndex = e.detail.value;
-    setFormData((prev) => ({
-      ...prev,
-      gender: genderOptions[genderIndex],
-    }));
-  };
-
-  // 处理城市选择
-  const handleCitySelect = async () => {
-    try {
-      const res = await Taro.chooseCity({
-        showLocatedCity: true,
-        showHotCities: true,
-      });
-
-      if (res.city) {
-        setFormData((prev) => ({
-          ...prev,
-          city: res.city,
-        }));
-      }
-    } catch (error) {
-      console.error("选择城市失败", error);
-    }
-  };
-
-  // 提交表单
-  const handleSubmit = async () => {
-    try {
-      // 表单验证
-      if (!formData.nickname) {
-        Taro.showToast({
-          title: "昵称不能为空",
-          icon: "none",
-        });
-        return;
-      }
-
-      setSubmitting(true);
-
-      // 提交更新
-      await updateUserProfile(formData);
-
-      Taro.showToast({
-        title: "保存成功",
-        icon: "success",
-      });
-
-      // 返回上一页
-      setTimeout(() => {
-        Taro.navigateBack();
-      }, 1500);
-    } catch (error) {
-      console.error("更新用户资料失败", error);
-      Taro.showToast({
-        title: "保存失败",
-        icon: "none",
-      });
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
   useEffect(() => {
-    fetchUserProfile();
+    fetchProfile();
   }, []);
 
-  if (loading) {
-    return (
-      <View className="profile-page loading">
-        <Text>加载中...</Text>
-      </View>
-    );
-  }
+  const fetchProfile = async () => {
+    const res = await Taro.request({
+      url: "/api/users/current",
+      method: "GET"
+    });
+    setProfile(res.data.data);
+  };
+
+  const handleSubmit = async () => {
+    try {
+      await Taro.request({
+        url: "/api/users/current",
+        method: "PUT",
+        data: profile
+      });
+      Taro.showToast({ title: "保存成功", icon: "success" });
+    } catch (error) {
+      Taro.showToast({ title: "保存失败", icon: "none" });
+    }
+  };
+
+  const chooseAvatar = async () => {
+    const res = await Taro.chooseImage({
+      count: 1,
+      sizeType: ["compressed"],
+      sourceType: ["album"]
+    });
+    setProfile({ ...profile, avatar: res.tempFilePaths[0] });
+  };
 
   return (
     <View className="profile-page">
-      <Form className="profile-form">
-        <View className="form-group avatar-group">
-          <Text className="form-label">头像</Text>
-          <View className="avatar-wrapper" onClick={handleUploadAvatar}>
-            {formData.avatar ? (
-              <Image className="avatar" src={formData.avatar} />
-            ) : (
-              <View className="avatar-placeholder">
-                <Text>+</Text>
-              </View>
-            )}
-          </View>
+      <Form onSubmit={handleSubmit}>
+        <View className="avatar-section" onClick={chooseAvatar}>
+          <Image src={profile.avatar || "/assets/default-avatar.png"} className="avatar" />
+          <View className="change-text">点击更换头像</View>
         </View>
 
-        <View className="form-group">
-          <Text className="form-label">昵称</Text>
+        <View className="form-item">
           <Input
-            className="form-input"
-            value={formData.nickname}
-            onInput={(e) => handleInputChange("nickname", e.detail.value)}
-            placeholder="请输入昵称"
-            maxlength={20}
+            placeholder="昵称"
+            value={profile.nickname}
+            onChange={e => setProfile({ ...profile, nickname: e.detail.value })}
           />
         </View>
 
-        <View className="form-group">
-          <Text className="form-label">个人简介</Text>
-          <Textarea
-            className="form-textarea"
-            value={formData.bio}
-            onInput={(e) => handleInputChange("bio", e.detail.value)}
-            placeholder="介绍一下自己吧"
-            maxlength={100}
+        <View className="form-item">
+          <Input
+            placeholder="城市"
+            value={profile.city}
+            onChange={e => setProfile({ ...profile, city: e.detail.value })}
           />
-          <Text className="char-count">{formData.bio.length}/100</Text>
         </View>
 
-        <View className="form-group">
-          <Text className="form-label">性别</Text>
-          <Picker
-            mode="selector"
-            range={genderOptions}
-            onChange={handleGenderChange}
-            value={genderOptions.indexOf(formData.gender)}
-          >
-            <View className="picker-value">
-              {formData.gender || "请选择性别"}
-              <Text className="picker-arrow">{">"}</Text>
-            </View>
-          </Picker>
+        <View className="form-item">
+          <Input
+            placeholder="个人简介"
+            value={profile.bio}
+            onChange={e => setProfile({ ...profile, bio: e.detail.value })}
+          />
         </View>
 
-        <View className="form-group">
-          <Text className="form-label">所在城市</Text>
-          <View className="city-picker" onClick={handleCitySelect}>
-            <Text>{formData.city || "请选择城市"}</Text>
-            <Text className="picker-arrow">{">"}</Text>
-          </View>
-        </View>
-
-        <Button
-          className="submit-btn"
-          onClick={handleSubmit}
-          loading={submitting}
-          disabled={submitting}
-        >
-          保存
+        <Button formType="submit" type="primary">
+          保存资料
         </Button>
       </Form>
     </View>

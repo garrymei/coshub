@@ -29,10 +29,23 @@ export interface Post {
 
 export enum PostType {
   SHARE = "SHARE", // 分享
+  SKILL = "SKILL", // 技能
   DISCUSSION = "DISCUSSION", // 讨论
   TUTORIAL = "TUTORIAL", // 教程
   NEWS = "NEWS", // 资讯
   EVENT = "EVENT", // 活动
+}
+
+export enum InteractionType {
+  LIKE = "LIKE", // 点赞
+  COLLECT = "COLLECT", // 收藏
+}
+
+export enum EventType {
+  VIEW = "VIEW", // 浏览
+  CLICK = "CLICK", // 点击
+  SHARE = "SHARE", // 分享
+  PUBLISH = "PUBLISH", // 发布
 }
 
 export enum PostCategory {

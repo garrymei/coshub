@@ -14,12 +14,30 @@ export default defineAppConfig({
     "pages/me/settings",
     "pages/login/index",
   ],
+  subPackages: [
+    {
+      root: "packageA",
+      pages: [
+        "pages/settings/account",
+        "pages/settings/notifications"
+      ]
+    }
+  ],
   window: {
     backgroundTextStyle: "light",
     navigationBarBackgroundColor: "#FF6B9D",
     navigationBarTitleText: "Coshub",
     navigationBarTextStyle: "white",
     backgroundColor: "#f8f9fa",
+    navigationStyle: "custom",
+    enablePullDownRefresh: true,
+    onReachBottomDistance: 50,
+    networkTimeout: {
+      request: 60000,
+      connectSocket: 60000,
+      uploadFile: 60000,
+      downloadFile: 60000
+    }
   },
   tabBar: {
     color: "#888",
@@ -28,26 +46,49 @@ export default defineAppConfig({
     borderStyle: "black",
     list: [
       {
-        pagePath: "pages/skills/index",
-        text: "技能",
-        iconPath: "assets/tab-skills.png",
-        selectedIconPath: "assets/tab-skills-active.png",
+        pagePath: "pages/feed/index",
+        text: "发现",
+        iconPath: "assets/images/tab-feed.png",
+        selectedIconPath: "assets/images/tab-feed-active.png",
       },
       {
-        pagePath: "pages/feed/index",
-        text: "分享",
-        iconPath: "assets/tab-feed.png",
-        selectedIconPath: "assets/tab-feed-active.png",
+        pagePath: "pages/skills/index",
+        text: "技能",
+        iconPath: "assets/images/tab-skills.png",
+        selectedIconPath: "assets/images/tab-skills-active.png",
       },
       {
         pagePath: "pages/me/index",
         text: "我的",
-        iconPath: "assets/tab-me.png",
-        selectedIconPath: "assets/tab-me-active.png",
+        iconPath: "assets/images/tab-me.png",
+        selectedIconPath: "assets/images/tab-me-active.png",
       },
     ],
   },
+  permission: {
+    "scope.userLocation": {
+      desc: "你的位置信息将用于推荐附近的内容"
+    },
+    "scope.writePhotosAlbum": {
+      desc: "需要保存图片到相册"
+    },
+    "scope.record": {
+      desc: "需要录制音频"
+    }
+  },
+  requiredBackgroundModes: ["location", "audio"],
+  navigateToMiniProgramAppIdList: [
+    // 实际需要跳转的小程序ID列表
+  ],
   sitemapLocation: "sitemap.json",
+  preloadRule: {
+    "pages/feed/index": {
+      network: "all",
+      packages: ["packageA"]
+    }
+  },
+  debug: false,
+  functionalPages: true
 });
 
 function defineAppConfig(config: any) {

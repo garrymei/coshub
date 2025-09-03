@@ -57,5 +57,10 @@
   "engines": {
     "node": ">=18.0.0",
     "pnpm": ">=9.0.0"
+  },
+  "dependencies": {
+    "@types/cache-manager": "^5.0.0",
+    "cache-manager": "^7.2.0",
+    "cache-manager-redis-store": "^3.0.1"
   }
 }

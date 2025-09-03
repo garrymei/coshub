@@ -23,7 +23,10 @@ model User {
   role        UserRole  @default(USER)
   verified    Boolean  @default(false)
   reputation  Int      @default(100)
-  city        String?
+  city        String?  @db.VarChar(50)
+  lat         Float?   @db.DoublePrecision
+  lng         Float?   @db.DoublePrecision
+  preferredCity String? @db.VarChar(50)
   
   // 统计数据
   viewCount   Int      @default(0)
@@ -162,6 +165,10 @@ model Post {
   content     String   @db.Text
   type        PostType
   category    PostCategory?
+  city        String?  @db.VarChar(50)
+  lat         Float?   @db.DoublePrecision
+  lng         Float?   @db.DoublePrecision
+  geohash     String?  @db.VarChar(12)
   
   // 媒体内容
   images      String[]
@@ -297,6 +304,22 @@ model Comment {
   @@index([targetId])
   @@index([parentId])
   @@index([status])
+  @@index([createdAt])
+}
+
+// 事件记录表
+model Event {
+  id          String   @id @default(cuid())
+  type        String   @db.VarChar(50)
+  targetType  String?  @db.VarChar(50)
+  targetId    String?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+  
+  @@map("events")
+  @@index([type])
+  @@index([targetType])
+  @@index([targetId])
   @@index([createdAt])
 }
 
