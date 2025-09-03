@@ -15,12 +15,13 @@ export default defineAppConfig({
     "pages/me/settings",
     "pages/login/index",
   ],
-  subPackages: [
-    {
-      root: "packageA",
-      pages: ["pages/settings/account", "pages/settings/notifications"],
-    },
-  ],
+  // 暂时注释掉不存在的子包配置
+  // subPackages: [
+  //   {
+  //     root: "packageA",
+  //     pages: ["pages/settings/account", "pages/settings/notifications"],
+  //   },
+  // ],
   window: {
     backgroundTextStyle: "light",
     navigationBarBackgroundColor: "#FF6B9D",
@@ -82,7 +83,7 @@ export default defineAppConfig({
   preloadRule: {
     "pages/feed/index": {
       network: "all",
-      packages: ["packageA"],
+      packages: [], // 移除对packageA的引用
     },
   },
   debug: false,
