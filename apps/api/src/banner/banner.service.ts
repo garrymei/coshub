@@ -15,4 +15,17 @@ export class BannerService {
       take: 5,
     });
   }
+
+  async createBanner(bannerData: any) {
+    return this.prisma.banner.create({
+      data: {
+        scene: bannerData.scene as any,
+        imageUrl: bannerData.imageUrl,
+        linkType: bannerData.linkType as any,
+        linkUrl: bannerData.linkUrl,
+        priority: bannerData.priority || 0,
+        online: bannerData.online !== false,
+      },
+    });
+  }
 }

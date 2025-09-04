@@ -1,6 +1,4 @@
-import { Injectable, NotFoundException, Inject } from "@nestjs/common";
-import { CACHE_MANAGER } from "@nestjs/cache-manager";
-import { Cache } from "cache-manager";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import {
   Post,
@@ -15,7 +13,6 @@ import { Prisma } from "../../generated/prisma";
 export class PostsService {
   constructor(
     private prisma: PrismaService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   // 创建帖子
@@ -37,7 +34,7 @@ export class PostsService {
         tags: createPostDto.tags || [],
         authorId: firstUser.id,
         // 处理技能帖特有字段
-        ...(createPostDto.type === 'SKILL' && {
+        ...(createPostDto.type === "SKILL" && {
           price: createPostDto.price,
           role: createPostDto.role,
           experience: createPostDto.experience,
@@ -80,7 +77,8 @@ export class PostsService {
 
     // 应用筛选条件
     if (query.type) {
-      where.type = query.type as any;
+      // 将小写转换为大写以匹配Prisma枚举
+      where.type = query.type.toUpperCase() as any;
     }
 
     if (query.category) {
@@ -144,7 +142,7 @@ export class PostsService {
     const limit = query.limit || 10;
 
     // 如果提供了游标，添加游标条件
-    if (query.cursor) {
+    if (query.cursor && query.cursor !== "null" && query.cursor !== "undefined") {
       const cursorField = query.sortBy || "createdAt";
       try {
         const cursorData = JSON.parse(
@@ -225,11 +223,11 @@ export class PostsService {
 
   // 获取帖子详情
   async findOne(id: string): Promise<Post> {
-    // 尝试从缓存获取
-    const cachedPost = await this.cacheManager.get<Post>(`post_${id}`);
-    if (cachedPost) {
-      return cachedPost;
-    }
+    // 暂时禁用缓存功能
+    // const cachedPost = await this.cacheManager.get<Post>(`post_${id}`);
+    // if (cachedPost) {
+    //   return cachedPost;
+    // }
 
     const post = await this.prisma.post.findFirst({
       where: {
@@ -259,8 +257,8 @@ export class PostsService {
     post.viewCount += 1;
     const transformed = this.transformPost(post);
 
-    // 缓存帖子详情
-    await this.cacheManager.set(`post_${id}`, transformed, 300);
+    // 暂时禁用缓存功能
+    // await this.cacheManager.set(`post_${id}`, transformed, 300);
 
     return transformed;
   }
@@ -513,7 +511,7 @@ export class PostsService {
     };
 
     // 添加技能帖特有字段
-    if (post.type === 'SKILL') {
+    if (post.type === "SKILL") {
       return {
         ...basePost,
         price: post.price,

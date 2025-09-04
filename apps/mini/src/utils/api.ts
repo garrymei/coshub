@@ -67,15 +67,15 @@ export const request = async ({
   } catch (error) {
     console.error("请求错误:", error);
     // 返回默认数据或处理错误
-    if (url.includes('/banners')) {
+    if (url.includes("/banners")) {
       return {
         success: true,
-        data: Config.BANNER.DEFAULT_IMAGES.map(url => ({
+        data: Config.BANNER.DEFAULT_IMAGES.map((url) => ({
           imageUrl: url,
-          linkUrl: '',
-          scene: 'feed'
+          linkUrl: "",
+          scene: "feed",
         })),
-        message: "使用默认Banner数据"
+        message: "使用默认Banner数据",
       };
     }
     return Promise.reject(error);

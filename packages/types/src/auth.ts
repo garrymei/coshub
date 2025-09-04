@@ -35,11 +35,11 @@ export enum Permission {
   MANAGE_REPORTS = "MANAGE_REPORTS", // 管理举报
   CREATE_REPORT = "CREATE_REPORT", // 创建举报
   VIEW_REPORTS = "VIEW_REPORTS", // 查看举报
-  
+
   // 帖子交互权限
   INTERACT_POST = "INTERACT_POST", // 与帖子交互（点赞、收藏等）
   COMMENT_POST = "COMMENT_POST", // 评论帖子
-  
+
   // 用户权限
   EDIT_PROFILE = "EDIT_PROFILE", // 编辑个人资料
   VIEW_PROFILE = "VIEW_PROFILE", // 查看个人资料

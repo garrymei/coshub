@@ -7,15 +7,12 @@ import {
 } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { RateLimitType, RATE_LIMIT_CONFIGS } from "@coshub/types";
-import { Inject } from "@nestjs/common";
-import { CACHE_MANAGER } from "@nestjs/cache-manager";
-import { Cache } from "cache-manager";
 
 @Injectable()
 export class RateLimitGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    // @Inject(CACHE_MANAGER) private cacheManager: Cache, // 暂时禁用缓存
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -36,26 +33,27 @@ export class RateLimitGuard implements CanActivate {
       return true;
     }
 
-    const key = `rate_limit:${rateLimitType}:${clientId}`;
-    const currentCount = (await this.cacheManager.get<number>(key)) || 0;
+    // 暂时禁用速率限制功能
+    // const key = `rate_limit:${rateLimitType}:${clientId}`;
+    // const currentCount = (await this.cacheManager.get<number>(key)) || 0;
 
-    if (currentCount >= config.max) {
-      throw new HttpException(
-        {
-          success: false,
-          error: {
-            code: "RATE_LIMIT_EXCEEDED",
-            message: config.message,
-            details: `请求次数: ${currentCount}/${config.max}`,
-          },
-          timestamp: new Date().toISOString(),
-        },
-        config.statusCode,
-      );
-    }
+    // if (currentCount >= config.max) {
+    //   throw new HttpException(
+    //     {
+    //       success: false,
+    //       error: {
+    //         code: "RATE_LIMIT_EXCEEDED",
+    //         message: config.message,
+    //         details: `请求次数: ${currentCount}/${config.max}`,
+    //       },
+    //       timestamp: new Date().toISOString(),
+    //     },
+    //     config.statusCode,
+    //   );
+    // }
 
-    // 增加计数
-    await this.cacheManager.set(key, currentCount + 1, config.windowMs / 1000);
+    // // 增加计数
+    // await this.cacheManager.set(key, currentCount + 1, config.windowMs / 1000);
 
     // 添加速率限制头
     if (config.headers) {
@@ -63,7 +61,7 @@ export class RateLimitGuard implements CanActivate {
       response.set("X-RateLimit-Limit", config.max.toString());
       response.set(
         "X-RateLimit-Remaining",
-        (config.max - currentCount - 1).toString(),
+        config.max.toString(), // 暂时显示为满额
       );
       response.set(
         "X-RateLimit-Reset",

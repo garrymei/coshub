@@ -21,12 +21,12 @@ export default function SkillsIndex() {
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [cursor, setCursor] = useState<string | null>(null);
-  
+
   // 筛选条件
   const [city, setCity] = useState("");
   const [role, setRole] = useState("");
   const [priceRange, setPriceRange] = useState("");
-  
+
   const cities = ["全部", "北京", "上海", "广州", "深圳", "杭州", "成都"];
   const roles = ["全部", "画师", "模型师", "声优", "程序员", "策划"];
   const priceRanges = ["全部", "0-100", "100-500", "500-1000", "1000以上"];
@@ -59,9 +59,9 @@ export default function SkillsIndex() {
         city: city === "全部" ? undefined : city,
         role: role === "全部" ? undefined : role,
         priceMin,
-        priceMax
+        priceMax,
       });
-      
+
       const list = res?.data || [];
       const nextCursor = res?.nextCursor ?? null;
       const more = res?.hasMore ?? list.length > 0;
@@ -109,29 +109,23 @@ export default function SkillsIndex() {
           range={cities}
           onChange={(e) => setCity(cities[e.detail.value])}
         >
-          <View className="filter-item">
-            {city || "城市"}
-          </View>
+          <View className="filter-item">{city || "城市"}</View>
         </Picker>
-        
+
         <Picker
           mode="selector"
           range={roles}
           onChange={(e) => setRole(roles[e.detail.value])}
         >
-          <View className="filter-item">
-            {role || "角色"}
-          </View>
+          <View className="filter-item">{role || "角色"}</View>
         </Picker>
-        
+
         <Picker
           mode="selector"
           range={priceRanges}
           onChange={(e) => setPriceRange(priceRanges[e.detail.value])}
         >
-          <View className="filter-item">
-            {priceRange || "价格"}
-          </View>
+          <View className="filter-item">{priceRange || "价格"}</View>
         </Picker>
       </View>
 
@@ -140,7 +134,7 @@ export default function SkillsIndex() {
           <SkillCard key={skill.id} {...skill} />
         ))}
       </View>
-      
+
       {loading && <View className="loading">加载中...</View>}
       {!hasMore && <View className="no-more">没有更多内容了</View>}
     </ScrollView>

@@ -74,17 +74,11 @@ export class PostsController {
   @Get()
   async findAll(
     @Query() query: PostQueryDTO & { type?: "share" | "skill" },
-  ): Promise<ApiResponse<PostListResponse>> {
+  ): Promise<PostListResponse> {
     // 直接使用 query.type，不需要额外处理
     try {
       const result = await this.postsService.findAll(query);
-
-      return {
-        success: true,
-        data: result,
-        message: "获取帖子列表成功",
-        timestamp: new Date().toISOString(),
-      };
+      return result;
     } catch (error) {
       throw new HttpException(
         {

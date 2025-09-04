@@ -34,17 +34,19 @@ export default function Banner({ scene }: { scene: "feed" | "skills" }) {
         // 使用默认Banner
         setBanners([
           {
-            id: 'default1',
-            imageUrl: 'https://coshub.oss-cn-hangzhou.aliyuncs.com/banners/default1.jpg',
-            linkType: '',
-            linkUrl: ''
+            id: "default1",
+            imageUrl:
+              "https://coshub.oss-cn-hangzhou.aliyuncs.com/banners/default1.jpg",
+            linkType: "",
+            linkUrl: "",
           },
           {
-            id: 'default2',
-            imageUrl: 'https://coshub.oss-cn-hangzhou.aliyuncs.com/banners/default2.jpg',
-            linkType: '',
-            linkUrl: ''
-          }
+            id: "default2",
+            imageUrl:
+              "https://coshub.oss-cn-hangzhou.aliyuncs.com/banners/default2.jpg",
+            linkType: "",
+            linkUrl: "",
+          },
         ]);
       } finally {
         setLoading(false);

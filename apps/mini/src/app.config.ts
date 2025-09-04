@@ -1,7 +1,7 @@
 export default defineAppConfig({
   pages: [
     "pages/feed/index",
-    "pages/login/index", 
+    "pages/login/index",
     "pages/feed/detail",
     "pages/skills/index",
     "pages/skills/detail",
@@ -13,7 +13,7 @@ export default defineAppConfig({
     "pages/me/profile",
     "pages/me/collections",
     "pages/me/posts",
-    "pages/me/settings"
+    "pages/me/settings",
   ],
   // 暂时注释掉不存在的子包配置
   // subPackages: [

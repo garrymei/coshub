@@ -1,8 +1,5 @@
 {
-  "pages": [
-    "pages/index/index",
-    "pages/feed/create"
-  ],
+  "pages": ["pages/index/index", "pages/feed/create"],
   "window": {
     "navigationBarTitleText": "Coshub Mini",
     "navigationBarBackgroundColor": "#ffffff",

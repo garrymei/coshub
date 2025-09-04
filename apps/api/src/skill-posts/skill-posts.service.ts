@@ -23,7 +23,7 @@ export class SkillPostsService {
       data: {
         title: createSkillPostDto.title,
         content: createSkillPostDto.description,
-        type: 'SKILL' as any,
+        type: "SKILL" as any,
         category: createSkillPostDto.category as any,
         images: createSkillPostDto.images,
         tags: createSkillPostDto.tags,
@@ -44,7 +44,7 @@ export class SkillPostsService {
     const where: Prisma.PostWhereInput = {
       deletedAt: null,
       status: "ACTIVE",
-      type: 'SKILL' as any, // 只查询技能帖
+      type: "SKILL" as any, // 只查询技能帖
     };
 
     // 应用筛选条件
@@ -189,7 +189,7 @@ export class SkillPostsService {
         id,
         deletedAt: null,
         status: "ACTIVE",
-        type: 'SKILL' as any,
+        type: "SKILL" as any,
       },
       include: {
         author: true,
@@ -221,7 +221,7 @@ export class SkillPostsService {
       where: {
         deletedAt: null,
         status: "ACTIVE",
-        type: 'SKILL' as any,
+        type: "SKILL" as any,
       },
       select: {
         city: true,
@@ -241,7 +241,7 @@ export class SkillPostsService {
       where: {
         deletedAt: null,
         status: "ACTIVE",
-        type: 'SKILL' as any,
+        type: "SKILL" as any,
       },
       select: {
         tags: true,

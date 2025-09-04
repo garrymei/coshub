@@ -25,7 +25,7 @@ export interface Post {
   isFeatured: boolean;
   createdAt: Date;
   updatedAt: Date;
-  
+
   // 技能帖特有字段
   price?: Record<string, unknown>;
   role?: string;
@@ -73,7 +73,7 @@ export interface PostMetadata {
   tools?: string[];
   skills?: SkillCategory[];
   event?: EventInfo;
-  
+
   // 技能帖特有元数据
   skillMetadata?: {
     portfolio?: string[];
