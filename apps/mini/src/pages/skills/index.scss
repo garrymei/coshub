@@ -1,29 +1,33 @@
 .skills-page {
+  width: 100%;
   height: 100vh;
-  background-color: #f5f5f5;
-  padding: 12px;
-
-  .filters {
+  background-color: #f8f9fa;
+  
+  .filter-bar {
     display: flex;
-    justify-content: space-between;
-    margin-bottom: 16px;
-    background: #fff;
-    padding: 8px;
-    border-radius: 8px;
-
-    .filter {
-      padding: 8px 12px;
-      background: #f5f5f5;
-      border-radius: 4px;
+    justify-content: space-around;
+    padding: 20px;
+    background-color: #fff;
+    margin-bottom: 10px;
+    
+    .filter-item {
+      padding: 8px 16px;
+      border-radius: 20px;
+      background-color: #f0f0f0;
       font-size: 14px;
-      color: #666;
+      color: #333;
     }
   }
-
-  .loading,
-  .no-more {
+  
+  .skills-list {
+    display: flex;
+    flex-direction: column;
+    padding: 0 16px;
+  }
+  
+  .loading, .no-more {
     text-align: center;
-    padding: 16px;
+    padding: 20px 0;
     color: #999;
     font-size: 14px;
   }

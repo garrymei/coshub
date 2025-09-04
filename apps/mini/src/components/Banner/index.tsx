@@ -13,31 +13,6 @@ interface BannerItem {
 
 export default function Banner({ scene }: { scene: "feed" | "skills" }) {
   const [banners, setBanners] = useState<BannerItem[]>([]);
-
-  useEffect(() => {
-    const fetchBanners = async () => {
-      try {
-        const res = await getBanners({ scene });
-        if (!res) {
-          throw new Error("Empty banner response");
-        }
-        const list = Array.isArray(res.data)
-          ? res.data
-          : Array.isArray(res)
-            ? res
-            : [];
-        setBanners(list);
-      } catch (error) {
-        Taro.showToast({
-          title: "轮播图加载失败",
-          icon: "none",
-        });
-        console.error("Banner加载失败:", error);
-      }
-    };
-    fetchBanners();
-  }, [scene]);
-
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -55,11 +30,22 @@ export default function Banner({ scene }: { scene: "feed" | "skills" }) {
             : [];
         setBanners(list);
       } catch (error) {
-        Taro.showToast({
-          title: "轮播图加载失败",
-          icon: "none",
-        });
         console.error("Banner加载失败:", error);
+        // 使用默认Banner
+        setBanners([
+          {
+            id: 'default1',
+            imageUrl: 'https://coshub.oss-cn-hangzhou.aliyuncs.com/banners/default1.jpg',
+            linkType: '',
+            linkUrl: ''
+          },
+          {
+            id: 'default2',
+            imageUrl: 'https://coshub.oss-cn-hangzhou.aliyuncs.com/banners/default2.jpg',
+            linkType: '',
+            linkUrl: ''
+          }
+        ]);
       } finally {
         setLoading(false);
       }

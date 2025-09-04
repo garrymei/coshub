@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateReportDTO } from "@coshub/types";
+import { Prisma } from "@prisma/client";
 
 @Injectable()
 export class ReportService {
@@ -9,10 +10,10 @@ export class ReportService {
   async createReport(dto: CreateReportDTO) {
     return this.prisma.report.create({
       data: {
-        type: dto.type,
-        targetType: dto.targetType,
+        type: dto.type as any,
+        targetType: dto.targetType as any,
         targetId: dto.targetId,
-        reason: dto.reason,
+        reason: dto.reason as any,
         description: dto.description,
         content: dto.content,
         reporterId: dto.reporterId,

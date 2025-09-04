@@ -36,6 +36,14 @@ export class PostsService {
         videos: createPostDto.videos || [],
         tags: createPostDto.tags || [],
         authorId: firstUser.id,
+        // 处理技能帖特有字段
+        ...(createPostDto.type === 'SKILL' && {
+          price: createPostDto.price,
+          role: createPostDto.role,
+          experience: createPostDto.experience,
+          availability: createPostDto.availability,
+          contactInfo: createPostDto.contactInfo,
+        }),
       },
       include: {
         author: true,
@@ -480,7 +488,7 @@ export class PostsService {
   }
 
   private transformPost(post: any): Post {
-    return {
+    const basePost = {
       id: post.id,
       title: post.title,
       content: post.content,
@@ -502,6 +510,20 @@ export class PostsService {
       },
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
-    } as any;
+    };
+
+    // 添加技能帖特有字段
+    if (post.type === 'SKILL') {
+      return {
+        ...basePost,
+        price: post.price,
+        role: post.role,
+        experience: post.experience,
+        availability: post.availability,
+        contactInfo: post.contactInfo,
+      } as any;
+    }
+
+    return basePost as any;
   }
 }

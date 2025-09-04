@@ -329,7 +329,7 @@ export class PostsController {
   }
 
   // 点赞/收藏接口
-  @Post(":id/interactions")
+  @HttpPost(":id/interactions")
   @UsePipes(new ValidationPipe({ transform: true }))
   @UseGuards(PermissionGuard, RateLimitGuard)
   @RequirePermissions(Permission.INTERACT_POST)
@@ -394,7 +394,7 @@ export class PostsController {
   }
 
   // 评论接口
-  @Post(":id/comments")
+  @HttpPost(":id/comments")
   @UsePipes(new ValidationPipe({ transform: true }))
   @UseGuards(PermissionGuard, RateLimitGuard)
   @RequirePermissions(Permission.COMMENT_POST)
@@ -431,7 +431,7 @@ export class PostsController {
   }
 
   // 埋点接口
-  @Post(":id/events")
+  @HttpPost(":id/events")
   @UsePipes(new ValidationPipe({ transform: true }))
   async trackEvent(
     @Param("id") postId: string,

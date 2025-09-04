@@ -177,12 +177,6 @@ model Post {
   // 标签
   tags        String[]
   
-  // 地理信息
-  city        String?  @db.VarChar(50)
-  lat         Float?
-  lng         Float?
-  geohash     String?  @db.VarChar(12)
-  
   // 状态和统计
   status      PostStatus @default(ACTIVE)
   viewCount   Int      @default(0)

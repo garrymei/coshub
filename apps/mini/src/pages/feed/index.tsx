@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { View, ScrollView } from "@tarojs/components";
 import PostCard from "@/components/PostCard";
 import Banner from "@/components/Banner";
-import { feedApi } from "@/services/api";
+import { getPosts } from "@/services/post";
 import "./index.scss";
 
 interface Post {
@@ -31,13 +31,13 @@ export default function FeedPage() {
 
     setLoading(true);
     try {
-      const res: any = await feedApi.getPosts({
-        type: "SHARE",
+      const res = await getPosts({
+        type: "share",
         cursor: refresh ? null : cursor,
       });
-      const list = res?.data?.data || [];
-      const nextCursor = res?.data?.cursor ?? null;
-      const more = res?.data?.meta?.hasNext ?? list.length > 0;
+      const list = res?.data || [];
+      const nextCursor = res?.nextCursor ?? null;
+      const more = res?.hasMore ?? list.length > 0;
 
       setPosts((prev) => (refresh ? list : [...prev, ...list]));
       setCursor(nextCursor);

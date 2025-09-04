@@ -68,3 +68,17 @@ export interface UserStats {
   commentsReceived: number;
   reputation: number;
 }
+
+export interface UpdateUserDTO {
+  username?: string;
+  nickname?: string;
+  avatar?: string;
+  bio?: string;
+  gender?: Gender;
+  birthday?: Date;
+  location?: string;
+  lat?: number;
+  lng?: number;
+  city?: string;
+  preferredCity?: string;
+}

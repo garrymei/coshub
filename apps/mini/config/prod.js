@@ -4,7 +4,33 @@ module.exports = {
   },
   defineConstants: {
   },
-  mini: {},
+  mini: {
+    // 启用JS文件压缩
+    minifyOption: {
+      enable: true,
+      config: {
+        // 启用JS压缩
+        jsMinifier: 'terser',
+        jsMinifierOptions: {
+          compress: {
+            drop_console: true,
+            drop_debugger: true
+          },
+          mangle: true
+        },
+        // 启用CSS压缩
+        cssMinifier: 'csso',
+        // 启用HTML压缩
+        htmlMinifier: 'html-minifier-terser'
+      }
+    },
+    // 启用组件按需注入
+    optimizeMainPackage: {
+      enable: true
+    },
+    // 启用分包优化
+    subPackages: true
+  },
   h5: {
     /**
      * WebpackChain 插件配置
