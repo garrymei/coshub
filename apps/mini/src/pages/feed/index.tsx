@@ -46,11 +46,11 @@ export default function FeedPage() {
       setHasMore(more);
 
       // Fetch banners (mock or real API)
-      if (process.env.TARO_APP_USE_MOCK === 'true') {
+      if (process.env.TARO_APP_USE_MOCK === "true") {
         setBanners((mockData as any).banners || []);
       } else {
         try {
-          const bannerRes = await api.banners.getList('home');
+          const bannerRes = await api.banners.getList("home");
           setBanners(bannerRes || []);
         } catch (e) {
           setBanners([]);
