@@ -191,8 +191,8 @@ importers:
         specifier: 3.6.25
         version: 3.6.25(@swc/helpers@0.5.5)(@tarojs/components@3.6.25(@tarojs/helper@3.6.25(@swc/helpers@0.5.5))(@tarojs/runtime@3.6.25(@tarojs/shared@3.6.25))(@tarojs/shared@3.6.25)(@types/react@18.3.24)(postcss@8.5.6)(react@18.3.1))(@tarojs/shared@3.6.25)(@tarojs/taro@3.6.25(@tarojs/helper@3.6.25(@swc/helpers@0.5.5))(@tarojs/runtime@3.6.25(@tarojs/shared@3.6.25))(@types/react@18.3.24)(postcss@8.5.6))
       '@tarojs/plugin-platform-tt':
-        specifier: 3.6.25
-        version: 3.6.25(@swc/helpers@0.5.5)(@tarojs/components@3.6.25(@tarojs/helper@3.6.25(@swc/helpers@0.5.5))(@tarojs/runtime@3.6.25(@tarojs/shared@3.6.25))(@tarojs/shared@3.6.25)(@types/react@18.3.24)(postcss@8.5.6)(react@18.3.1))(@tarojs/shared@3.6.25)(@tarojs/taro@3.6.25(@tarojs/helper@3.6.25(@swc/helpers@0.5.5))(@tarojs/runtime@3.6.25(@tarojs/shared@3.6.25))(@types/react@18.3.24)(postcss@8.5.6))
+        specifier: 4.1.6
+        version: 4.1.6(@tarojs/service@4.1.6(@swc/helpers@0.5.5))(@tarojs/shared@3.6.25)
       '@tarojs/plugin-platform-weapp':
         specifier: 3.6.25
         version: 3.6.25(@swc/helpers@0.5.5)(@tarojs/components@3.6.25(@tarojs/helper@3.6.25(@swc/helpers@0.5.5))(@tarojs/runtime@3.6.25(@tarojs/shared@3.6.25))(@tarojs/shared@3.6.25)(@types/react@18.3.24)(postcss@8.5.6)(react@18.3.1))(@tarojs/shared@3.6.25)(@tarojs/taro@3.6.25(@tarojs/helper@3.6.25(@swc/helpers@0.5.5))(@tarojs/runtime@3.6.25(@tarojs/shared@3.6.25))(@types/react@18.3.24)(postcss@8.5.6))
@@ -2694,6 +2694,13 @@ packages:
     peerDependencies:
       '@tarojs/components': ~3.6.25
       '@tarojs/shared': ~3.6.25
+
+  '@tarojs/plugin-platform-tt@4.1.6':
+    resolution: {integrity: sha512-1Y/2OBt73nD0sLbKTAtYpTsOQm/DFj8xyFGiTQ5Ro2v8/xHuULmdRWhYOurh+Fb9f6sqxnYqe3c60iz+kzR3NQ==}
+    engines: {node: '>= 18'}
+    peerDependencies:
+      '@tarojs/service': 4.1.6
+      '@tarojs/shared': 4.1.6
 
   '@tarojs/plugin-platform-weapp@3.6.25':
     resolution: {integrity: sha512-c4iXbMWPOOCx8EOeyqVQwIl5QhMHmNKXC8jS1XESaYY5L3IHbTMY/8nd57GzOoY20tCwOZ/x+Vk13CACbeE6AA==}
@@ -12332,6 +12339,12 @@ snapshots:
       - '@tarojs/taro'
       - supports-color
 
+  '@tarojs/plugin-platform-tt@4.1.6(@tarojs/service@4.1.6(@swc/helpers@0.5.5))(@tarojs/shared@3.6.25)':
+    dependencies:
+      '@tarojs/service': 4.1.6(@swc/helpers@0.5.5)
+      '@tarojs/shared': 3.6.25
+      webpack-sources: 3.3.3
+
   '@tarojs/plugin-platform-weapp@3.6.25(@swc/helpers@0.5.5)(@tarojs/components@3.6.25(@tarojs/helper@3.6.25(@swc/helpers@0.5.5))(@tarojs/runtime@3.6.25(@tarojs/shared@3.6.25))(@tarojs/shared@3.6.25)(@types/react@18.3.24)(postcss@8.5.6)(react@18.3.1))(@tarojs/shared@3.6.25)(@tarojs/taro@3.6.25(@tarojs/helper@3.6.25(@swc/helpers@0.5.5))(@tarojs/runtime@3.6.25(@tarojs/shared@3.6.25))(@types/react@18.3.24)(postcss@8.5.6))':
     dependencies:
       '@tarojs/components': 3.6.25(@tarojs/helper@3.6.25(@swc/helpers@0.5.5))(@tarojs/runtime@3.6.25(@tarojs/shared@3.6.25))(@tarojs/shared@3.6.25)(@types/react@18.3.24)(postcss@8.5.6)(react@18.3.1)
@@ -15273,7 +15286,7 @@ snapshots:
       '@typescript-eslint/parser': 6.21.0(eslint@8.57.1)(typescript@5.9.2)
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.9.2))(eslint@8.57.1))(eslint@8.57.1)
+      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0)(eslint@8.57.1)
       eslint-plugin-import: 2.32.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.9.2))(eslint-import-resolver-typescript@3.10.1)(eslint@8.57.1)
       eslint-plugin-jsx-a11y: 6.10.2(eslint@8.57.1)
       eslint-plugin-react: 7.37.5(eslint@8.57.1)
@@ -15307,7 +15320,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.9.2))(eslint@8.57.1))(eslint@8.57.1):
+  eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0)(eslint@8.57.1):
     dependencies:
       '@nolyfill/is-core-module': 1.0.39
       debug: 4.4.1
@@ -15332,14 +15345,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.1(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.9.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.9.2))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1):
+  eslint-module-utils@2.12.1(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.9.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1)(eslint@8.57.1):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
       '@typescript-eslint/parser': 6.21.0(eslint@8.57.1)(typescript@5.9.2)
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.9.2))(eslint@8.57.1))(eslint@8.57.1)
+      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0)(eslint@8.57.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -15383,7 +15396,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.1(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.9.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.9.2))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1)
+      eslint-module-utils: 2.12.1(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.9.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1)(eslint@8.57.1)
       hasown: 2.0.2
       is-core-module: 2.16.1
       is-glob: 4.0.3
