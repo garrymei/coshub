@@ -1,3 +1,5 @@
+@import './styles/tailwind.css';
+
 /* 全局样式 */
 page {
   font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica,
@@ -6,7 +8,7 @@ page {
   font-size: 14px;
   line-height: 1.5;
   color: #333;
-  background-color: #f8f9fa;
+  background-color: #FEF2F2;
 }
 
 /* 清除默认样式 */
@@ -35,11 +37,19 @@ button::after {
 
 /* 主题色 */
 .primary-color {
-  color: #FF6B9D;
+  color: #D946EF;
 }
 
 .primary-bg {
-  background-color: #FF6B9D;
+  background-color: #D946EF;
+}
+
+.secondary-color {
+  color: #FBCFE8;
+}
+
+.secondary-bg {
+  background-color: #FBCFE8;
 }
 
 /* 通用边距 */
@@ -96,7 +106,7 @@ button::after {
 }
 
 .btn-primary {
-  background-color: #FF6B9D;
+  background-color: #D946EF;
   color: white;
 }
 

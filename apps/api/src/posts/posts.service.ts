@@ -11,9 +11,7 @@ import { Prisma } from "../../generated/prisma";
 
 @Injectable()
 export class PostsService {
-  constructor(
-    private prisma: PrismaService,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   // 创建帖子
   async create(createPostDto: CreatePostDTO): Promise<Post> {
@@ -142,7 +140,11 @@ export class PostsService {
     const limit = query.limit || 10;
 
     // 如果提供了游标，添加游标条件
-    if (query.cursor && query.cursor !== "null" && query.cursor !== "undefined") {
+    if (
+      query.cursor &&
+      query.cursor !== "null" &&
+      query.cursor !== "undefined"
+    ) {
       const cursorField = query.sortBy || "createdAt";
       try {
         const cursorData = JSON.parse(

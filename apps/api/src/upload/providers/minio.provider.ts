@@ -14,11 +14,15 @@ export class MinioStorageProvider implements StorageProvider {
     const endpointHost = endpointRaw
       .replace("http://", "")
       .replace("https://", "");
-    
+
     // 修复MinIO endpoint配置问题
-    const endPoint = endpointHost.includes(':') ? endpointHost.split(':')[0] : endpointHost;
-    const port = endpointHost.includes(':') ? parseInt(endpointHost.split(':')[1]) : this.config.get<number>("MINIO_PORT", 9000);
-    
+    const endPoint = endpointHost.includes(":")
+      ? endpointHost.split(":")[0]
+      : endpointHost;
+    const port = endpointHost.includes(":")
+      ? parseInt(endpointHost.split(":")[1])
+      : this.config.get<number>("MINIO_PORT", 9000);
+
     this.client = new Minio.Client({
       endPoint: endPoint,
       port: port,

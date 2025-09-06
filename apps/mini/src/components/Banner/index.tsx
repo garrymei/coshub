@@ -1,96 +1,64 @@
-import { View, Image, Swiper, SwiperItem } from "@tarojs/components";
-import Taro from "@tarojs/taro";
-import { getBanners } from "@/services/banner";
-import { useEffect, useState } from "react";
-import "./index.scss";
+import { View, Swiper, SwiperItem, Image } from "@tarojs/components";
+import { Banner as BannerType } from "@/services/api";
 
-interface BannerItem {
-  id: string;
-  imageUrl: string;
-  linkType: string;
-  linkUrl: string;
+interface BannerProps {
+  banners: BannerType[];
+  height?: number;
+  autoplay?: boolean;
+  interval?: number;
+  onBannerClick?: (banner: BannerType) => void;
 }
 
-export default function Banner({ scene }: { scene: "feed" | "skills" }) {
-  const [banners, setBanners] = useState<BannerItem[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function Banner({
+  banners = [],
+  height = 200,
+  autoplay = true,
+  interval = 3000,
+  onBannerClick,
+}: BannerProps) {
+  if (!banners.length) {
+    return null;
+  }
 
-  useEffect(() => {
-    const fetchBanners = async () => {
-      setLoading(true);
-      try {
-        const res = await getBanners({ scene });
-        if (!res) {
-          throw new Error("Empty banner response");
-        }
-        const list = Array.isArray(res.data)
-          ? res.data
-          : Array.isArray(res)
-            ? res
-            : [];
-        setBanners(list);
-      } catch (error) {
-        console.error("Banner加载失败:", error);
-        // 使用默认Banner
-        setBanners([
-          {
-            id: "default1",
-            imageUrl:
-              "https://coshub.oss-cn-hangzhou.aliyuncs.com/banners/default1.jpg",
-            linkType: "",
-            linkUrl: "",
-          },
-          {
-            id: "default2",
-            imageUrl:
-              "https://coshub.oss-cn-hangzhou.aliyuncs.com/banners/default2.jpg",
-            linkType: "",
-            linkUrl: "",
-          },
-        ]);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchBanners();
-  }, [scene]);
-
-  if (loading)
-    return (
-      <View className="banner-loading">
-        <View className="loading-text">加载中...</View>
-      </View>
-    );
-
-  if (banners.length === 0) return null;
+  const handleBannerClick = (banner: BannerType) => {
+    if (onBannerClick) {
+      onBannerClick(banner);
+    } else if (banner.link) {
+      // 默认处理链接跳转
+      console.log("Banner clicked:", banner.link);
+    }
+  };
 
   return (
-    <View className="banner">
+    <View className="banner-container rounded-xl overflow-hidden shadow-medium mb-6">
       <Swiper
-        className="swiper"
+        className="banner-swiper"
+        style={{ height: `${height}px` }}
         indicatorDots
-        autoplay
+        autoplay={autoplay}
         circular
-        indicatorColor="#999"
-        indicatorActiveColor="#FF6B9D"
+        interval={interval}
+        duration={500}
       >
         {banners.map((banner) => (
           <SwiperItem key={banner.id}>
-            <Image
-              className="image"
-              src={banner.imageUrl}
-              mode="aspectFill"
-              onClick={() => {
-                const lt = banner.linkType?.toLowerCase();
-                if (lt === "internal" || lt === "page") {
-                  Taro.navigateTo({ url: banner.linkUrl });
-                } else if (lt === "external" || lt === "web") {
-                  Taro.navigateTo({
-                    url: `/pages/webview/index?url=${encodeURIComponent(banner.linkUrl)}`,
-                  });
-                }
-              }}
-            />
+            <View
+              className="banner-item relative h-full cursor-pointer"
+              onClick={() => handleBannerClick(banner)}
+            >
+              <Image
+                className="banner-image w-full h-full object-cover"
+                src={banner.image}
+                mode="aspectFill"
+              />
+              {banner.title && (
+                <View className="banner-title absolute bottom-0 left-0 right-0 p-4 gradient-overlay">
+                  <View className="title-text text-white text-lg font-semibold text-shadow">
+                    {banner.title}
+                  </View>
+                </View>
+              )}
+            </View>
           </SwiperItem>
         ))}
       </Swiper>

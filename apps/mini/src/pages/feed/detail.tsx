@@ -9,7 +9,7 @@ import {
 import Taro, { useRouter } from "@tarojs/taro";
 import React, { useState, useEffect } from "react";
 import { Post, Comment } from "../../types";
-import { feedApi } from "../../services/api";
+import { api } from "../../services/api";
 import {
   showToast,
   showLoading,
@@ -42,7 +42,7 @@ const FeedDetailPage: React.FC = () => {
   const fetchPostDetail = async (postId: string) => {
     try {
       showLoading();
-      const data = await feedApi.getPostDetail(postId);
+      const data = await api.posts.getDetail(postId);
       setPost(data);
     } catch (error) {
       console.error("获取帖子详情失败:", error);
@@ -55,7 +55,7 @@ const FeedDetailPage: React.FC = () => {
 
   const fetchComments = async (postId: string) => {
     try {
-      const data = await feedApi.getComments(postId);
+      const data = await api.posts.getComments(postId);
       setComments(data);
     } catch (error) {
       console.error("获取评论失败:", error);
@@ -72,14 +72,14 @@ const FeedDetailPage: React.FC = () => {
 
     try {
       if (post.isLiked) {
-        await feedApi.unlikePost(post.id);
+        await api.posts.unlike(post.id);
         setPost({
           ...post,
           isLiked: false,
           likeCount: post.likeCount - 1,
         });
       } else {
-        await feedApi.likePost(post.id);
+        await api.posts.like(post.id);
         setPost({
           ...post,
           isLiked: true,
@@ -102,14 +102,14 @@ const FeedDetailPage: React.FC = () => {
 
     try {
       if (post.isCollected) {
-        await feedApi.uncollectPost(post.id);
+        await api.posts.uncollect(post.id);
         setPost({
           ...post,
           isCollected: false,
           collectCount: post.collectCount - 1,
         });
       } else {
-        await feedApi.collectPost(post.id);
+        await api.posts.collect(post.id);
         setPost({
           ...post,
           isCollected: true,
@@ -134,7 +134,7 @@ const FeedDetailPage: React.FC = () => {
     }
 
     try {
-      await feedApi.addComment(post.id, commentContent);
+      await api.posts.comment(post.id, commentContent);
       showToast("评论成功", "success");
       setCommentContent("");
       fetchComments(post.id);

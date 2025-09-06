@@ -1,7 +1,7 @@
 import { View, Text, Textarea, Image, Button } from "@tarojs/components";
 import Taro from "@tarojs/taro";
 import React, { useState } from "react";
-import { feedApi } from "../../services/api";
+import { api } from "../../services/api";
 import {
   showToast,
   showLoading,
@@ -87,7 +87,7 @@ const FeedCreatePage: React.FC = () => {
     try {
       showLoading("发布中...");
 
-      await feedApi.createPost({
+      await api.posts.create({
         caption,
         media: images,
         tags,

@@ -33,7 +33,7 @@ async function bootstrap() {
   app.setGlobalPrefix("api");
 
   const port = process.env.PORT || 8080;
-  await app.listen(port, '127.0.0.1');
+  await app.listen(port, "127.0.0.1");
 
   const logger = app.get(LoggerService);
   logger.log(`🚀 Coshub API 服务启动成功！`);

@@ -7,7 +7,7 @@ import { PrismaModule } from "../prisma/prisma.module";
 
 @Module({
   imports: [
-    PrismaModule, 
+    PrismaModule,
     // CacheModule, // 暂时禁用缓存模块
   ],
   providers: [PermissionService, PermissionGuard, RateLimitGuard],

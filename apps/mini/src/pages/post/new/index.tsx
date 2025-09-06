@@ -10,7 +10,7 @@ import {
   Picker,
 } from "@tarojs/components";
 import { getUploadConfig } from "@/services/upload";
-import { feedApi, skillApi } from "@/services/api";
+import { api } from "@/services/api";
 import "./index.scss";
 
 // 帖子类型
@@ -177,7 +177,7 @@ export default function NewPostPage() {
       let result: any;
       if (postType === "share") {
         // 分享帖走 /posts，后端使用大写枚举
-        result = await feedApi.createPost({
+        result = await api.posts.create({
           title,
           content,
           type: "SHARE" as any,
@@ -187,7 +187,7 @@ export default function NewPostPage() {
         });
       } else {
         // 技能帖走 /skills
-        result = await skillApi.createSkill({
+        result = await api.skills.create({
           title,
           description: content,
           images,

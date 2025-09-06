@@ -1,7 +1,7 @@
 import { View, Text, Button, Image } from "@tarojs/components";
 import Taro from "@tarojs/taro";
 import React, { useState } from "react";
-import { userApi } from "../../services/api";
+import { api } from "../../services/api";
 import { showToast, showLoading, hideLoading } from "../../utils/common";
 import "./index.scss";
 
@@ -17,7 +17,7 @@ const LoginPage: React.FC = () => {
       const { code } = await Taro.login();
 
       // 调用后端登录接口
-      const { token, user } = await userApi.login(code);
+      const { token, user } = await api.user.login(code);
 
       // 存储登录信息
       Taro.setStorageSync("token", token);
