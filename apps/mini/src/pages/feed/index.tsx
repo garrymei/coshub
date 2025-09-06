@@ -3,6 +3,7 @@ import { View, ScrollView } from "@tarojs/components";
 import PostCard from "@/components/PostCard";
 import Banner from "@/components/Banner";
 import { getPosts } from "@/services/post";
+import { api, mockData, Banner as BannerType } from "@/services/api";
 import "./index.scss";
 
 interface Post {
@@ -21,6 +22,7 @@ interface Post {
 
 export default function FeedPage() {
   const [posts, setPosts] = useState<Post[]>([]);
+  const [banners, setBanners] = useState<BannerType[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [cursor, setCursor] = useState<string | null>(null);
@@ -42,6 +44,18 @@ export default function FeedPage() {
       setPosts((prev) => (refresh ? list : [...prev, ...list]));
       setCursor(nextCursor);
       setHasMore(more);
+
+      // Fetch banners (mock or real API)
+      if (process.env.TARO_APP_USE_MOCK === 'true') {
+        setBanners((mockData as any).banners || []);
+      } else {
+        try {
+          const bannerRes = await api.banners.getList('home');
+          setBanners(bannerRes || []);
+        } catch (e) {
+          setBanners([]);
+        }
+      }
     } finally {
       setLoading(false);
     }
@@ -72,7 +86,7 @@ export default function FeedPage() {
       onRefresherRefresh={onRefresh}
       onScrollToLower={onScrollToLower}
     >
-      <Banner scene="feed" />
+      <Banner banners={banners} />
 
       {posts.map((post) => (
         <PostCard key={post.id} {...post} />

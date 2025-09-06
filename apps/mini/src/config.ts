@@ -1,10 +1,11 @@
 // 环境配置
 export const Config = {
-  // API基础URL - 开发环境
+  // API基础URL - 可被 TARO_APP_API_BASE_URL 覆盖
   API_BASE_URL:
-    process.env.NODE_ENV === "development"
-      ? "http://localhost:8080/api"
-      : "https://api.coshub.com",
+    (process.env.TARO_APP_API_BASE_URL as string | undefined) ||
+    (process.env.NODE_ENV === "development"
+      ? "http://localhost:3001/api"
+      : "https://api.coshub.com"),
 
   // Banner相关配置
   BANNER: {

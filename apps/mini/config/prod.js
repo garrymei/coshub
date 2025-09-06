@@ -3,6 +3,8 @@ module.exports = {
     NODE_ENV: '"production"'
   },
   defineConstants: {
+    TARO_APP_API_BASE_URL: JSON.stringify(process.env.TARO_APP_API_BASE_URL || 'https://api.coshub.com'),
+    TARO_APP_USE_MOCK: JSON.stringify(process.env.TARO_APP_USE_MOCK || 'false'),
   },
   mini: {
     // 启用JS文件压缩
