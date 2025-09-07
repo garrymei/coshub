@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { View, Text, Image, Button, ScrollView } from "@tarojs/components";
+import Taro from "@tarojs/taro";
 import { api, mockData, User } from "@/services/api";
 import "./index.scss";
 
@@ -114,11 +115,9 @@ export default function MePage() {
   const fetchUserProfile = async () => {
     try {
       setLoading(true);
-      // 开发环境使用模拟数据
-      if (process.env.NODE_ENV === "development") {
+      if (process.env.TARO_APP_USE_MOCK === "true") {
         setUserProfile(mockUserProfile);
       } else {
-        // 生产环境调用真实API
         const profile = await api.user.getProfile();
         setUserProfile(profile);
       }
@@ -134,14 +133,12 @@ export default function MePage() {
   // 检查登录状态
   const checkLoginStatus = () => {
     try {
-      const token = wx.getStorageSync("token");
-      const userInfo = wx.getStorageSync("userInfo");
+      const token = Taro.getStorageSync("token");
+      const userInfo = Taro.getStorageSync("userInfo");
 
       if (!token || !userInfo) {
         // 未登录，跳转到登录页
-        wx.navigateTo({
-          url: "/pages/login/index",
-        });
+        Taro.navigateTo({ url: "/pages/login/index" });
       } else {
         // 已登录，获取用户资料
         fetchUserProfile();
@@ -153,16 +150,12 @@ export default function MePage() {
 
   // 跳转到资料编辑页
   const goToProfile = () => {
-    wx.navigateTo({
-      url: "/pages/me/profile",
-    });
+    Taro.navigateTo({ url: "/pages/me/profile" });
   };
 
   // 跳转到设置页
   const goToSettings = () => {
-    wx.navigateTo({
-      url: "/pages/me/settings",
-    });
+    Taro.navigateTo({ url: "/pages/me/settings" });
   };
 
   // 标签页切换
@@ -172,16 +165,14 @@ export default function MePage() {
 
   // 退出登录
   const logout = () => {
-    wx.showModal({
+    Taro.showModal({
       title: "提示",
       content: "确定要退出登录吗？",
       success: (res) => {
         if (res.confirm) {
-          wx.removeStorageSync("token");
-          wx.removeStorageSync("userInfo");
-          wx.reLaunch({
-            url: "/pages/login/index",
-          });
+          Taro.removeStorageSync("token");
+          Taro.removeStorageSync("userInfo");
+          Taro.reLaunch({ url: "/pages/login/index" });
         }
       },
     });
