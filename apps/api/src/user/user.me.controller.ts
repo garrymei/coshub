@@ -63,4 +63,3 @@ export class UserMeController {
     return this.toUserPayload(updated);
   }
 }
-

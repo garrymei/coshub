@@ -188,9 +188,12 @@ export const api = {
       priceMin?: number;
       priceMax?: number;
     }): Promise<{ data: Skill[]; nextCursor?: string; hasMore: boolean }> => {
-      const res = await request<{ total: number; page: number; pageSize: number; items: any[] }>(
-        { url: "/skills", data: params },
-      );
+      const res = await request<{
+        total: number;
+        page: number;
+        pageSize: number;
+        items: any[];
+      }>({ url: "/skills", data: params });
       const total = (res as any).total ?? 0;
       const page = (res as any).page ?? 1;
       const pageSize = (res as any).pageSize ?? (params.limit || 10);
@@ -217,12 +220,10 @@ export const api = {
 
   // 轮播图相关
   banners: {
-    getList: async (
-      type: "home" | "plaza" | "skills",
-    ): Promise<Banner[]> => {
-      const res = await request<{ success: boolean; data: any[] }>(
-        { url: `/banners?scene=${mapBannerScene(type)}` },
-      );
+    getList: async (type: "home" | "plaza" | "skills"): Promise<Banner[]> => {
+      const res = await request<{ success: boolean; data: any[] }>({
+        url: `/banners?scene=${mapBannerScene(type)}`,
+      });
       const list = ((res as any).data || []) as any[];
       return list.map((b) => ({
         id: b.id,

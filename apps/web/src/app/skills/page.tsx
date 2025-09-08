@@ -41,7 +41,12 @@ export default function SkillsPage() {
             authorId: s.authorId || "",
             authorName: s.authorName || "",
             authorAvatar: s.authorAvatar || "/default-avatar.png",
-            stats: { viewCount: 0, likeCount: 0, commentCount: 0, shareCount: 0 },
+            stats: {
+              viewCount: 0,
+              likeCount: 0,
+              commentCount: 0,
+              shareCount: 0,
+            },
             createdAt: s.createdAt ? new Date(s.createdAt) : new Date(),
             updatedAt: s.updatedAt ? new Date(s.updatedAt) : new Date(),
           }),

@@ -38,7 +38,12 @@ export default function PostList({ type }: PostListProps) {
         videos: p.videos || [],
         tags: p.tags || [],
         city: p.city,
-        stats: p.stats || { viewCount: 0, likeCount: 0, commentCount: 0, shareCount: 0 },
+        stats: p.stats || {
+          viewCount: 0,
+          likeCount: 0,
+          commentCount: 0,
+          shareCount: 0,
+        },
         createdAt: p.createdAt ? new Date(p.createdAt) : new Date(),
         updatedAt: p.updatedAt ? new Date(p.updatedAt) : new Date(),
       })) as Post[];

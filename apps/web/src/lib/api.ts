@@ -11,7 +11,10 @@ async function apiFetch<T>(
   const res = await fetch(
     path.startsWith("http") ? path : `${API_BASE_URL}${path}`,
     {
-      headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+      headers: {
+        "Content-Type": "application/json",
+        ...(options.headers || {}),
+      },
       ...options,
     },
   );
@@ -75,31 +78,37 @@ export interface WebSkill {
 
 // Mock 数据（仅在 USE_MOCK=true 时使用）
 const mock = {
-  banners: [{
-    id: "mock-1",
-    scene: "feed" as const,
-    imageUrl: "/api/banners/1.jpg",
-    linkType: "external" as const,
-    linkUrl: "https://example.com",
-    priority: 1,
-    online: true,
-  }],
-  posts: [{
-    id: "mock-1",
-    title: "Mock Post",
-    content: "This is a mock post",
-    authorId: "u1",
-    authorName: "Mock User",
-    images: ["/api/posts/1.jpg"],
-    tags: ["mock"],
-  }],
-  skills: [{
-    id: "mock-1",
-    title: "Mock Skill",
-    description: "Mock desc",
-    images: [],
-    tags: ["mock"],
-  }],
+  banners: [
+    {
+      id: "mock-1",
+      scene: "feed" as const,
+      imageUrl: "/api/banners/1.jpg",
+      linkType: "external" as const,
+      linkUrl: "https://example.com",
+      priority: 1,
+      online: true,
+    },
+  ],
+  posts: [
+    {
+      id: "mock-1",
+      title: "Mock Post",
+      content: "This is a mock post",
+      authorId: "u1",
+      authorName: "Mock User",
+      images: ["/api/posts/1.jpg"],
+      tags: ["mock"],
+    },
+  ],
+  skills: [
+    {
+      id: "mock-1",
+      title: "Mock Skill",
+      description: "Mock desc",
+      images: [],
+      tags: ["mock"],
+    },
+  ],
 };
 
 export const api = {
@@ -116,7 +125,10 @@ export const api = {
   posts: {
     list: async (params: Record<string, any> = {}) => {
       if (USE_MOCK)
-        return { items: mock.posts as WebPost[], hasNext: false } as ListResult<WebPost>;
+        return {
+          items: mock.posts as WebPost[],
+          hasNext: false,
+        } as ListResult<WebPost>;
       const qs = new URLSearchParams(params as any).toString();
       const res = await apiFetch<{
         data: WebPost[];
@@ -135,11 +147,17 @@ export const api = {
   skills: {
     list: async (params: Record<string, any> = {}) => {
       if (USE_MOCK)
-        return { items: mock.skills as WebSkill[], hasNext: false } as ListResult<WebSkill>;
+        return {
+          items: mock.skills as WebSkill[],
+          hasNext: false,
+        } as ListResult<WebSkill>;
       const qs = new URLSearchParams(params as any).toString();
-      const res = await apiFetch<{ items: WebSkill[]; total?: number; nextCursor?: string; hasNext?: boolean }>(
-        `/skills${qs ? `?${qs}` : ""}`,
-      );
+      const res = await apiFetch<{
+        items: WebSkill[];
+        total?: number;
+        nextCursor?: string;
+        hasNext?: boolean;
+      }>(`/skills${qs ? `?${qs}` : ""}`);
       return {
         items: (res as any).data?.items || (res as any).items || [],
         total: (res as any).data?.total || (res as any).total,
@@ -153,14 +171,18 @@ export const api = {
   skillPosts: {
     create: async (data: any) => {
       if (USE_MOCK) return { success: true, data: { id: "mock-id" } } as any;
-      return apiFetch("/skill-posts", { method: "POST", body: JSON.stringify(data) });
+      return apiFetch("/skill-posts", {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
     },
     get: async (id: string) => {
       if (USE_MOCK) return { success: true, data: mock.skills[0] } as any;
       return apiFetch(`/skill-posts/${id}`);
     },
     list: async (params: any) => {
-      if (USE_MOCK) return { success: true, data: { items: mock.skills } } as any;
+      if (USE_MOCK)
+        return { success: true, data: { items: mock.skills } } as any;
       const qs = new URLSearchParams(params as any).toString();
       return apiFetch(`/skill-posts${qs ? `?${qs}` : ""}`);
     },
@@ -171,15 +193,25 @@ export const api = {
       if (USE_MOCK) return { success: true, data: { url: "mock-url" } } as any;
       const form = new FormData();
       form.append("file", file);
-      const res = await fetch(`${API_BASE_URL}/upload`, { method: "POST", body: form });
+      const res = await fetch(`${API_BASE_URL}/upload`, {
+        method: "POST",
+        body: form,
+      });
       if (!res.ok) throw new Error("Upload failed");
       return (await res.json()) as any;
     },
     uploadFiles: async (files: FileList) => {
-      if (USE_MOCK) return { success: true, data: { urls: ["mock-url-1", "mock-url-2"] } } as any;
+      if (USE_MOCK)
+        return {
+          success: true,
+          data: { urls: ["mock-url-1", "mock-url-2"] },
+        } as any;
       const form = new FormData();
       Array.from(files).forEach((f) => form.append("files", f));
-      const res = await fetch(`${API_BASE_URL}/upload/multi`, { method: "POST", body: form });
+      const res = await fetch(`${API_BASE_URL}/upload/multi`, {
+        method: "POST",
+        body: form,
+      });
       if (!res.ok) throw new Error("Upload failed");
       return (await res.json()) as any;
     },
