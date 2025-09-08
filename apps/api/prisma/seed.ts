@@ -236,6 +236,42 @@ async function main() {
 
   console.log(`✅ 创建了 ${requests.length} 个请求`);
 
+  // 创建示例Banner
+  const banners = await Promise.all([
+    prisma.banner.create({
+      data: {
+        scene: 'FEED',
+        imageUrl: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=400&fit=crop',
+        linkType: 'INTERNAL',
+        linkUrl: '/skill-posts',
+        priority: 100,
+        online: true,
+      },
+    }),
+    prisma.banner.create({
+      data: {
+        scene: 'FEED',
+        imageUrl: 'https://images.unsplash.com/photo-1606041008023-472dfb5e530f?w=800&h=400&fit=crop',
+        linkType: 'INTERNAL',
+        linkUrl: '/requests',
+        priority: 90,
+        online: true,
+      },
+    }),
+    prisma.banner.create({
+      data: {
+        scene: 'FEED',
+        imageUrl: 'https://images.unsplash.com/photo-1594736797933-d0b6e6b4e67a?w=800&h=400&fit=crop',
+        linkType: 'EXTERNAL',
+        linkUrl: 'https://example.com',
+        priority: 80,
+        online: true,
+      },
+    }),
+  ]);
+
+  console.log(`✅ 创建了 ${banners.length} 个Banner`);
+
   console.log('🎉 种子数据初始化完成！');
 }
 

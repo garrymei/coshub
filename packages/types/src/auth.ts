@@ -33,6 +33,16 @@ export enum Permission {
   REVIEW_REPORTS = "REVIEW_REPORTS", // 审核举报
   MODERATE_CONTENT = "MODERATE_CONTENT", // 内容审核
   MANAGE_REPORTS = "MANAGE_REPORTS", // 管理举报
+  CREATE_REPORT = "CREATE_REPORT", // 创建举报
+  VIEW_REPORTS = "VIEW_REPORTS", // 查看举报
+
+  // 帖子交互权限
+  INTERACT_POST = "INTERACT_POST", // 与帖子交互（点赞、收藏等）
+  COMMENT_POST = "COMMENT_POST", // 评论帖子
+
+  // 用户权限
+  EDIT_PROFILE = "EDIT_PROFILE", // 编辑个人资料
+  VIEW_PROFILE = "VIEW_PROFILE", // 查看个人资料
 
   // 系统管理权限
   SYSTEM_CONFIG = "SYSTEM_CONFIG", // 系统配置
@@ -153,6 +163,8 @@ export enum RateLimitType {
   COMMENT = "COMMENT", // 评论
   LIKE = "LIKE", // 点赞
   REPORT = "REPORT", // 举报
+  INTERACT_POST = "INTERACT_POST", // 帖子交互
+  COMMENT_POST = "COMMENT_POST", // 评论帖子
 
   // 上传相关
   UPLOAD_FILE = "UPLOAD_FILE", // 文件上传
@@ -252,6 +264,20 @@ export const RATE_LIMIT_CONFIGS: Record<RateLimitType, RateLimitConfig> = {
     windowMs: 1 * 60 * 1000, // 1分钟
     max: 200, // 最多200次
     message: "搜索请求过于频繁，请1分钟后再试",
+    statusCode: 429,
+    headers: true,
+  },
+  [RateLimitType.INTERACT_POST]: {
+    windowMs: 1 * 60 * 1000, // 1分钟
+    max: 100, // 最多100次
+    message: "帖子交互过于频繁，请1分钟后再试",
+    statusCode: 429,
+    headers: true,
+  },
+  [RateLimitType.COMMENT_POST]: {
+    windowMs: 1 * 60 * 1000, // 1分钟
+    max: 50, // 最多50次
+    message: "评论过于频繁，请1分钟后再试",
     statusCode: 429,
     headers: true,
   },

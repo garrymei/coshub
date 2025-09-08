@@ -1,0 +1,29 @@
+[1mdiff --git a/apps/mini/package.json b/apps/mini/package.json[m
+[1mindex 436ed88..6d4fb4c 100644[m
+[1m--- a/apps/mini/package.json[m
+[1m+++ b/apps/mini/package.json[m
+[36m@@ -42,19 +42,19 @@[m
+   "dependencies": {[m
+     "@babel/runtime": "^7.21.0",[m
+     "@coshub/types": "file:../../packages/types",[m
+[31m-    "@tarojs/components": "^3.6.25",[m
+[32m+[m[32m    "@tarojs/components": "3.6.25",[m
+     "@tarojs/helper": "3.6.25",[m
+[31m-    "@tarojs/plugin-framework-react": "^3.6.25",[m
+[32m+[m[32m    "@tarojs/plugin-framework-react": "3.6.25",[m
+     "@tarojs/plugin-platform-alipay": "3.6.25",[m
+     "@tarojs/plugin-platform-jd": "3.6.25",[m
+     "@tarojs/plugin-platform-qq": "3.6.25",[m
+     "@tarojs/plugin-platform-swan": "3.6.25",[m
+     "@tarojs/plugin-platform-tt": "3.6.25",[m
+     "@tarojs/plugin-platform-weapp": "3.6.25",[m
+[31m-    "@tarojs/react": "^4.1.6",[m
+[31m-    "@tarojs/runtime": "^3.6.25",[m
+[32m+[m[32m    "@tarojs/react": "3.6.25",[m
+[32m+[m[32m    "@tarojs/runtime": "3.6.25",[m
+     "@tarojs/shared": "3.6.25",[m
+[31m-    "@tarojs/taro": "^3.6.25",[m
+[32m+[m[32m    "@tarojs/taro": "3.6.25",[m
+     "@types/react-dom": "^19.1.9",[m
+     "react": "^18.3.1",[m
+     "react-dom": "^18.3.1"[m

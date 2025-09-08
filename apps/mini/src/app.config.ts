@@ -1,32 +1,27 @@
 export default defineAppConfig({
   pages: [
-    "pages/feed/index",
-    "pages/feed/detail",
+    "pages/home/index",
+    "pages/plaza/index",
     "pages/skills/index",
+    "pages/me/index",
+    "pages/login/index",
+    "pages/feed/detail",
     "pages/skills/detail",
     "pages/skills/create",
     "pages/feed/create",
     "pages/webview/index",
     "pages/post/new/index",
-    "pages/me/index",
     "pages/me/profile",
     "pages/me/collections",
     "pages/me/posts",
     "pages/me/settings",
-    "pages/login/index",
-  ],
-  subPackages: [
-    {
-      root: "packageA",
-      pages: ["pages/settings/account", "pages/settings/notifications"],
-    },
   ],
   window: {
     backgroundTextStyle: "light",
-    navigationBarBackgroundColor: "#FF6B9D",
+    navigationBarBackgroundColor: "#D946EF",
     navigationBarTitleText: "Coshub",
     navigationBarTextStyle: "white",
-    backgroundColor: "#f8f9fa",
+    backgroundColor: "#FEF2F2",
     navigationStyle: "custom",
     enablePullDownRefresh: true,
     onReachBottomDistance: 50,
@@ -38,16 +33,22 @@ export default defineAppConfig({
     },
   },
   tabBar: {
-    color: "#888",
-    selectedColor: "#FF6B9D",
+    color: "#6b7280",
+    selectedColor: "#D946EF",
     backgroundColor: "#ffffff",
     borderStyle: "black",
     list: [
       {
-        pagePath: "pages/feed/index",
-        text: "发现",
+        pagePath: "pages/home/index",
+        text: "首页",
         iconPath: "assets/images/tab-feed.png",
         selectedIconPath: "assets/images/tab-feed-active.png",
+      },
+      {
+        pagePath: "pages/plaza/index",
+        text: "广场",
+        iconPath: "assets/images/tab-plaza.png",
+        selectedIconPath: "assets/images/tab-plaza-active.png",
       },
       {
         pagePath: "pages/skills/index",
@@ -75,14 +76,12 @@ export default defineAppConfig({
     },
   },
   requiredBackgroundModes: ["location", "audio"],
-  navigateToMiniProgramAppIdList: [
-    // 实际需要跳转的小程序ID列表
-  ],
+  navigateToMiniProgramAppIdList: [],
   sitemapLocation: "sitemap.json",
   preloadRule: {
     "pages/feed/index": {
       network: "all",
-      packages: ["packageA"],
+      packages: [],
     },
   },
   debug: false,

@@ -14,9 +14,18 @@ export class MinioStorageProvider implements StorageProvider {
     const endpointHost = endpointRaw
       .replace("http://", "")
       .replace("https://", "");
+
+    // 修复MinIO endpoint配置问题
+    const endPoint = endpointHost.includes(":")
+      ? endpointHost.split(":")[0]
+      : endpointHost;
+    const port = endpointHost.includes(":")
+      ? parseInt(endpointHost.split(":")[1])
+      : this.config.get<number>("MINIO_PORT", 9000);
+
     this.client = new Minio.Client({
-      endPoint: endpointHost,
-      port: this.config.get<number>("MINIO_PORT", 9000),
+      endPoint: endPoint,
+      port: port,
       useSSL: this.config.get<boolean>("MINIO_USE_SSL", false),
       accessKey: this.config.get<string>("MINIO_ACCESS_KEY", "minioadmin"),
       secretKey: this.config.get<string>("MINIO_SECRET_KEY", "minioadmin"),

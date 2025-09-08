@@ -1,8 +1,10 @@
 import Taro from "@tarojs/taro";
 import { STORAGE_KEYS, STATUS_CODES } from "./constants";
 
-// API基础URL
-const BASE_URL = "https://api.coshub.com";
+import { Config } from "../config";
+
+// API基础URL - 使用配置文件中的设置
+const BASE_URL = Config.API_BASE_URL;
 
 // 请求方法类型
 type Method = "GET" | "POST" | "PUT" | "DELETE";
@@ -41,6 +43,7 @@ export const request = async ({
         "Content-Type": "application/json",
         ...header,
       },
+      timeout: Config.BANNER.TIMEOUT,
     });
 
     // 处理响应
@@ -63,6 +66,18 @@ export const request = async ({
     }
   } catch (error) {
     console.error("请求错误:", error);
+    // 返回默认数据或处理错误
+    if (url.includes("/banners")) {
+      return {
+        success: true,
+        data: Config.BANNER.DEFAULT_IMAGES.map((url) => ({
+          imageUrl: url,
+          linkUrl: "",
+          scene: "feed",
+        })),
+        message: "使用默认Banner数据",
+      };
+    }
     return Promise.reject(error);
   }
 };

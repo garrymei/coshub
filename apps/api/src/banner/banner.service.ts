@@ -1,21 +1,31 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
-import { BannerScene } from "@prisma/client";
 
 @Injectable()
 export class BannerService {
   constructor(private prisma: PrismaService) {}
 
-  async getBanners(scene: BannerScene) {
+  async getBanners(scene: string) {
     return this.prisma.banner.findMany({
       where: {
-        scene,
+        scene: scene as any,
         online: true,
-        OR: [{ startAt: null }, { startAt: { lte: new Date() } }],
-        OR: [{ endAt: null }, { endAt: { gte: new Date() } }],
       },
       orderBy: { priority: "desc" },
       take: 5,
+    });
+  }
+
+  async createBanner(bannerData: any) {
+    return this.prisma.banner.create({
+      data: {
+        scene: bannerData.scene as any,
+        imageUrl: bannerData.imageUrl,
+        linkType: bannerData.linkType as any,
+        linkUrl: bannerData.linkUrl,
+        priority: bannerData.priority || 0,
+        online: bannerData.online !== false,
+      },
     });
   }
 }

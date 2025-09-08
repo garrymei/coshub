@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from "@nestjs/common";
+import { Controller, Get, Post, Query, Body } from "@nestjs/common";
 import { BannerService } from "./banner.service";
 import { BannerScene } from "@coshub/types";
 import { ApiResponse } from "@coshub/types";
@@ -14,6 +14,16 @@ export class BannerController {
       success: true,
       data: banners,
       message: "获取Banner成功",
+    } as ApiResponse;
+  }
+
+  @Post()
+  async createBanner(@Body() bannerData: any) {
+    const banner = await this.bannerService.createBanner(bannerData);
+    return {
+      success: true,
+      data: banner,
+      message: "创建Banner成功",
     } as ApiResponse;
   }
 }

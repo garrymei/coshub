@@ -9,7 +9,7 @@ import {
 import Taro, { useRouter } from "@tarojs/taro";
 import React, { useState, useEffect } from "react";
 import { SkillPost, Comment } from "../../types";
-import { skillApi, feedApi } from "../../services/api";
+import { api } from "../../services/api";
 import {
   showToast,
   showLoading,
@@ -40,7 +40,7 @@ const SkillDetailPage: React.FC = () => {
   const fetchSkillDetail = async (skillId: string) => {
     try {
       showLoading();
-      const data = await skillApi.getSkillDetail(skillId);
+      const data = await api.skills.getDetail(skillId);
       setSkill(data);
     } catch (error) {
       console.error("获取技能详情失败:", error);
@@ -53,7 +53,7 @@ const SkillDetailPage: React.FC = () => {
 
   const fetchComments = async (skillId: string) => {
     try {
-      const data = await feedApi.getComments(skillId);
+      const data = await api.posts.getComments(skillId);
       setComments(data);
     } catch (error) {
       console.error("获取评论失败:", error);
@@ -70,14 +70,14 @@ const SkillDetailPage: React.FC = () => {
 
     try {
       if (skill.isLiked) {
-        await feedApi.unlikePost(skill.id);
+        await api.posts.unlike(skill.id);
         setSkill({
           ...skill,
           isLiked: false,
           likeCount: skill.likeCount - 1,
         });
       } else {
-        await feedApi.likePost(skill.id);
+        await api.posts.like(skill.id);
         setSkill({
           ...skill,
           isLiked: true,
@@ -100,14 +100,14 @@ const SkillDetailPage: React.FC = () => {
 
     try {
       if (skill.isCollected) {
-        await feedApi.uncollectPost(skill.id);
+        await api.posts.uncollect(skill.id);
         setSkill({
           ...skill,
           isCollected: false,
           collectCount: skill.collectCount - 1,
         });
       } else {
-        await feedApi.collectPost(skill.id);
+        await api.posts.collect(skill.id);
         setSkill({
           ...skill,
           isCollected: true,
@@ -132,7 +132,7 @@ const SkillDetailPage: React.FC = () => {
     }
 
     try {
-      await feedApi.addComment(skill.id, commentContent);
+      await api.posts.comment(skill.id, commentContent);
       showToast("评论成功", "success");
       setCommentContent("");
       fetchComments(skill.id);

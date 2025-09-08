@@ -43,6 +43,18 @@ export interface CreateReportDTO {
   evidence?: string[]; // 证据（图片URL等）
 }
 
+export interface ReportQueryDTO {
+  page?: number;
+  limit?: number;
+  status?: ReportStatus;
+  type?: ReportType;
+  targetType?: ReportTargetType;
+  reporterId?: string;
+  resolvedBy?: string;
+  startDate?: Date;
+  endDate?: Date;
+}
+
 export interface Report {
   id: string;
   type: ReportType;

@@ -1,7 +1,7 @@
 import { View, Text, Input, Textarea, Image, Button } from "@tarojs/components";
 import Taro from "@tarojs/taro";
 import React, { useState } from "react";
-import { skillApi } from "../../services/api";
+import { api } from "../../services/api";
 import {
   showToast,
   showLoading,
@@ -98,7 +98,7 @@ const SkillCreatePage: React.FC = () => {
     try {
       showLoading("发布中...");
 
-      await skillApi.createSkill({
+      await api.skills.create({
         caption: title,
         price: Number(price),
         serviceDescription: description,

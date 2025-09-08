@@ -14,14 +14,18 @@ interface PostCardProps {
   collectCount: number;
   isLiked: boolean;
   isCollected: boolean;
+  layout?: "masonry" | "list";
 }
 
 export default function PostCard(props: PostCardProps) {
+  const { layout = "masonry" } = props;
+
   const goDetail = () => {
     Taro.navigateTo({ url: `/pages/feed/detail?id=${props.id}` });
   };
+
   return (
-    <View className="post-card" onClick={goDetail}>
+    <View className={`post-card ${layout}`} onClick={goDetail}>
       <View className="header">
         <Image className="avatar" src={props.avatar} />
         <View className="info">

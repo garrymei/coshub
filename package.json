@@ -14,6 +14,7 @@
     "dev:web": "turbo run dev --filter=@coshub/web",
     "dev:api": "turbo run dev --filter=@coshub/api",
     "dev:mini": "turbo run dev --filter=@coshub/mini",
+    "build:h5": "pnpm -C apps/mini run build:h5",
     "build:web": "turbo run build --filter=@coshub/web",
     "build:api": "turbo run build --filter=@coshub/api",
     "build:mini": "turbo run build --filter=@coshub/mini",

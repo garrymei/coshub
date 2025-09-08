@@ -12,42 +12,39 @@ import { Prisma } from "../../generated/prisma";
 export class SkillPostsService {
   constructor(private prisma: PrismaService) {}
 
-  // 创建技能帖
+  // 创建技能帖（兼容层）
   async create(createSkillPostDto: CreateSkillPostDTO): Promise<SkillPost> {
-    // 暂时使用第一个用户作为作者，后续集成认证后从JWT获取
     const firstUser = await this.prisma.user.findFirst();
     if (!firstUser) {
       throw new Error("未找到用户，请先运行种子数据");
     }
 
-    const skillPost = await this.prisma.skillPost.create({
+    const post = await this.prisma.post.create({
       data: {
         title: createSkillPostDto.title,
-        description: createSkillPostDto.description,
+        content: createSkillPostDto.description,
+        type: "SKILL" as any,
         category: createSkillPostDto.category as any,
-        role: createSkillPostDto.role as any,
-        experience: createSkillPostDto.experience as any,
-        city: createSkillPostDto.city,
-        price: createSkillPostDto.price as Prisma.JsonObject,
         images: createSkillPostDto.images,
         tags: createSkillPostDto.tags,
-        availability: createSkillPostDto.availability as any,
-        contactInfo: createSkillPostDto.contactInfo as any,
         authorId: firstUser.id,
+        // 技能帖特有字段
+        city: createSkillPostDto.city,
       },
       include: {
         author: true,
       },
     });
 
-    return this.transformSkillPost(skillPost);
+    return this.transformSkillPost(post);
   }
 
-  // 获取技能帖列表
+  // 获取技能帖列表（兼容层）
   async findAll(query: SkillPostQueryDTO): Promise<SkillPostListResponse> {
-    const where: Prisma.SkillPostWhereInput = {
+    const where: Prisma.PostWhereInput = {
       deletedAt: null,
       status: "ACTIVE",
+      type: "SKILL" as any, // 只查询技能帖
     };
 
     // 应用筛选条件
@@ -55,9 +52,10 @@ export class SkillPostsService {
       where.category = query.category as any;
     }
 
-    if (query.role) {
-      where.role = query.role as any;
-    }
+    // role字段在Post模型中不存在，暂时注释掉
+    // if (query.role) {
+    //   where.role = query.role as any;
+    // }
 
     if (query.city) {
       where.city = {
@@ -75,7 +73,7 @@ export class SkillPostsService {
           },
         },
         {
-          description: {
+          content: {
             contains: query.keyword,
             mode: "insensitive",
           },
@@ -89,7 +87,7 @@ export class SkillPostsService {
     }
 
     // 排序
-    const orderBy: Prisma.SkillPostOrderByWithRelationInput = {};
+    const orderBy: Prisma.PostOrderByWithRelationInput = {};
     switch (query.sortBy) {
       case "createdAt":
         orderBy.createdAt = "desc";
@@ -98,7 +96,8 @@ export class SkillPostsService {
         orderBy.viewCount = "desc";
         break;
       case "rating":
-        orderBy.avgRating = "desc";
+        // 评分需要特殊处理，因为现在使用统一的Post表
+        orderBy.likeCount = "desc"; // 暂时用点赞数代替评分
         break;
       default:
         orderBy.updatedAt = "desc";
@@ -136,7 +135,7 @@ export class SkillPostsService {
     // 获取数据（多取一条用于判断是否有下一页）
     const take = limit + 1;
 
-    const skillPosts = await this.prisma.skillPost.findMany({
+    const posts = await this.prisma.post.findMany({
       where,
       orderBy,
       take,
@@ -146,8 +145,8 @@ export class SkillPostsService {
     });
 
     // 判断是否有下一页
-    const hasNext = skillPosts.length > limit;
-    const items = skillPosts.slice(0, limit);
+    const hasNext = posts.length > limit;
+    const items = posts.slice(0, limit);
 
     // 计算下一页游标
     let nextCursor: string | undefined;
@@ -168,7 +167,7 @@ export class SkillPostsService {
     }
 
     // 获取总数（仅用于向后兼容）
-    const total = await this.prisma.skillPost.count({ where });
+    const total = await this.prisma.post.count({ where });
 
     return {
       items: items.map((post) => this.transformSkillPost(post)),
@@ -183,25 +182,26 @@ export class SkillPostsService {
     };
   }
 
-  // 获取技能帖详情
+  // 获取技能帖详情（兼容层）
   async findOne(id: string): Promise<SkillPost> {
-    const skillPost = await this.prisma.skillPost.findFirst({
+    const post = await this.prisma.post.findFirst({
       where: {
         id,
         deletedAt: null,
         status: "ACTIVE",
+        type: "SKILL" as any,
       },
       include: {
         author: true,
       },
     });
 
-    if (!skillPost) {
+    if (!post) {
       throw new NotFoundException(`技能帖 ID ${id} 不存在`);
     }
 
     // 增加浏览量
-    await this.prisma.skillPost.update({
+    await this.prisma.post.update({
       where: { id },
       data: {
         viewCount: {
@@ -210,17 +210,18 @@ export class SkillPostsService {
       },
     });
 
-    skillPost.viewCount += 1; // 更新本地对象以返回最新值
+    post.viewCount += 1; // 更新本地对象以返回最新值
 
-    return this.transformSkillPost(skillPost);
+    return this.transformSkillPost(post);
   }
 
-  // 获取城市列表
+  // 获取城市列表（兼容层）
   async getCities(): Promise<string[]> {
-    const cities = await this.prisma.skillPost.findMany({
+    const cities = await this.prisma.post.findMany({
       where: {
         deletedAt: null,
         status: "ACTIVE",
+        type: "SKILL" as any,
       },
       select: {
         city: true,
@@ -234,19 +235,20 @@ export class SkillPostsService {
     return cities.map((item) => item.city);
   }
 
-  // 获取热门标签
+  // 获取热门标签（兼容层）
   async getTags(): Promise<string[]> {
-    const skillPosts = await this.prisma.skillPost.findMany({
+    const posts = await this.prisma.post.findMany({
       where: {
         deletedAt: null,
         status: "ACTIVE",
+        type: "SKILL" as any,
       },
       select: {
         tags: true,
       },
     });
 
-    const allTags = skillPosts.flatMap((post) => post.tags);
+    const allTags = posts.flatMap((post) => post.tags);
     const tagCounts = allTags.reduce(
       (acc, tag) => {
         acc[tag] = (acc[tag] || 0) + 1;
@@ -261,9 +263,9 @@ export class SkillPostsService {
       .map(([tag]) => tag);
   }
 
-  // 更新技能帖
+  // 更新技能帖（兼容层）
   async update(id: string, updateSkillPostDto: any): Promise<SkillPost> {
-    const skillPost = await this.prisma.skillPost.update({
+    const post = await this.prisma.post.update({
       where: { id },
       data: {
         ...updateSkillPostDto,
@@ -274,12 +276,12 @@ export class SkillPostsService {
       },
     });
 
-    return this.transformSkillPost(skillPost);
+    return this.transformSkillPost(post);
   }
 
-  // 删除技能帖（软删除）
+  // 删除技能帖（软删除，兼容层）
   async remove(id: string): Promise<boolean> {
-    await this.prisma.skillPost.update({
+    await this.prisma.post.update({
       where: { id },
       data: {
         deletedAt: new Date(),

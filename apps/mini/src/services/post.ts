@@ -7,6 +7,9 @@ interface GetPostsParams {
   role?: string;
   priceMin?: number;
   priceMax?: number;
+  page?: number;
+  limit?: number;
+  tags?: string[];
 }
 
 interface GetPostsResponse {

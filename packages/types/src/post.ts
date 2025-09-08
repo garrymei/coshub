@@ -25,6 +25,13 @@ export interface Post {
   isFeatured: boolean;
   createdAt: Date;
   updatedAt: Date;
+
+  // 技能帖特有字段
+  price?: Record<string, unknown>;
+  role?: string;
+  experience?: string;
+  availability?: Record<string, unknown>;
+  contactInfo?: Record<string, unknown>;
 }
 
 export enum PostType {
@@ -66,6 +73,13 @@ export interface PostMetadata {
   tools?: string[];
   skills?: SkillCategory[];
   event?: EventInfo;
+
+  // 技能帖特有元数据
+  skillMetadata?: {
+    portfolio?: string[];
+    certifications?: string[];
+    equipment?: string[];
+  };
 }
 
 export interface EventInfo {
@@ -107,6 +121,12 @@ export interface CreatePostDTO {
   images?: string[];
   videos?: string[];
   metadata?: Partial<PostMetadata>;
+  // 技能帖特有字段
+  price?: Record<string, unknown>;
+  role?: string;
+  experience?: string;
+  availability?: Record<string, unknown>;
+  contactInfo?: Record<string, unknown>;
 }
 
 export interface UpdatePostDTO {
@@ -127,6 +147,9 @@ export interface PostQueryDTO {
   authorId?: string;
   keyword?: string;
   city?: string;
+  lat?: number;
+  lng?: number;
+  radiusKm?: number;
   sortBy?: "latest" | "popular" | "mostViewed";
   page?: number;
   limit?: number;

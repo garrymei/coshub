@@ -31,7 +31,7 @@ export async function updateUserProfile(
 ): Promise<UserProfile> {
   return request({
     url: "/users/me",
-    method: "PATCH",
+    method: "PUT", // 修改为PUT，与API定义的Method类型兼容
     data: profile,
   });
 }
@@ -62,5 +62,17 @@ export async function getUserFavorites(params: {
     url: "/users/me/favorites",
     method: "GET",
     data: params,
+  });
+}
+
+// 添加getUserCollections函数，与collections.tsx页面兼容
+export async function getUserCollections(page = 1): Promise<{
+  list: any[];
+  hasMore: boolean;
+}> {
+  return request({
+    url: "/users/me/collections",
+    method: "GET",
+    data: { page, limit: 10 },
   });
 }

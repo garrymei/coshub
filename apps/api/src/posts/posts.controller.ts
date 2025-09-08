@@ -74,17 +74,11 @@ export class PostsController {
   @Get()
   async findAll(
     @Query() query: PostQueryDTO & { type?: "share" | "skill" },
-  ): Promise<ApiResponse<PostListResponse>> {
+  ): Promise<PostListResponse> {
     // 直接使用 query.type，不需要额外处理
     try {
       const result = await this.postsService.findAll(query);
-
-      return {
-        success: true,
-        data: result,
-        message: "获取帖子列表成功",
-        timestamp: new Date().toISOString(),
-      };
+      return result;
     } catch (error) {
       throw new HttpException(
         {
@@ -329,7 +323,7 @@ export class PostsController {
   }
 
   // 点赞/收藏接口
-  @Post(":id/interactions")
+  @HttpPost(":id/interactions")
   @UsePipes(new ValidationPipe({ transform: true }))
   @UseGuards(PermissionGuard, RateLimitGuard)
   @RequirePermissions(Permission.INTERACT_POST)
@@ -394,7 +388,7 @@ export class PostsController {
   }
 
   // 评论接口
-  @Post(":id/comments")
+  @HttpPost(":id/comments")
   @UsePipes(new ValidationPipe({ transform: true }))
   @UseGuards(PermissionGuard, RateLimitGuard)
   @RequirePermissions(Permission.COMMENT_POST)
@@ -431,7 +425,7 @@ export class PostsController {
   }
 
   // 埋点接口
-  @Post(":id/events")
+  @HttpPost(":id/events")
   @UsePipes(new ValidationPipe({ transform: true }))
   async trackEvent(
     @Param("id") postId: string,
