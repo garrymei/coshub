@@ -44,11 +44,25 @@ interface GetPostsResponse {
 export async function getPosts(
   params: GetPostsParams,
 ): Promise<GetPostsResponse> {
-  return request({
+  const res = await request({
     url: "/posts",
     method: "GET",
-    data: params,
+    data: {
+      ...params,
+      type:
+        params.type === "skill"
+          ? "skill"
+          : params.type === "share"
+            ? "share"
+            : undefined,
+    },
   });
+  // 适配后端 PostListResponse 结构
+  return {
+    data: (res as any).data,
+    nextCursor: (res as any).cursor ?? (res as any).meta?.nextCursor ?? null,
+    hasMore: Boolean((res as any).meta?.hasNext),
+  } as any;
 }
 
 interface CreatePostParams {

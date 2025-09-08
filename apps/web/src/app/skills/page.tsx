@@ -7,6 +7,7 @@ import PostCard from "@/components/PostCard";
 import MasonryGrid from "@/components/MasonryGrid";
 import PostFilter, { PostFilters } from "@/components/PostFilter";
 import { Post } from "@/types/post";
+import { api, type WebSkill } from "@/lib/api";
 
 export default function SkillsPage() {
   const { user, loading } = useAuth();
@@ -21,113 +22,37 @@ export default function SkillsPage() {
       return;
     }
 
-    // 模拟获取技能区帖子数据
+    // 通过 API 获取技能数据
     const fetchSkillPosts = async () => {
       setLoadingPosts(true);
-
-      // 这里应该调用API获取技能区帖子数据
-      // const response = await fetch('/api/skill-posts');
-      // const postsData = await response.json();
-
-      // 模拟数据
-      const mockSkillPosts: Post[] = [
-        {
-          id: "skill1",
-          title: "专业Cosplay摄影服务",
-          content:
-            "提供专业的Cosplay摄影服务，包括室内外拍摄、后期修图等。有5年摄影经验，擅长各种风格。",
-          type: "SHARE",
-          category: "RESOURCE",
-          city: "北京",
-          images: ["/mock-skill-1.jpg"],
-          videos: [],
-          tags: ["摄影", "Cosplay", "专业服务"],
-          authorId: "user1",
-          authorName: "专业摄影师",
-          authorAvatar: "/default-avatar.png",
-          stats: {
-            viewCount: 1200,
-            likeCount: 89,
-            commentCount: 23,
-            shareCount: 12,
-          },
-          createdAt: new Date(Date.now() - 86400000),
-          updatedAt: new Date(Date.now() - 86400000),
-        },
-        {
-          id: "skill2",
-          title: "道具制作定制服务",
-          content:
-            "承接各种道具制作定制，包括武器、装备、装饰品等。使用高质量材料，做工精细。",
-          type: "SHARE",
-          category: "RESOURCE",
-          city: "上海",
-          images: ["/mock-skill-2.jpg", "/mock-skill-2-2.jpg"],
-          videos: [],
-          tags: ["道具制作", "定制", "高质量"],
-          authorId: "user2",
-          authorName: "道具制作师",
-          authorAvatar: "/default-avatar.png",
-          stats: {
-            viewCount: 890,
-            likeCount: 67,
-            commentCount: 18,
-            shareCount: 8,
-          },
-          createdAt: new Date(Date.now() - 172800000),
-          updatedAt: new Date(Date.now() - 172800000),
-        },
-        {
-          id: "skill3",
-          title: "Cosplay化妆教学",
-          content:
-            "提供Cosplay化妆教学服务，一对一指导，从基础到高级技巧。适合新手和有经验的coser。",
-          type: "TUTORIAL",
-          category: "TUTORIAL",
-          city: "广州",
-          images: ["/mock-skill-3.jpg"],
-          videos: [],
-          tags: ["化妆", "教学", "一对一"],
-          authorId: "user3",
-          authorName: "化妆师",
-          authorAvatar: "/default-avatar.png",
-          stats: {
-            viewCount: 650,
-            likeCount: 45,
-            commentCount: 12,
-            shareCount: 5,
-          },
-          createdAt: new Date(Date.now() - 259200000),
-          updatedAt: new Date(Date.now() - 259200000),
-        },
-        {
-          id: "skill4",
-          title: "服装制作与修改",
-          content:
-            "专业服装制作与修改服务，包括设计、裁剪、缝制等。可根据角色图片定制服装。",
-          type: "SHARE",
-          category: "RESOURCE",
-          city: "深圳",
-          images: ["/mock-skill-4.jpg"],
-          videos: [],
-          tags: ["服装制作", "修改", "定制"],
-          authorId: "user4",
-          authorName: "服装师",
-          authorAvatar: "/default-avatar.png",
-          stats: {
-            viewCount: 780,
-            likeCount: 56,
-            commentCount: 15,
-            shareCount: 7,
-          },
-          createdAt: new Date(Date.now() - 345600000),
-          updatedAt: new Date(Date.now() - 345600000),
-        },
-      ];
-
-      setPosts(mockSkillPosts);
-      setFilteredPosts(mockSkillPosts);
-      setLoadingPosts(false);
+      try {
+        const res = await api.skills.list({ page: 1 });
+        const items = (res.items as any as WebSkill[]).map(
+          (s): Post => ({
+            id: s.id,
+            title: s.title,
+            content: s.description || "",
+            type: "SHARE",
+            category: "RESOURCE",
+            city: s.city,
+            images: s.images || [],
+            videos: [],
+            tags: s.tags || [],
+            authorId: s.authorId || "",
+            authorName: s.authorName || "",
+            authorAvatar: s.authorAvatar || "/default-avatar.png",
+            stats: { viewCount: 0, likeCount: 0, commentCount: 0, shareCount: 0 },
+            createdAt: s.createdAt ? new Date(s.createdAt) : new Date(),
+            updatedAt: s.updatedAt ? new Date(s.updatedAt) : new Date(),
+          }),
+        );
+        setPosts(items);
+        setFilteredPosts(items);
+      } catch (e) {
+        console.error("加载技能失败", e);
+      } finally {
+        setLoadingPosts(false);
+      }
     };
 
     fetchSkillPosts();

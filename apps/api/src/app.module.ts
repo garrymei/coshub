@@ -17,6 +17,7 @@ import { ReportsModule } from "./reports/reports.module";
 import { LoggerModule } from "./logger/logger.module";
 import { LoggerMiddleware } from "./logger/logger.middleware";
 import { AuthModule } from "./auth/auth.module";
+import { UserModule } from "./user/user.module";
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { AuthModule } from "./auth/auth.module";
     // RedisCacheModule,
     LoggerModule,
     AuthModule,
+    UserModule,
   ],
   controllers: [AppController, HealthController],
   providers: [

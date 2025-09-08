@@ -2,48 +2,22 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import type { Banner } from "@/types/banner";
+import { api, type WebBanner } from "@/lib/api";
 
 interface BannerProps {
   scene: "feed" | "skills";
 }
 
 export default function Banner({ scene }: BannerProps) {
-  const [banners, setBanners] = useState<Banner[]>([]);
+  const [banners, setBanners] = useState<WebBanner[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 模拟获取 banner 数据
     const fetchBanners = async () => {
       try {
-        // TODO: 替换为真实 API 调用
-        const mockBanners: Banner[] = [
-          {
-            id: "1",
-            scene: "feed" as const,
-            imageUrl: "/api/banners/1.jpg",
-            linkType: "external" as const,
-            linkUrl: "https://example.com/event1",
-            priority: 1,
-            online: true,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-          {
-            id: "2",
-            scene: "feed" as const,
-            imageUrl: "/api/banners/2.jpg",
-            linkType: "internal" as const,
-            linkUrl: "/events/summer-cosplay",
-            priority: 2,
-            online: true,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-        ].filter((b) => b.online);
-
-        setBanners(mockBanners);
+        const list = await api.banners.list(scene);
+        setBanners((list || []).filter((b) => (b as any).online !== false));
       } catch (error) {
         console.error("获取 Banner 失败:", error);
       } finally {
@@ -64,7 +38,7 @@ export default function Banner({ scene }: BannerProps) {
     return () => clearInterval(timer);
   }, [banners.length]);
 
-  const handleBannerClick = (banner: Banner) => {
+  const handleBannerClick = (banner: WebBanner) => {
     if (banner.linkType === "external") {
       window.open(banner.linkUrl, "_blank");
     } else {

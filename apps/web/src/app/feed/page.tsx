@@ -8,6 +8,7 @@ import MasonryGrid from "@/components/MasonryGrid";
 import PostFilter, { PostFilters } from "@/components/PostFilter";
 import { useAuth } from "@/hooks/useAuth";
 import { Post } from "@/types/post";
+import { api, type WebPost } from "@/lib/api";
 
 export default function FeedPage() {
   const { user, loading } = useAuth();
@@ -24,90 +25,49 @@ export default function FeedPage() {
     }
   }, [user, loading, router]);
 
-  // 模拟获取帖子数据
+  // 从 API 获取帖子数据
   useEffect(() => {
-    if (activeTab === "work") {
-      // 模拟交流区帖子数据
-      const mockPosts: Post[] = [
-        {
-          id: "1",
-          title: "我的第一个Cosplay作品",
-          content:
-            "分享我的第一个Cosplay作品，希望大家喜欢！这次cos的是初音未来，虽然还有很多不足，但我会继续努力的！",
-          type: "SHARE",
-          category: "COSPLAY_SHOW",
-          images: ["/api/posts/1.jpg", "/api/posts/1-2.jpg"],
-          videos: [],
-          tags: ["cosplay", "初音未来", "分享"],
-          authorId: "user1",
-          authorName: "Cosplayer001",
-          authorAvatar: "/api/avatars/1.jpg",
-          city: "北京",
-          stats: {
-            viewCount: 150,
-            likeCount: 25,
-            commentCount: 8,
-            shareCount: 3,
-          },
-          createdAt: new Date("2024-01-15"),
-          updatedAt: new Date("2024-01-15"),
-        },
-        {
-          id: "2",
-          title: "摄影技巧分享",
-          content: "分享一些Cosplay摄影的技巧和经验，希望对大家有帮助！",
-          type: "TUTORIAL",
-          category: "TUTORIAL",
-          images: ["/api/posts/2.jpg"],
-          videos: [],
-          tags: ["摄影", "技巧", "分享"],
-          authorId: "user2",
-          authorName: "摄影师002",
-          authorAvatar: "/api/avatars/2.jpg",
-          city: "上海",
-          stats: {
-            viewCount: 89,
-            likeCount: 12,
-            commentCount: 5,
-            shareCount: 2,
-          },
-          createdAt: new Date("2024-01-14"),
-          updatedAt: new Date("2024-01-14"),
-        },
-        {
-          id: "3",
-          title: "道具制作过程",
-          content: "记录一下道具制作的全过程，从设计到完成，每一步都很重要！",
-          type: "SHARE",
-          category: "RESOURCE",
-          images: [
-            "/api/posts/3.jpg",
-            "/api/posts/3-2.jpg",
-            "/api/posts/3-3.jpg",
-          ],
-          videos: [],
-          tags: ["道具", "制作", "过程"],
-          authorId: "user3",
-          authorName: "道具师003",
-          authorAvatar: "/api/avatars/3.jpg",
-          city: "广州",
-          stats: {
-            viewCount: 234,
-            likeCount: 45,
-            commentCount: 12,
-            shareCount: 8,
-          },
-          createdAt: new Date("2024-01-13"),
-          updatedAt: new Date("2024-01-13"),
-        },
-      ];
-      setPosts(mockPosts);
-      setFilteredPosts(mockPosts);
-      setLoadingPosts(false);
-    } else {
-      // 技能区帖子会重定向到技能页面
+    if (activeTab !== "work") {
       router.push("/skills");
+      return;
     }
+    const fetchPosts = async () => {
+      setLoadingPosts(true);
+      try {
+        const res = await api.posts.list({ type: "share", page: 1 });
+        const items = (res.items as any as WebPost[]).map(
+          (p): Post => ({
+            id: p.id,
+            title: p.title || "",
+            content: p.content || "",
+            type: "SHARE",
+            category: "COSPLAY_SHOW",
+            images: p.images || [],
+            videos: p.videos || [],
+            tags: p.tags || [],
+            authorId: p.authorId,
+            authorName: p.authorName || "",
+            authorAvatar: p.authorAvatar || "/api/avatars/placeholder.jpg",
+            city: p.city,
+            stats: p.stats || {
+              viewCount: 0,
+              likeCount: 0,
+              commentCount: 0,
+              shareCount: 0,
+            },
+            createdAt: p.createdAt ? new Date(p.createdAt) : new Date(),
+            updatedAt: p.updatedAt ? new Date(p.updatedAt) : new Date(),
+          }),
+        );
+        setPosts(items);
+        setFilteredPosts(items);
+      } catch (e) {
+        console.error("加载帖子失败", e);
+      } finally {
+        setLoadingPosts(false);
+      }
+    };
+    fetchPosts();
   }, [activeTab, router]);
 
   // 处理筛选变化

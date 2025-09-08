@@ -92,10 +92,26 @@ export interface Banner {
   order: number;
 }
 
+// 工具：适配小程序端与后端的参数差异
+const mapBannerScene = (type: "home" | "plaza" | "skills"): string => {
+  // API 使用 scene: feed | skills | home
+  if (type === "plaza") return "feed";
+  return type; // home/skills 保持一致
+};
+
+const mapPostType = (
+  type?: "home" | "plaza" | "share" | "skill",
+): "share" | "skill" | undefined => {
+  if (!type) return undefined;
+  if (type === "plaza" || type === "home") return "share";
+  return type;
+};
+
 // API方法
 export const api = {
   // 用户相关
   user: {
+    // TODO: 后端暂无 /user/profile；先保留占位，联调阶段用 mock 或补充后端接口
     getProfile: (): Promise<User> => request({ url: "/user/profile" }),
     updateProfile: (data: Partial<User>): Promise<User> =>
       request({ url: "/user/profile", method: "PUT", data }),
@@ -105,13 +121,33 @@ export const api = {
 
   // 帖子相关
   posts: {
-    getList: (params: {
-      type?: "home" | "plaza";
+    getList: async (params: {
+      type?: "home" | "plaza" | "share" | "skill";
       cursor?: string;
       limit?: number;
       search?: string;
-    }): Promise<{ data: Post[]; nextCursor?: string; hasMore: boolean }> =>
-      request({ url: "/posts", data: params }),
+      page?: number;
+      sortBy?: "latest" | "popular" | "mostViewed";
+    }): Promise<{ data: Post[]; nextCursor?: string; hasMore: boolean }> => {
+      const res = await request<{
+        data: any[];
+        meta?: { hasNext?: boolean; nextCursor?: string };
+        cursor?: string | null;
+      }>({
+        url: "/posts",
+        data: {
+          ...params,
+          type: mapPostType(params.type),
+          keyword: params.search,
+        },
+      });
+
+      return {
+        data: (res as any).data as any,
+        nextCursor: (res as any).cursor ?? (res as any).meta?.nextCursor,
+        hasMore: Boolean((res as any).meta?.hasNext),
+      } as any;
+    },
 
     getDetail: (id: string): Promise<Post> => request({ url: `/posts/${id}` }),
 
@@ -122,17 +158,17 @@ export const api = {
       request({ url: `/posts/${id}/like`, method: "POST" }),
 
     unlike: (id: string): Promise<void> =>
-      request({ url: `/posts/${id}/unlike`, method: "POST" }),
+      request({ url: `/posts/${id}/like`, method: "DELETE" }),
 
     collect: (id: string): Promise<void> =>
       request({ url: `/posts/${id}/collect`, method: "POST" }),
 
     uncollect: (id: string): Promise<void> =>
-      request({ url: `/posts/${id}/uncollect`, method: "POST" }),
+      request({ url: `/posts/${id}/collect`, method: "DELETE" }),
 
     comment: (id: string, content: string): Promise<void> =>
       request({
-        url: `/posts/${id}/comment`,
+        url: `/posts/${id}/comments`,
         method: "POST",
         data: { content },
       }),
@@ -143,7 +179,7 @@ export const api = {
 
   // 技能相关
   skills: {
-    getList: (params: {
+    getList: async (params: {
       cursor?: string;
       limit?: number;
       search?: string;
@@ -151,8 +187,19 @@ export const api = {
       city?: string;
       priceMin?: number;
       priceMax?: number;
-    }): Promise<{ data: Skill[]; nextCursor?: string; hasMore: boolean }> =>
-      request({ url: "/skills", data: params }),
+    }): Promise<{ data: Skill[]; nextCursor?: string; hasMore: boolean }> => {
+      const res = await request<{ total: number; page: number; pageSize: number; items: any[] }>(
+        { url: "/skills", data: params },
+      );
+      const total = (res as any).total ?? 0;
+      const page = (res as any).page ?? 1;
+      const pageSize = (res as any).pageSize ?? (params.limit || 10);
+      return {
+        data: (res as any).items as any,
+        nextCursor: undefined,
+        hasMore: page * pageSize < total,
+      } as any;
+    },
 
     getDetail: (id: string): Promise<Skill> =>
       request({ url: `/skills/${id}` }),
@@ -170,8 +217,22 @@ export const api = {
 
   // 轮播图相关
   banners: {
-    getList: (type: "home" | "plaza" | "skills"): Promise<Banner[]> =>
-      request({ url: `/banners?type=${type}` }),
+    getList: async (
+      type: "home" | "plaza" | "skills",
+    ): Promise<Banner[]> => {
+      const res = await request<{ success: boolean; data: any[] }>(
+        { url: `/banners?scene=${mapBannerScene(type)}` },
+      );
+      const list = ((res as any).data || []) as any[];
+      return list.map((b) => ({
+        id: b.id,
+        title: "",
+        image: b.imageUrl,
+        link: b.linkUrl,
+        type,
+        order: b.priority ?? 0,
+      }));
+    },
   },
 
   // 搜索相关

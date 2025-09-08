@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import PostCard from "./PostCard";
-import { Post } from "@/types/post";
+import type { Post } from "@/types/post";
+import { api, type WebPost } from "@/lib/api";
 
 interface PostListProps {
   type: "work" | "skill";
@@ -20,15 +21,27 @@ export default function PostList({ type }: PostListProps) {
 
     setLoading(true);
     try {
-      // TODO: 替换为真实 API 调用
-      const response = await fetch(
-        `/api/posts?type=${type}&page=${isLoadMore ? page + 1 : 1}&cursor=${cursor || ""}`,
-      );
-
-      if (!response.ok) throw new Error("获取帖子失败");
-
-      const data = await response.json();
-      const newPosts = data.posts || [];
+      const mapped = type === "work" ? "share" : "skill";
+      const res = await api.posts.list({
+        type: mapped,
+        page: isLoadMore ? page + 1 : 1,
+        cursor: cursor || undefined,
+      });
+      const newPosts = (res.items as any as WebPost[]).map((p) => ({
+        id: p.id,
+        title: p.title || "",
+        content: p.content || "",
+        authorId: p.authorId,
+        authorName: p.authorName || "",
+        authorAvatar: p.authorAvatar || "/api/avatars/placeholder.jpg",
+        images: p.images || [],
+        videos: p.videos || [],
+        tags: p.tags || [],
+        city: p.city,
+        stats: p.stats || { viewCount: 0, likeCount: 0, commentCount: 0, shareCount: 0 },
+        createdAt: p.createdAt ? new Date(p.createdAt) : new Date(),
+        updatedAt: p.updatedAt ? new Date(p.updatedAt) : new Date(),
+      })) as Post[];
 
       if (isLoadMore) {
         setPosts((prev) => [...prev, ...newPosts]);
@@ -37,9 +50,8 @@ export default function PostList({ type }: PostListProps) {
         setPosts(newPosts);
         setPage(1);
       }
-
-      setHasMore(newPosts.length === 10); // 假设每页 10 条
-      setCursor(data.nextCursor || null);
+      setHasMore(Boolean(res.hasNext));
+      setCursor(res.nextCursor || null);
     } catch (error) {
       console.error("获取帖子失败:", error);
     } finally {
