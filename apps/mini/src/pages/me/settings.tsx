@@ -7,6 +7,7 @@ import {
   checkLogin,
   goToLogin,
 } from "../../utils/common";
+import ThemeToggle from "@/components/ThemeToggle";
 import "./settings.scss";
 
 const SettingsPage: React.FC = () => {
@@ -84,17 +85,13 @@ const SettingsPage: React.FC = () => {
           <Switch
             checked={notificationEnabled}
             onChange={handleNotificationChange}
-            color="#FF6B9D"
+            color="var(--coshub-primary)"
           />
         </View>
 
         <View className="settings-item">
-          <Text className="settings-label">深色模式</Text>
-          <Switch
-            checked={darkModeEnabled}
-            onChange={handleDarkModeChange}
-            color="#FF6B9D"
-          />
+          <Text className="settings-label">主题模式</Text>
+          <ThemeToggle />
         </View>
       </View>
 

@@ -31,12 +31,12 @@ const request = async <T = any>(options: {
 
     if (response.statusCode >= 200 && response.statusCode < 300) {
       const result = response.data as any;
-      
+
       // 统一处理API响应格式
       if (result.success === false) {
         throw new Error(result.error?.message || result.message || "请求失败");
       }
-      
+
       return result;
     } else if (response.statusCode === 401) {
       // 未授权，清除token并跳转登录
@@ -52,21 +52,22 @@ const request = async <T = any>(options: {
       }, 2000);
       throw new Error("登录已过期");
     } else {
-      const errorMessage = response.data?.error?.message || 
-                          response.data?.message || 
-                          `HTTP ${response.statusCode}: 请求失败`;
+      const errorMessage =
+        response.data?.error?.message ||
+        response.data?.message ||
+        `HTTP ${response.statusCode}: 请求失败`;
       throw new Error(errorMessage);
     }
   } catch (error: any) {
     console.error("API请求失败:", error);
-    
+
     // 网络错误处理
     if (error.errMsg?.includes("timeout")) {
       throw new Error("网络超时，请检查网络连接");
     } else if (error.errMsg?.includes("fail")) {
       throw new Error("网络连接失败，请检查网络设置");
     }
-    
+
     throw error;
   }
 };

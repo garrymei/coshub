@@ -17,12 +17,12 @@ export default function Masonry({
   // 将子元素分配到不同的列中
   const columnsData = useMemo(() => {
     const cols: ReactNode[][] = Array.from({ length: columns }, () => []);
-    
+
     children.forEach((child, index) => {
       const columnIndex = index % columns;
       cols[columnIndex].push(child);
     });
-    
+
     return cols;
   }, [children, columns]);
 
@@ -46,6 +46,3 @@ export default function Masonry({
     </View>
   );
 }
-
-
-

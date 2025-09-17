@@ -71,7 +71,7 @@ export const formatDate = (dateString: string): string => {
 const uploadToServer = async (filePath: string): Promise<string> => {
   try {
     const token = Taro.getStorageSync("token");
-    
+
     const uploadResult = await Taro.uploadFile({
       url: `${process.env.TARO_APP_API_BASE_URL || "http://localhost:3001/api"}/upload/image`,
       filePath,
@@ -106,10 +106,10 @@ export const uploadImage = (): Promise<string> => {
       sourceType: ["album", "camera"],
       success: async (res) => {
         const tempFilePath = res.tempFilePaths[0];
-        
+
         try {
           showLoading("上传中...");
-          
+
           if (process.env.TARO_APP_USE_MOCK === "true") {
             // 模拟上传
             setTimeout(() => {
@@ -145,10 +145,10 @@ export const uploadImages = (count = 9): Promise<string[]> => {
       sourceType: ["album", "camera"],
       success: async (res) => {
         const tempFilePaths = res.tempFilePaths;
-        
+
         try {
           showLoading("上传中...");
-          
+
           if (process.env.TARO_APP_USE_MOCK === "true") {
             // 模拟上传
             setTimeout(() => {
@@ -157,7 +157,9 @@ export const uploadImages = (count = 9): Promise<string[]> => {
             }, 1000);
           } else {
             // 真实上传
-            const uploadPromises = tempFilePaths.map(filePath => uploadToServer(filePath));
+            const uploadPromises = tempFilePaths.map((filePath) =>
+              uploadToServer(filePath),
+            );
             const imageUrls = await Promise.all(uploadPromises);
             hideLoading();
             resolve(imageUrls);
@@ -217,7 +219,9 @@ export const checkNetworkStatus = (): Promise<boolean> => {
 };
 
 // 网络状态监听
-export const onNetworkStatusChange = (callback: (isConnected: boolean) => void) => {
+export const onNetworkStatusChange = (
+  callback: (isConnected: boolean) => void,
+) => {
   Taro.onNetworkStatusChange((res) => {
     callback(res.isConnected);
     if (!res.isConnected) {

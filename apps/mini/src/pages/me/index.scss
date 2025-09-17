@@ -1,15 +1,28 @@
-// 我的页面样式
+// 我的页面样式 - 基于设计Token
 .me-page {
+  min-height: 100vh;
+  background: var(--coshub-bg);
+  transition: background-color var(--coshub-transition-normal);
+
   .gradient-primary {
-    background: linear-gradient(135deg, #D946EF 0%, #A855F7 100%);
+    background: linear-gradient(135deg, var(--coshub-primary) 0%, var(--coshub-primary-strong) 100%);
+    border-radius: 0 0 var(--coshub-radius-xl) var(--coshub-radius-xl);
+    box-shadow: var(--coshub-shadow-md);
   }
 
   .tab-active {
-    @apply text-primary-600 border-b-2 border-primary-600;
+    color: var(--coshub-primary);
+    border-bottom: 2px solid var(--coshub-primary);
+    font-weight: var(--coshub-font-weight-semibold);
   }
 
   .tab-inactive {
-    @apply text-gray-500;
+    color: var(--coshub-text-weak);
+    transition: color var(--coshub-transition-fast);
+  }
+
+  .tab-inactive:hover {
+    color: var(--coshub-text);
   }
 
   .line-clamp-3 {
@@ -21,7 +34,7 @@
   }
 
   .shadow-soft {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--coshub-shadow-sm);
   }
 
   .gradient-overlay {
@@ -33,6 +46,14 @@
   }
 
   .transition-opacity {
-    transition: opacity 0.2s ease;
+    transition: opacity var(--coshub-transition-fast);
+  }
+}
+
+/* 暗色模式 */
+.dark .me-page {
+  .gradient-primary {
+    background: linear-gradient(135deg, var(--coshub-primary) 0%, var(--coshub-primary-strong) 100%);
+    box-shadow: var(--coshub-shadow-lg);
   }
 }

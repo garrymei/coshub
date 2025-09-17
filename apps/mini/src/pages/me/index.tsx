@@ -172,7 +172,9 @@ export default function MePage() {
     } catch (error) {
       console.error("获取收藏内容失败", error);
       // 降级到模拟数据
-      setCollections(tabContents.find(tab => tab.id === "collections")?.content || []);
+      setCollections(
+        tabContents.find((tab) => tab.id === "collections")?.content || [],
+      );
     } finally {
       setCollectionsLoading(false);
     }
@@ -187,7 +189,7 @@ export default function MePage() {
     } catch (error) {
       console.error("获取点赞内容失败", error);
       // 降级到模拟数据
-      setLikes(tabContents.find(tab => tab.id === "likes")?.content || []);
+      setLikes(tabContents.find((tab) => tab.id === "likes")?.content || []);
     } finally {
       setLikesLoading(false);
     }
@@ -196,7 +198,7 @@ export default function MePage() {
   // 标签页切换
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);
-    
+
     // 当切换到收藏或点赞标签页时，获取真实数据
     if (tabId === "collections" && collections.length === 0) {
       fetchCollections();
@@ -383,10 +385,14 @@ export default function MePage() {
               </View>
             ) : collections.length > 0 ? (
               collections.map((item: any) => (
-                <View 
-                  key={item.id} 
+                <View
+                  key={item.id}
                   className="rounded-xl overflow-hidden cursor-pointer"
-                  onClick={() => Taro.navigateTo({ url: `/pages/post/detail?id=${item.post?.id || item.id}` })}
+                  onClick={() =>
+                    Taro.navigateTo({
+                      url: `/pages/post/detail?id=${item.post?.id || item.id}`,
+                    })
+                  }
                 >
                   <Image
                     className="w-full h-auto min-h-32 max-h-80 object-cover rounded-xl"
@@ -411,10 +417,14 @@ export default function MePage() {
               </View>
             ) : likes.length > 0 ? (
               likes.map((item: any) => (
-                <View 
-                  key={item.id} 
+                <View
+                  key={item.id}
                   className="rounded-xl overflow-hidden cursor-pointer"
-                  onClick={() => Taro.navigateTo({ url: `/pages/post/detail?id=${item.post?.id || item.id}` })}
+                  onClick={() =>
+                    Taro.navigateTo({
+                      url: `/pages/post/detail?id=${item.post?.id || item.id}`,
+                    })
+                  }
                 >
                   <Image
                     className="w-full h-auto min-h-32 max-h-80 object-cover rounded-xl"

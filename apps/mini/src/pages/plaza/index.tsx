@@ -121,7 +121,9 @@ export default function PlazaPage() {
                     {post.author?.nickname || "匿名用户"}
                   </View>
                   <View className="text-xs text-gray-500">
-                    {post.createdAt ? new Date(post.createdAt).toLocaleDateString() : "刚刚"}
+                    {post.createdAt
+                      ? new Date(post.createdAt).toLocaleDateString()
+                      : "刚刚"}
                   </View>
                 </View>
                 <View className="text-xs text-gray-400">
@@ -178,15 +180,21 @@ export default function PlazaPage() {
                 <View className="flex items-center gap-6">
                   <View className="flex items-center gap-1">
                     <View className="text-lg">❤️</View>
-                    <View className="text-sm text-gray-600">{post.likeCount || 0}</View>
+                    <View className="text-sm text-gray-600">
+                      {post.likeCount || 0}
+                    </View>
                   </View>
                   <View className="flex items-center gap-1">
                     <View className="text-lg">💬</View>
-                    <View className="text-sm text-gray-600">{post.commentCount || 0}</View>
+                    <View className="text-sm text-gray-600">
+                      {post.commentCount || 0}
+                    </View>
                   </View>
                   <View className="flex items-center gap-1">
                     <View className="text-lg">⭐</View>
-                    <View className="text-sm text-gray-600">{post.collectCount || 0}</View>
+                    <View className="text-sm text-gray-600">
+                      {post.collectCount || 0}
+                    </View>
                   </View>
                 </View>
                 <View className="text-sm text-gray-400">
@@ -216,4 +224,3 @@ export default function PlazaPage() {
     </View>
   );
 }
-

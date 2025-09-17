@@ -1,46 +1,93 @@
 .settings-page {
-  background-color: #f8f9fa;
+  background-color: var(--coshub-bg);
   min-height: 100vh;
-  padding: 16px 0;
+  padding: var(--coshub-space-sm) 0;
+  transition: background-color var(--coshub-transition-normal);
   
   .settings-group {
-    background-color: #fff;
-    margin-bottom: 16px;
+    background-color: var(--coshub-surface);
+    margin-bottom: var(--coshub-space-sm);
+    border-radius: var(--coshub-radius-lg);
+    box-shadow: var(--coshub-shadow-sm);
+    overflow: hidden;
     
     .settings-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 16px;
-      border-bottom: 1px solid #f0f0f0;
+      padding: var(--coshub-space-sm);
+      border-bottom: 1px solid var(--coshub-border-weak);
+      transition: background-color var(--coshub-transition-fast);
       
       &:last-child {
         border-bottom: none;
       }
       
+      &:hover {
+        background-color: var(--coshub-surface-weak);
+      }
+      
       .settings-label {
-        font-size: 16px;
-        color: #333;
+        font-size: var(--coshub-font-size-md);
+        color: var(--coshub-text);
+        font-weight: var(--coshub-font-weight-medium);
       }
       
       .settings-arrow {
-        font-size: 18px;
-        color: #ccc;
+        font-size: var(--coshub-font-size-lg);
+        color: var(--coshub-text-subtle);
+        transition: color var(--coshub-transition-fast);
+      }
+      
+      &:hover .settings-arrow {
+        color: var(--coshub-text-weak);
       }
     }
   }
   
   .logout-button {
     width: 90%;
-    height: 44px;
-    background-color: #fff;
-    color: #FF6B9D;
-    font-size: 16px;
-    border-radius: 22px;
+    height: 88rpx;
+    background-color: var(--coshub-surface);
+    color: var(--coshub-primary);
+    font-size: var(--coshub-font-size-md);
+    font-weight: var(--coshub-font-weight-medium);
+    border-radius: var(--coshub-radius-full);
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 24px auto;
-    border: 1px solid #FF6B9D;
+    margin: var(--coshub-space-md) auto;
+    border: 1px solid var(--coshub-primary);
+    transition: all var(--coshub-transition-fast);
+    box-shadow: var(--coshub-shadow-sm);
+    
+    &:hover {
+      background-color: var(--coshub-primary-subtle);
+      transform: translateY(-1rpx);
+      box-shadow: var(--coshub-shadow-md);
+    }
+    
+    &:active {
+      transform: translateY(0);
+      box-shadow: var(--coshub-shadow-sm);
+    }
+  }
+}
+
+/* 暗色模式 */
+.dark .settings-page {
+  .settings-group {
+    background-color: var(--coshub-surface);
+    box-shadow: var(--coshub-shadow-md);
+  }
+  
+  .logout-button {
+    background-color: var(--coshub-surface);
+    color: var(--coshub-primary);
+    border-color: var(--coshub-primary);
+    
+    &:hover {
+      background-color: var(--coshub-primary-subtle);
+    }
   }
 }

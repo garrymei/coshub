@@ -9,10 +9,10 @@ class App extends Component<{ children?: ReactNode }> {
   componentDidMount() {
     // 检查登录状态
     this.checkLoginStatus();
-    
+
     // 监听网络状态变化
     this.setupNetworkListener();
-    
+
     // 监听小程序生命周期
     this.setupLifecycleListeners();
   }

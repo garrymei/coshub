@@ -1,0 +1,46 @@
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--coshub-space-xs);
+  padding: var(--coshub-space-xs) var(--coshub-space-sm);
+  border-radius: var(--coshub-radius-lg);
+  background-color: var(--coshub-surface-weak);
+  border: 1px solid var(--coshub-border);
+  cursor: pointer;
+  transition: all var(--coshub-transition-fast);
+  user-select: none;
+
+  &:hover {
+    background-color: var(--coshub-surface-strong);
+    border-color: var(--coshub-border-strong);
+    transform: translateY(-1rpx);
+    box-shadow: var(--coshub-shadow-sm);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: none;
+  }
+
+  &__icon {
+    font-size: var(--coshub-font-size-lg);
+    line-height: 1;
+  }
+
+  &__text {
+    font-size: var(--coshub-font-size-sm);
+    color: var(--coshub-text);
+    font-weight: var(--coshub-font-weight-medium);
+  }
+}
+
+/* 暗色模式下的主题切换器 */
+.dark .theme-toggle {
+  background-color: var(--coshub-surface-weak);
+  border-color: var(--coshub-border);
+
+  &:hover {
+    background-color: var(--coshub-surface-strong);
+    border-color: var(--coshub-border-strong);
+  }
+}

@@ -1,23 +1,45 @@
-// Banner组件样式
+// Banner组件样式 - 基于设计Token
 .banner-container {
+  border-radius: var(--coshub-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--coshub-shadow-md);
+  transition: box-shadow var(--coshub-transition-normal);
+
+  &:hover {
+    box-shadow: var(--coshub-shadow-lg);
+  }
+
   .banner-swiper {
-    border-radius: 12px;
+    border-radius: var(--coshub-radius-lg);
     overflow: hidden;
   }
 
   .banner-item {
     position: relative;
     overflow: hidden;
+    cursor: pointer;
+    transition: transform var(--coshub-transition-fast);
+
+    &:hover {
+      transform: scale(1.02);
+    }
   }
 
   .banner-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform var(--coshub-transition-slow);
+  }
+
+  .banner-item:hover .banner-image {
+    transform: scale(1.05);
   }
 
   .banner-title {
     background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+    backdrop-filter: blur(var(--coshub-blur));
+    -webkit-backdrop-filter: blur(var(--coshub-blur));
   }
 
   .gradient-overlay {
@@ -25,11 +47,21 @@
   }
 
   .text-shadow {
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    text-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.5);
   }
 
   .banner-loading {
-    background-color: #f3f4f6;
-    border-radius: 12px;
+    background-color: var(--coshub-surface-weak);
+    border-radius: var(--coshub-radius-lg);
+    color: var(--coshub-text-weak);
   }
+}
+
+/* 暗色模式 */
+.dark .banner-container {
+  .banner-loading {
+    background-color: var(--coshub-surface-weak);
+    color: var(--coshub-text-weak);
+  }
+}
 }

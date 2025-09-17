@@ -23,7 +23,7 @@ export default function NetworkStatus() {
     Taro.onNetworkStatusChange((res) => {
       setIsOnline(res.isConnected);
       setShow(true);
-      
+
       // 3秒后隐藏提示
       setTimeout(() => {
         setShow(false);

@@ -15,7 +15,7 @@ interface ThemeConfig {
 export default function ThemeManagementPage() {
   const [themeConfig, setThemeConfig] = useState<ThemeConfig>({
     primaryColor: "#D946EF",
-    secondaryColor: "#9D5CFF", 
+    secondaryColor: "#9D5CFF",
     accentColor: "#FFE66D",
     backgroundColor: "#ffffff",
     textColor: "#030213",
@@ -43,7 +43,7 @@ export default function ThemeManagementPage() {
       setThemeConfig({
         primaryColor: "#D946EF",
         secondaryColor: "#9D5CFF",
-        accentColor: "#FFE66D", 
+        accentColor: "#FFE66D",
         backgroundColor: "#ffffff",
         textColor: "#030213",
         borderRadius: "0.625rem",
@@ -65,8 +65,8 @@ export default function ThemeManagementPage() {
           <button
             onClick={togglePreview}
             className={`px-4 py-2 rounded-md transition-colors ${
-              previewMode 
-                ? "bg-green-600 text-white hover:bg-green-700" 
+              previewMode
+                ? "bg-green-600 text-white hover:bg-green-700"
                 : "bg-gray-600 text-white hover:bg-gray-700"
             }`}
           >
@@ -91,7 +91,7 @@ export default function ThemeManagementPage() {
         {/* 主题配置表单 */}
         <div className="bg-white rounded-lg shadow p-6">
           <h3 className="text-lg font-semibold mb-4">主题配置</h3>
-          
+
           <div className="space-y-4">
             {/* 主色调 */}
             <div>
@@ -102,13 +102,23 @@ export default function ThemeManagementPage() {
                 <input
                   type="color"
                   value={themeConfig.primaryColor}
-                  onChange={(e) => setThemeConfig(prev => ({ ...prev, primaryColor: e.target.value }))}
+                  onChange={(e) =>
+                    setThemeConfig((prev) => ({
+                      ...prev,
+                      primaryColor: e.target.value,
+                    }))
+                  }
                   className="w-12 h-10 border border-gray-300 rounded cursor-pointer"
                 />
                 <input
                   type="text"
                   value={themeConfig.primaryColor}
-                  onChange={(e) => setThemeConfig(prev => ({ ...prev, primaryColor: e.target.value }))}
+                  onChange={(e) =>
+                    setThemeConfig((prev) => ({
+                      ...prev,
+                      primaryColor: e.target.value,
+                    }))
+                  }
                   className="flex-1 border border-gray-300 rounded-md px-3 py-2"
                   placeholder="#D946EF"
                 />
@@ -124,13 +134,23 @@ export default function ThemeManagementPage() {
                 <input
                   type="color"
                   value={themeConfig.secondaryColor}
-                  onChange={(e) => setThemeConfig(prev => ({ ...prev, secondaryColor: e.target.value }))}
+                  onChange={(e) =>
+                    setThemeConfig((prev) => ({
+                      ...prev,
+                      secondaryColor: e.target.value,
+                    }))
+                  }
                   className="w-12 h-10 border border-gray-300 rounded cursor-pointer"
                 />
                 <input
                   type="text"
                   value={themeConfig.secondaryColor}
-                  onChange={(e) => setThemeConfig(prev => ({ ...prev, secondaryColor: e.target.value }))}
+                  onChange={(e) =>
+                    setThemeConfig((prev) => ({
+                      ...prev,
+                      secondaryColor: e.target.value,
+                    }))
+                  }
                   className="flex-1 border border-gray-300 rounded-md px-3 py-2"
                   placeholder="#9D5CFF"
                 />
@@ -146,13 +166,23 @@ export default function ThemeManagementPage() {
                 <input
                   type="color"
                   value={themeConfig.accentColor}
-                  onChange={(e) => setThemeConfig(prev => ({ ...prev, accentColor: e.target.value }))}
+                  onChange={(e) =>
+                    setThemeConfig((prev) => ({
+                      ...prev,
+                      accentColor: e.target.value,
+                    }))
+                  }
                   className="w-12 h-10 border border-gray-300 rounded cursor-pointer"
                 />
                 <input
                   type="text"
                   value={themeConfig.accentColor}
-                  onChange={(e) => setThemeConfig(prev => ({ ...prev, accentColor: e.target.value }))}
+                  onChange={(e) =>
+                    setThemeConfig((prev) => ({
+                      ...prev,
+                      accentColor: e.target.value,
+                    }))
+                  }
                   className="flex-1 border border-gray-300 rounded-md px-3 py-2"
                   placeholder="#FFE66D"
                 />
@@ -168,13 +198,23 @@ export default function ThemeManagementPage() {
                 <input
                   type="color"
                   value={themeConfig.backgroundColor}
-                  onChange={(e) => setThemeConfig(prev => ({ ...prev, backgroundColor: e.target.value }))}
+                  onChange={(e) =>
+                    setThemeConfig((prev) => ({
+                      ...prev,
+                      backgroundColor: e.target.value,
+                    }))
+                  }
                   className="w-12 h-10 border border-gray-300 rounded cursor-pointer"
                 />
                 <input
                   type="text"
                   value={themeConfig.backgroundColor}
-                  onChange={(e) => setThemeConfig(prev => ({ ...prev, backgroundColor: e.target.value }))}
+                  onChange={(e) =>
+                    setThemeConfig((prev) => ({
+                      ...prev,
+                      backgroundColor: e.target.value,
+                    }))
+                  }
                   className="flex-1 border border-gray-300 rounded-md px-3 py-2"
                   placeholder="#ffffff"
                 />
@@ -190,13 +230,23 @@ export default function ThemeManagementPage() {
                 <input
                   type="color"
                   value={themeConfig.textColor}
-                  onChange={(e) => setThemeConfig(prev => ({ ...prev, textColor: e.target.value }))}
+                  onChange={(e) =>
+                    setThemeConfig((prev) => ({
+                      ...prev,
+                      textColor: e.target.value,
+                    }))
+                  }
                   className="w-12 h-10 border border-gray-300 rounded cursor-pointer"
                 />
                 <input
                   type="text"
                   value={themeConfig.textColor}
-                  onChange={(e) => setThemeConfig(prev => ({ ...prev, textColor: e.target.value }))}
+                  onChange={(e) =>
+                    setThemeConfig((prev) => ({
+                      ...prev,
+                      textColor: e.target.value,
+                    }))
+                  }
                   className="flex-1 border border-gray-300 rounded-md px-3 py-2"
                   placeholder="#030213"
                 />
@@ -210,7 +260,12 @@ export default function ThemeManagementPage() {
               </label>
               <select
                 value={themeConfig.borderRadius}
-                onChange={(e) => setThemeConfig(prev => ({ ...prev, borderRadius: e.target.value }))}
+                onChange={(e) =>
+                  setThemeConfig((prev) => ({
+                    ...prev,
+                    borderRadius: e.target.value,
+                  }))
+                }
                 className="w-full border border-gray-300 rounded-md px-3 py-2"
               >
                 <option value="0">无圆角</option>
@@ -228,7 +283,12 @@ export default function ThemeManagementPage() {
               </label>
               <select
                 value={themeConfig.fontFamily}
-                onChange={(e) => setThemeConfig(prev => ({ ...prev, fontFamily: e.target.value }))}
+                onChange={(e) =>
+                  setThemeConfig((prev) => ({
+                    ...prev,
+                    fontFamily: e.target.value,
+                  }))
+                }
                 className="w-full border border-gray-300 rounded-md px-3 py-2"
               >
                 <option value="Inter">Inter</option>
@@ -244,8 +304,8 @@ export default function ThemeManagementPage() {
         {/* 主题预览 */}
         <div className="bg-white rounded-lg shadow p-6">
           <h3 className="text-lg font-semibold mb-4">主题预览</h3>
-          
-          <div 
+
+          <div
             className="p-4 rounded-lg border"
             style={{
               backgroundColor: themeConfig.backgroundColor,
@@ -259,7 +319,7 @@ export default function ThemeManagementPage() {
               <div className="space-x-2">
                 <button
                   className="px-4 py-2 text-white rounded-md"
-                  style={{ 
+                  style={{
                     backgroundColor: themeConfig.primaryColor,
                     borderRadius: themeConfig.borderRadius,
                   }}
@@ -268,7 +328,7 @@ export default function ThemeManagementPage() {
                 </button>
                 <button
                   className="px-4 py-2 text-white rounded-md"
-                  style={{ 
+                  style={{
                     backgroundColor: themeConfig.secondaryColor,
                     borderRadius: themeConfig.borderRadius,
                   }}
@@ -277,7 +337,7 @@ export default function ThemeManagementPage() {
                 </button>
                 <button
                   className="px-4 py-2 text-black rounded-md"
-                  style={{ 
+                  style={{
                     backgroundColor: themeConfig.accentColor,
                     borderRadius: themeConfig.borderRadius,
                   }}
@@ -287,9 +347,9 @@ export default function ThemeManagementPage() {
               </div>
 
               {/* 卡片预览 */}
-              <div 
+              <div
                 className="p-4 border rounded-md"
-                style={{ 
+                style={{
                   borderColor: themeConfig.primaryColor + "30",
                   borderRadius: themeConfig.borderRadius,
                 }}
