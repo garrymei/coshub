@@ -1,28 +1,35 @@
-.banner {
-  width: 100%;
-  height: 200px;
-  border-radius: 8px;
-  overflow: hidden;
-  margin-bottom: 16px;
-  position: relative;
-
-  &-image {
-    width: 100%;
-    height: 100%;
+// Banner组件样式
+.banner-container {
+  .banner-swiper {
+    border-radius: 12px;
+    overflow: hidden;
   }
 
-  &-loading {
+  .banner-item {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .banner-image {
     width: 100%;
     height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #f5f5f5;
-    border-radius: 8px;
+    object-fit: cover;
+  }
 
-    .loading-text {
-      color: #999;
-      font-size: 14px;
-    }
+  .banner-title {
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+  }
+
+  .gradient-overlay {
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.6));
+  }
+
+  .text-shadow {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  }
+
+  .banner-loading {
+    background-color: #f3f4f6;
+    border-radius: 12px;
   }
 }

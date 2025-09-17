@@ -1,5 +1,5 @@
 import { View } from "@tarojs/components";
-import { ReactNode } from "react";
+import { ReactNode, useMemo } from "react";
 
 interface MasonryProps {
   children: ReactNode[];
@@ -14,21 +14,38 @@ export default function Masonry({
   gap = 3,
   className = "",
 }: MasonryProps) {
-  const gapClass = `gap-${gap}`;
+  // 将子元素分配到不同的列中
+  const columnsData = useMemo(() => {
+    const cols: ReactNode[][] = Array.from({ length: columns }, () => []);
+    
+    children.forEach((child, index) => {
+      const columnIndex = index % columns;
+      cols[columnIndex].push(child);
+    });
+    
+    return cols;
+  }, [children, columns]);
+
+  const gapStyle = {
+    gap: `${gap * 0.25}rem`,
+  };
 
   return (
-    <View
-      className={`masonry-layout ${className}`}
-      style={{
-        columnCount: columns,
-        columnGap: `${gap * 0.25}rem`,
-      }}
-    >
-      {children.map((child, index) => (
-        <View key={index} className="masonry-item">
-          {child}
-        </View>
-      ))}
+    <View className={`masonry-layout ${className}`} style={gapStyle}>
+      <View className="masonry-columns">
+        {columnsData.map((columnChildren, columnIndex) => (
+          <View key={columnIndex} className="masonry-column" style={gapStyle}>
+            {columnChildren.map((child, index) => (
+              <View key={`${columnIndex}-${index}`} className="masonry-item">
+                {child}
+              </View>
+            ))}
+          </View>
+        ))}
+      </View>
     </View>
   );
 }
+
+
+

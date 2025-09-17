@@ -1,7 +1,7 @@
 export default defineAppConfig({
   pages: [
     "pages/home/index",
-    "pages/plaza/index",
+    "pages/plaza/index", 
     "pages/skills/index",
     "pages/me/index",
     "pages/login/index",
@@ -79,7 +79,7 @@ export default defineAppConfig({
   navigateToMiniProgramAppIdList: [],
   sitemapLocation: "sitemap.json",
   preloadRule: {
-    "pages/feed/index": {
+    "pages/home/index": {
       network: "all",
       packages: [],
     },

@@ -71,6 +71,25 @@ export default function AdminPage() {
             进入管理
           </Link>
         </div>
+
+        {/* 主题管理卡片 */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center mb-4">
+            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+              <span className="text-2xl">🎨</span>
+            </div>
+            <div className="ml-4">
+              <h3 className="text-lg font-semibold text-gray-900">主题管理</h3>
+              <p className="text-sm text-gray-600">自定义应用颜色和样式主题</p>
+            </div>
+          </div>
+          <Link
+            href="/admin/theme"
+            className="block w-full text-center bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 transition-colors"
+          >
+            进入管理
+          </Link>
+        </div>
       </div>
 
       {/* 快速统计 */}

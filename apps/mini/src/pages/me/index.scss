@@ -1,2 +1,38 @@
-// 我的页面样式已迁移到TailwindCSS
-// 保留此文件以防需要自定义样式
+// 我的页面样式
+.me-page {
+  .gradient-primary {
+    background: linear-gradient(135deg, #D946EF 0%, #A855F7 100%);
+  }
+
+  .tab-active {
+    @apply text-primary-600 border-b-2 border-primary-600;
+  }
+
+  .tab-inactive {
+    @apply text-gray-500;
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .shadow-soft {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .gradient-overlay {
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.6));
+  }
+
+  .group:hover .group-hover\:opacity-100 {
+    opacity: 1;
+  }
+
+  .transition-opacity {
+    transition: opacity 0.2s ease;
+  }
+}

@@ -67,6 +67,36 @@ export const formatDate = (dateString: string): string => {
   }
 };
 
+// 上传图片到服务器
+const uploadToServer = async (filePath: string): Promise<string> => {
+  try {
+    const token = Taro.getStorageSync("token");
+    
+    const uploadResult = await Taro.uploadFile({
+      url: `${process.env.TARO_APP_API_BASE_URL || "http://localhost:3001/api"}/upload/image`,
+      filePath,
+      name: "file",
+      header: {
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+    });
+
+    if (uploadResult.statusCode === 200) {
+      const result = JSON.parse(uploadResult.data);
+      if (result.success && result.data?.url) {
+        return result.data.url;
+      } else {
+        throw new Error(result.message || "上传失败");
+      }
+    } else {
+      throw new Error(`上传失败: ${uploadResult.statusCode}`);
+    }
+  } catch (error) {
+    console.error("上传图片失败:", error);
+    throw error;
+  }
+};
+
 // 上传图片
 export const uploadImage = (): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -74,20 +104,32 @@ export const uploadImage = (): Promise<string> => {
       count: 1,
       sizeType: ["compressed"],
       sourceType: ["album", "camera"],
-      success: (res) => {
+      success: async (res) => {
         const tempFilePath = res.tempFilePaths[0];
-
-        // 这里应该调用实际的上传API，这里只是模拟
-        showLoading("上传中...");
-
-        // 模拟上传延迟
-        setTimeout(() => {
+        
+        try {
+          showLoading("上传中...");
+          
+          if (process.env.TARO_APP_USE_MOCK === "true") {
+            // 模拟上传
+            setTimeout(() => {
+              hideLoading();
+              resolve(tempFilePath);
+            }, 1000);
+          } else {
+            // 真实上传
+            const imageUrl = await uploadToServer(tempFilePath);
+            hideLoading();
+            resolve(imageUrl);
+          }
+        } catch (error) {
           hideLoading();
-          // 返回模拟的图片URL
-          resolve(tempFilePath);
-        }, 1000);
+          showToast("上传失败", "error");
+          reject(error);
+        }
       },
       fail: (err) => {
+        showToast("选择图片失败", "error");
         reject(err);
       },
     });
@@ -101,20 +143,33 @@ export const uploadImages = (count = 9): Promise<string[]> => {
       count,
       sizeType: ["compressed"],
       sourceType: ["album", "camera"],
-      success: (res) => {
+      success: async (res) => {
         const tempFilePaths = res.tempFilePaths;
-
-        // 这里应该调用实际的上传API，这里只是模拟
-        showLoading("上传中...");
-
-        // 模拟上传延迟
-        setTimeout(() => {
+        
+        try {
+          showLoading("上传中...");
+          
+          if (process.env.TARO_APP_USE_MOCK === "true") {
+            // 模拟上传
+            setTimeout(() => {
+              hideLoading();
+              resolve(tempFilePaths);
+            }, 1000);
+          } else {
+            // 真实上传
+            const uploadPromises = tempFilePaths.map(filePath => uploadToServer(filePath));
+            const imageUrls = await Promise.all(uploadPromises);
+            hideLoading();
+            resolve(imageUrls);
+          }
+        } catch (error) {
           hideLoading();
-          // 返回模拟的图片URL数组
-          resolve(tempFilePaths);
-        }, 1000);
+          showToast("上传失败", "error");
+          reject(error);
+        }
       },
       fail: (err) => {
+        showToast("选择图片失败", "error");
         reject(err);
       },
     });
@@ -139,4 +194,34 @@ export const goToLogin = () => {
 // 获取当前用户信息
 export const getCurrentUser = () => {
   return Taro.getStorageSync("userInfo");
+};
+
+// 检查网络状态
+export const checkNetworkStatus = (): Promise<boolean> => {
+  return new Promise((resolve) => {
+    Taro.getNetworkType({
+      success: (res) => {
+        if (res.networkType === "none") {
+          showToast("网络连接不可用", "error");
+          resolve(false);
+        } else {
+          resolve(true);
+        }
+      },
+      fail: () => {
+        showToast("网络状态检查失败", "error");
+        resolve(false);
+      },
+    });
+  });
+};
+
+// 网络状态监听
+export const onNetworkStatusChange = (callback: (isConnected: boolean) => void) => {
+  Taro.onNetworkStatusChange((res) => {
+    callback(res.isConnected);
+    if (!res.isConnected) {
+      showToast("网络连接已断开", "error");
+    }
+  });
 };

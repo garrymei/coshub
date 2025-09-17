@@ -57,6 +57,12 @@ export default function AdminLayout({
                 >
                   举报处理
                 </Link>
+                <Link
+                  href="/admin/theme"
+                  className="text-gray-700 hover:text-purple-600 transition-colors"
+                >
+                  主题管理
+                </Link>
               </div>
             </div>
 

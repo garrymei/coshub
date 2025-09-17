@@ -1,0 +1,36 @@
+// 错误边界组件样式
+.error-boundary {
+  @apply min-h-screen flex items-center justify-center bg-gray-50 p-4;
+
+  .error-content {
+    @apply text-center max-w-sm w-full;
+  }
+
+  .error-icon {
+    @apply text-6xl mb-4;
+  }
+
+  .error-title {
+    @apply text-xl font-bold text-gray-800 mb-2;
+  }
+
+  .error-message {
+    @apply text-sm text-gray-600 mb-6 leading-relaxed;
+  }
+
+  .error-actions {
+    @apply flex flex-col gap-3;
+  }
+
+  .retry-button {
+    @apply bg-primary-600 text-white px-6 py-3 rounded-lg text-sm font-medium;
+    border: none;
+    outline: none;
+  }
+
+  .home-button {
+    @apply bg-gray-100 text-gray-700 px-6 py-3 rounded-lg text-sm font-medium;
+    border: none;
+    outline: none;
+  }
+}

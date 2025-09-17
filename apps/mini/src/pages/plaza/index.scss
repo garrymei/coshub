@@ -1,2 +1,24 @@
-// 广场页面样式已迁移到TailwindCSS
-// 保留此文件以防需要自定义样式
+// 广场页面样式
+.plaza-page {
+  .search-input {
+    @apply w-full h-10 pl-10 pr-4 bg-gray-100 rounded-full text-sm;
+    border: none;
+    outline: none;
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .shadow-soft {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .backdrop-blur-soft {
+    backdrop-filter: blur(8px);
+  }
+}

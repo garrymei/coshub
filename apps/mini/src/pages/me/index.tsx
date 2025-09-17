@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { View, Text, Image, Button, ScrollView } from "@tarojs/components";
 import Taro from "@tarojs/taro";
 import { api, mockData, User } from "@/services/api";
+import { getUserCollections, getUserLikes } from "@/services/user";
 import "./index.scss";
 
 interface TabContent {
@@ -14,6 +15,10 @@ export default function MePage() {
   const [userProfile, setUserProfile] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("posts");
+  const [collections, setCollections] = useState<any[]>([]);
+  const [likes, setLikes] = useState<any[]>([]);
+  const [collectionsLoading, setCollectionsLoading] = useState(false);
+  const [likesLoading, setLikesLoading] = useState(false);
 
   // 模拟数据
   const mockUserProfile: User = {
@@ -158,9 +163,46 @@ export default function MePage() {
     Taro.navigateTo({ url: "/pages/me/settings" });
   };
 
+  // 获取收藏内容
+  const fetchCollections = async () => {
+    try {
+      setCollectionsLoading(true);
+      const res = await getUserCollections(1);
+      setCollections(res.list);
+    } catch (error) {
+      console.error("获取收藏内容失败", error);
+      // 降级到模拟数据
+      setCollections(tabContents.find(tab => tab.id === "collections")?.content || []);
+    } finally {
+      setCollectionsLoading(false);
+    }
+  };
+
+  // 获取点赞内容
+  const fetchLikes = async () => {
+    try {
+      setLikesLoading(true);
+      const res = await getUserLikes(1);
+      setLikes(res.list);
+    } catch (error) {
+      console.error("获取点赞内容失败", error);
+      // 降级到模拟数据
+      setLikes(tabContents.find(tab => tab.id === "likes")?.content || []);
+    } finally {
+      setLikesLoading(false);
+    }
+  };
+
   // 标签页切换
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);
+    
+    // 当切换到收藏或点赞标签页时，获取真实数据
+    if (tabId === "collections" && collections.length === 0) {
+      fetchCollections();
+    } else if (tabId === "likes" && likes.length === 0) {
+      fetchLikes();
+    }
   };
 
   // 退出登录
@@ -333,17 +375,59 @@ export default function MePage() {
           </View>
         )}
 
-        {(activeTab === "collections" || activeTab === "likes") && (
+        {activeTab === "collections" && (
           <View className="grid grid-cols-2 gap-3">
-            {currentTabContent?.content.map((item: any) => (
-              <View key={item.id} className="rounded-xl overflow-hidden">
-                <Image
-                  className="w-full h-auto min-h-32 max-h-80 object-cover rounded-xl"
-                  src={item.image}
-                  mode="aspectFill"
-                />
+            {collectionsLoading ? (
+              <View className="col-span-2 text-center py-8">
+                <Text className="text-gray-500">加载中...</Text>
               </View>
-            ))}
+            ) : collections.length > 0 ? (
+              collections.map((item: any) => (
+                <View 
+                  key={item.id} 
+                  className="rounded-xl overflow-hidden cursor-pointer"
+                  onClick={() => Taro.navigateTo({ url: `/pages/post/detail?id=${item.post?.id || item.id}` })}
+                >
+                  <Image
+                    className="w-full h-auto min-h-32 max-h-80 object-cover rounded-xl"
+                    src={item.post?.images?.[0] || item.image}
+                    mode="aspectFill"
+                  />
+                </View>
+              ))
+            ) : (
+              <View className="col-span-2 text-center py-8">
+                <Text className="text-gray-500">暂无收藏内容</Text>
+              </View>
+            )}
+          </View>
+        )}
+
+        {activeTab === "likes" && (
+          <View className="grid grid-cols-2 gap-3">
+            {likesLoading ? (
+              <View className="col-span-2 text-center py-8">
+                <Text className="text-gray-500">加载中...</Text>
+              </View>
+            ) : likes.length > 0 ? (
+              likes.map((item: any) => (
+                <View 
+                  key={item.id} 
+                  className="rounded-xl overflow-hidden cursor-pointer"
+                  onClick={() => Taro.navigateTo({ url: `/pages/post/detail?id=${item.post?.id || item.id}` })}
+                >
+                  <Image
+                    className="w-full h-auto min-h-32 max-h-80 object-cover rounded-xl"
+                    src={item.post?.images?.[0] || item.image}
+                    mode="aspectFill"
+                  />
+                </View>
+              ))
+            ) : (
+              <View className="col-span-2 text-center py-8">
+                <Text className="text-gray-500">暂无点赞内容</Text>
+              </View>
+            )}
           </View>
         )}
       </ScrollView>

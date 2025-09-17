@@ -76,3 +76,15 @@ export async function getUserCollections(page = 1): Promise<{
     data: { page, limit: 10 },
   });
 }
+
+// 添加getUserLikes函数，与likes.tsx页面兼容
+export async function getUserLikes(page = 1): Promise<{
+  list: any[];
+  hasMore: boolean;
+}> {
+  return request({
+    url: "/users/me/likes",
+    method: "GET",
+    data: { page, limit: 10 },
+  });
+}

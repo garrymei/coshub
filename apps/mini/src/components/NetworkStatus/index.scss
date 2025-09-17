@@ -1,0 +1,26 @@
+// 网络状态提示组件样式
+.network-status {
+  @apply fixed top-0 left-0 right-0 z-50 px-4 py-2 text-center text-sm font-medium;
+  animation: slideDown 0.3s ease-out;
+
+  &.online {
+    @apply bg-green-500 text-white;
+  }
+
+  &.offline {
+    @apply bg-red-500 text-white;
+  }
+
+  .network-text {
+    @apply text-sm;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
