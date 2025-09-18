@@ -63,11 +63,10 @@ export default function SkillCard({
             <Text className="skill-card__title">{skill.title}</Text>
             <View className="skill-card__meta">
               <View className="skill-card__author-info">
-                <Image
-                  className="skill-card__avatar"
-                  src={skill.user.avatar}
-                />
-                <Text className="skill-card__author">{skill.user.nickname}</Text>
+                <Image className="skill-card__avatar" src={skill.user.avatar} />
+                <Text className="skill-card__author">
+                  {skill.user.nickname}
+                </Text>
               </View>
               <Text className="skill-card__price">
                 {skill.price > 0 ? `￥${skill.price}` : "议价"}
@@ -99,17 +98,14 @@ export default function SkillCard({
               </Text>
             </View>
 
-            <Text className="skill-card__description">
-              {skill.description}
-            </Text>
+            <Text className="skill-card__description">{skill.description}</Text>
 
             <View className="skill-card__meta skill-card__meta--list">
               <View className="skill-card__author-info">
-                <Image
-                  className="skill-card__avatar"
-                  src={skill.user.avatar}
-                />
-                <Text className="skill-card__author">{skill.user.nickname}</Text>
+                <Image className="skill-card__avatar" src={skill.user.avatar} />
+                <Text className="skill-card__author">
+                  {skill.user.nickname}
+                </Text>
               </View>
               <Text className="skill-card__price skill-card__price--list">
                 {skill.price > 0 ? `￥${skill.price}` : "议价"}

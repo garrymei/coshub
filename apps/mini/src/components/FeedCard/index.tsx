@@ -109,7 +109,7 @@ export default function FeedCard({
       <View className="feed-card__actions">
         <View className="feed-card__action-group">
           <View
-            className={`feed-card__action ${post.isLiked ? 'feed-card__action--active' : ''}`}
+            className={`feed-card__action ${post.isLiked ? "feed-card__action--active" : ""}`}
             onClick={handleLike}
           >
             <Text className="feed-card__action-icon">
@@ -118,17 +118,14 @@ export default function FeedCard({
             <Text className="feed-card__action-count">{post.likeCount}</Text>
           </View>
 
-          <View
-            className="feed-card__action"
-            onClick={handleComment}
-          >
+          <View className="feed-card__action" onClick={handleComment}>
             <Text className="feed-card__action-icon">💬</Text>
             <Text className="feed-card__action-count">{post.commentCount}</Text>
           </View>
         </View>
 
         <View
-          className={`feed-card__action ${post.isCollected ? 'feed-card__action--active' : ''}`}
+          className={`feed-card__action ${post.isCollected ? "feed-card__action--active" : ""}`}
           onClick={handleCollect}
         >
           <Text className="feed-card__action-icon">
