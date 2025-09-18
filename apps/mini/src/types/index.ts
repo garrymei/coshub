@@ -16,11 +16,14 @@ export interface User {
 // 基础帖子模型
 export interface Post {
   id: string;
-  authorId: string;
+  authorId?: string;
   author?: User;
-  type: "skill" | "share";
-  media: string[];
-  caption: string;
+  user?: User; // 兼容不同的命名
+  type?: "skill" | "share";
+  media?: string[];
+  images?: string[]; // 兼容不同的命名
+  content?: string; // 兼容不同的命名
+  caption?: string;
   tags?: string[];
   likeCount: number;
   commentCount: number;
@@ -37,6 +40,22 @@ export interface SkillPost extends Post {
   skillTags: string[];
   contactInfo?: string;
   serviceDescription: string;
+}
+
+// 技能服务模型
+export interface Skill {
+  id: string;
+  userId: string;
+  user: User;
+  title: string;
+  description: string;
+  price: number;
+  category: "makeup" | "photography" | "editing" | "props" | "wigs";
+  images: string[];
+  tags: string[];
+  city: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 // 互动模型（点赞、收藏、评论）

@@ -1,0 +1,74 @@
+/* 卡片展示组件 */
+.card-showcase {
+  padding: var(--coshub-space-md);
+  background: var(--coshub-bg);
+  min-height: 100vh;
+
+  /* 头部区域 */
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--coshub-space-xl);
+    padding: var(--coshub-space-md);
+    background: var(--coshub-glass);
+    backdrop-filter: blur(var(--coshub-blur));
+    -webkit-backdrop-filter: blur(var(--coshub-blur));
+    border-radius: var(--coshub-radius-lg);
+    border: 1px solid var(--coshub-border-weak);
+  }
+
+  /* 标题 */
+  &__title {
+    font-size: var(--coshub-font-size-xl);
+    font-weight: var(--coshub-font-weight-bold);
+    color: var(--coshub-text);
+  }
+
+  /* 章节 */
+  &__section {
+    margin-bottom: var(--coshub-space-2xl);
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  /* 章节标题 */
+  &__section-title {
+    font-size: var(--coshub-font-size-lg);
+    font-weight: var(--coshub-font-weight-semibold);
+    color: var(--coshub-text);
+    margin-bottom: var(--coshub-space-md);
+    padding-left: var(--coshub-space-sm);
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 6rpx;
+      height: 32rpx;
+      background: linear-gradient(135deg, var(--coshub-primary), var(--coshub-primary-weak));
+      border-radius: var(--coshub-radius-sm);
+    }
+  }
+
+  /* 卡片容器 */
+  &__cards {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--coshub-space-md);
+
+    /* 响应式网格 */
+    @media (min-width: 768px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (min-width: 1024px) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+}

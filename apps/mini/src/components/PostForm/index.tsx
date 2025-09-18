@@ -1,4 +1,4 @@
-import { View, Form, Input, Textarea, Picker } from "@tarojs/components";
+import { View, Form, Input, Textarea, Picker, Button } from "@tarojs/components";
 import { useState } from "react";
 import Taro from "@tarojs/taro";
 import { PostType } from "@coshub/types";

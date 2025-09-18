@@ -99,17 +99,6 @@ export interface Post {
   updatedAt: string;
 }
 
-export interface Banner {
-  id: string;
-  title?: string;
-  imageUrl: string;
-  linkUrl?: string;
-  linkType?: "external" | "internal";
-  scene: string;
-  priority: number;
-  online: boolean;
-}
-
 export interface Skill {
   id: string;
   userId: string;

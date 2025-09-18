@@ -482,5 +482,262 @@ button::after {
   justify-content: center;
   align-items: center;
   padding: 40px 0;
-  color: #ff4d4f;
+  color: var(--coshub-error);
+}
+
+/* ===== 主题切换增强 ===== */
+
+/* 系统主题跟随 */
+@media (prefers-color-scheme: dark) {
+  page {
+    color-scheme: dark;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  page {
+    color-scheme: light;
+  }
+}
+
+/* 手动主题切换类 */
+.light {
+  color-scheme: light;
+}
+
+.dark {
+  color-scheme: dark;
+}
+
+/* ===== 玻璃拟物效果增强 ===== */
+
+/* 玻璃卡片变体 */
+.glass-card--strong {
+  background: var(--coshub-glass-strong);
+  backdrop-filter: blur(calc(var(--coshub-blur) * 1.5));
+  -webkit-backdrop-filter: blur(calc(var(--coshub-blur) * 1.5));
+}
+
+.glass-card--weak {
+  background: var(--coshub-glass-weak);
+  backdrop-filter: blur(calc(var(--coshub-blur) * 0.5));
+  -webkit-backdrop-filter: blur(calc(var(--coshub-blur) * 0.5));
+}
+
+/* ===== 动画增强 ===== */
+
+/* 弹跳动画 */
+@keyframes bounce-in {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.bounce-in {
+  animation: bounce-in 0.5s ease-out;
+}
+
+/* 淡入动画 */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+/* 滑入动画 */
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.slide-in-left {
+  animation: slide-in-left 0.4s ease-out;
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.slide-in-right {
+  animation: slide-in-right 0.4s ease-out;
+}
+
+/* ===== 交互增强 ===== */
+
+/* 点击波纹效果 */
+.ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(217, 70, 239, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.ripple:active::before {
+  width: 300rpx;
+  height: 300rpx;
+}
+
+/* 悬浮效果 */
+.float {
+  transition: transform var(--coshub-transition-normal);
+}
+
+.float:hover {
+  transform: translateY(-4rpx);
+}
+
+/* 缩放效果 */
+.scale {
+  transition: transform var(--coshub-transition-normal);
+}
+
+.scale:hover {
+  transform: scale(1.05);
+}
+
+.scale:active {
+  transform: scale(0.95);
+}
+
+/* ===== 响应式工具类 ===== */
+
+/* 隐藏/显示 */
+.hidden { display: none !important; }
+.visible { display: block !important; }
+
+/* 文本对齐 */
+.text-left { text-align: left; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+
+/* 弹性布局 */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.flex-row { flex-direction: row; }
+.flex-wrap { flex-wrap: wrap; }
+.flex-nowrap { flex-wrap: nowrap; }
+
+.items-start { align-items: flex-start; }
+.items-center { align-items: center; }
+.items-end { align-items: flex-end; }
+.items-stretch { align-items: stretch; }
+
+.justify-start { justify-content: flex-start; }
+.justify-center { justify-content: center; }
+.justify-end { justify-content: flex-end; }
+.justify-between { justify-content: space-between; }
+.justify-around { justify-content: space-around; }
+
+.flex-1 { flex: 1; }
+.flex-shrink-0 { flex-shrink: 0; }
+.flex-grow-0 { flex-grow: 0; }
+
+/* 定位 */
+.relative { position: relative; }
+.absolute { position: absolute; }
+.fixed { position: fixed; }
+.sticky { position: sticky; }
+
+/* 溢出处理 */
+.overflow-hidden { overflow: hidden; }
+.overflow-scroll { overflow: scroll; }
+.overflow-auto { overflow: auto; }
+
+/* 文本溢出 */
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ===== 性能优化 ===== */
+
+/* 硬件加速 */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* 平滑滚动 */
+.smooth-scroll {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 选择禁用 */
+.no-select {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* 点击高亮禁用 */
+.no-tap-highlight {
+  -webkit-tap-highlight-color: transparent;
 }

@@ -1,125 +1,337 @@
-import { useState } from 'react';
-import { Search, Plus } from 'lucide-react';
-import { Header } from './Header';
-import { DynamicCard } from './DynamicCard';
-import { Input } from './ui/input';
-import { Button } from './ui/button';
+import { useEffect, useMemo, useState } from "react";
+import { Search, Plus } from "lucide-react";
+import { Header } from "./Header";
+import { DynamicCard } from "./DynamicCard";
+import { Input } from "./ui/input";
+import { Button } from "./ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "./ui/alert-dialog";
+import { fetchSquareFeed } from "../services/contentService";
+import type { DynamicItem, SquareFeedData } from "../types/content";
 
-const mockSquareData = [
-  {
-    id: '1',
-    user: {
-      avatar: 'https://images.unsplash.com/photo-1673047233994-78df05226bfc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjdXRlJTIwYW5pbWUlMjBjaGFyYWN0ZXJ8ZW58MXx8fHwxNzU3MDYxNTU5fDA&ixlib=rb-4.1.0&q=80&w=200&utm_source=figma&utm_medium=referral',
-      name: '旅行小达人',
-      location: '杭州·西湖区'
-    },
-    content: {
-      text: '周末去西湖边走走，春天的杭州真的太美了！樱花盛开，游人如织，每一帧都是明信片级别的风景～',
-      images: [
-        'https://images.unsplash.com/photo-1577949619851-db947ef972af?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0cmF2ZWwlMjBsaWZlc3R5bGUlMjBiYW5uZXJ8ZW58MXx8fHwxNzU3MDYyMjY0fDA&ixlib=rb-4.1.0&q=80&w=400&utm_source=figma&utm_medium=referral',
-        'https://images.unsplash.com/photo-1639784119996-3de5792ddff1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsaWZlc3R5bGUlMjBiYW5uZXIlMjB5b3VuZyUyMHBlb3BsZXxlbnwxfHx8fDE3NTcwNjIyNjN8MA&ixlib=rb-4.1.0&q=80&w=400&utm_source=figma&utm_medium=referral',
-        'https://images.unsplash.com/photo-1464854860390-e95991b46441?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmYXNoaW9uJTIwbGlmZXN0eWxlJTIwYmFubmVyfGVufDF8fHx8MTc1NzA2MjI2NHww&ixlib=rb-4.1.0&q=80&w=400&utm_source=figma&utm_medium=referral'
-      ],
-      tags: ['旅行', '杭州', '西湖', '春游', '樱花']
-    },
-    stats: {
-      likes: 256,
-      comments: 42,
-      isLiked: false,
-      isBookmarked: false
-    }
-  },
-  {
-    id: '2',
-    user: {
-      avatar: 'https://images.unsplash.com/photo-1581132285926-a4c91a76ef14?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhbmltZSUyMGdpcmwlMjBwb3J0cmFpdHxlbnwxfHx8fDE3NTcwNjE1NjJ8MA&ixlib=rb-4.1.0&q=80&w=200&utm_source=figma&utm_medium=referral',
-      name: '美食探索家',
-      location: '广州·天河区'
-    },
-    content: {
-      text: '发现了一家超棒的粤菜餐厅！招牌白切鸡嫩滑无比，虾饺皮薄馅鲜，环境也很雅致。价格合理，值得推荐！',
-      images: [
-        'https://images.unsplash.com/photo-1578960281840-cb36759fb109?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmb29kJTIwbGlmZXN0eWxlJTIwYmFubmVyfGVufDF8fHx8MTc1NzA2MjI2NHww&ixlib=rb-4.1.0&q=80&w=400&utm_source=figma&utm_medium=referral'
-      ],
-      tags: ['美食', '粤菜', '广州', '探店', '推荐']
-    },
-    stats: {
-      likes: 189,
-      comments: 28,
-      isLiked: true,
-      isBookmarked: true
-    }
-  },
-  {
-    id: '3',
-    user: {
-      avatar: 'https://images.unsplash.com/photo-1641298583600-7d6ad2098298?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhbmltZSUyMGNoYXJhY3RlciUyMGNvc3BsYXl8ZW58MXx8fHwxNzU3MDYxNTY1fDA&ixlib=rb-4.1.0&q=80&w=200&utm_source=figma&utm_medium=referral',
-      name: '健身小姐姐',
-      location: '深圳·南山区'
-    },
-    content: {
-      text: '今天的健身打卡！坚持了30天的晨练，感觉整个人的精神状态都不一样了。分享一些简单的居家运动，一起变美变健康～',
-      images: [
-        'https://images.unsplash.com/photo-1639784119996-3de5792ddff1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsaWZlc3R5bGUlMjBiYW5uZXIlMjB5b3VuZyUyMHBlb3BsZXxlbnwxfHx8fDE3NTcwNjIyNjN8MA&ixlib=rb-4.1.0&q=80&w=400&utm_source=figma&utm_medium=referral',
-        'https://images.unsplash.com/photo-1588912914078-2fe5224fd8b8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxza2lsbHMlMjBsZWFybmluZyUyMGVkdWNhdGlvbnxlbnwxfHx8fDE3NTcwNjIyNjV8MA&ixlib=rb-4.1.0&q=80&w=400&utm_source=figma&utm_medium=referral'
-      ],
-      tags: ['健身', '晨练', '打卡', '运动', '健康生活']
-    },
-    stats: {
-      likes: 312,
-      comments: 56,
-      isLiked: false,
-      isBookmarked: false
-    }
-  }
-];
+type DialogState = {
+  type: "publish" | "comment" | "share";
+  dynamic?: DynamicItem;
+};
 
 export function SquarePage() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [dynamics, setDynamics] = useState(mockSquareData);
+  const [feed, setFeed] = useState<SquareFeedData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeOrder, setActiveOrder] = useState<"latest" | "popular">("latest");
+  const [dialog, setDialog] = useState<DialogState | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const load = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const data = await fetchSquareFeed();
+        if (isMounted) {
+          setFeed(data);
+        }
+      } catch (err) {
+        if (isMounted) {
+          setError("内容加载失败，请稍后重试");
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    load();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const retry = () => {
+    setIsLoading(true);
+    setError(null);
+    fetchSquareFeed()
+      .then(setFeed)
+      .catch(() => setError("内容加载失败，请稍后重试"))
+      .finally(() => setIsLoading(false));
+  };
 
   const handleLike = (id: string) => {
-    setDynamics(prev => 
-      prev.map(dynamic => 
-        dynamic.id === id 
-          ? { 
-              ...dynamic, 
-              stats: {
-                ...dynamic.stats,
-                isLiked: !dynamic.stats.isLiked,
-                likes: dynamic.stats.isLiked ? dynamic.stats.likes - 1 : dynamic.stats.likes + 1
+    setFeed((prev) => {
+      if (!prev) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        dynamics: prev.dynamics.map((dynamic) =>
+          dynamic.id === id
+            ? {
+                ...dynamic,
+                stats: {
+                  ...dynamic.stats,
+                  isLiked: !dynamic.stats.isLiked,
+                  likes: dynamic.stats.isLiked
+                    ? dynamic.stats.likes - 1
+                    : dynamic.stats.likes + 1,
+                },
               }
-            }
-          : dynamic
-      )
-    );
+            : dynamic
+        ),
+      };
+    });
   };
 
   const handleBookmark = (id: string) => {
-    setDynamics(prev => 
-      prev.map(dynamic => 
-        dynamic.id === id 
-          ? { 
-              ...dynamic, 
-              stats: {
-                ...dynamic.stats,
-                isBookmarked: !dynamic.stats.isBookmarked
+    setFeed((prev) => {
+      if (!prev) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        dynamics: prev.dynamics.map((dynamic) =>
+          dynamic.id === id
+            ? {
+                ...dynamic,
+                stats: {
+                  ...dynamic.stats,
+                  isBookmarked: !dynamic.stats.isBookmarked,
+                },
               }
-            }
-          : dynamic
-      )
-    );
+            : dynamic
+        ),
+      };
+    });
   };
 
   const handlePublish = () => {
-    // 这里可以打开发布页面或模态框
-    console.log('打开发布页面');
+    setDialog({ type: "publish" });
+  };
+
+  const resolveDynamic = (id: string) =>
+    feed?.dynamics.find((item) => item.id === id);
+
+  const handleComment = (id: string) => {
+    setDialog({ type: "comment", dynamic: resolveDynamic(id) });
+  };
+
+  const handleShare = (id: string) => {
+    setDialog({ type: "share", dynamic: resolveDynamic(id) });
+  };
+
+  const handleTopicSelect = (topic: string) => {
+    const pure = topic.replace(/^#/, "");
+    setSearchQuery(pure);
+  };
+
+  const filteredDynamics = useMemo(() => {
+    if (!feed) {
+      return [];
+    }
+
+    const query = searchQuery.trim().toLowerCase();
+
+    const matchesQuery = (dynamic: DynamicItem) => {
+      if (!query) {
+        return true;
+      }
+
+      const text = dynamic.content.text.toLowerCase();
+      const name = dynamic.user.name.toLowerCase();
+      const location = (dynamic.user.location || "").toLowerCase();
+      const tags = dynamic.content.tags.map((tag) => tag.toLowerCase());
+
+      return (
+        text.includes(query) ||
+        name.includes(query) ||
+        location.includes(query) ||
+        tags.some((tag) => tag.includes(query))
+      );
+    };
+
+    const base = feed.dynamics.filter(matchesQuery);
+
+    const sorted = [...base].sort((a, b) => {
+      if (activeOrder === "popular") {
+        return b.stats.likes - a.stats.likes;
+      }
+
+      return (
+        new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+      );
+    });
+
+    return sorted;
+  }, [feed, searchQuery, activeOrder]);
+
+  const dialogTitleMap: Record<DialogState["type"], string> = {
+    publish: "发布动态",
+    comment: "评论功能即将上线",
+    share: "分享功能即将上线",
+  };
+
+  const dialogDescriptionMap: Record<DialogState["type"], string> = {
+    publish: "即将跳转至发布流程，敬请期待正式版的小程序发布页。",
+    comment: dialog?.dynamic
+      ? `我们正在完善互动体验，很快就能和 ${dialog.dynamic.user.name} 互动啦！`
+      : "我们正在完善互动体验，敬请期待。",
+    share: dialog?.dynamic
+      ? `${dialog.dynamic.user.name} 的精彩内容值得分享，稍后我们会开放多平台分享能力。`
+      : "精彩内容值得分享，稍后我们会开放多平台分享能力。",
+  };
+
+  const renderAlertDialog = () => (
+    <AlertDialog
+      open={Boolean(dialog)}
+      onOpenChange={(open) => {
+        if (!open) {
+          setDialog(null);
+        }
+      }}
+    >
+      <AlertDialogContent className="rounded-2xl">
+        <AlertDialogHeader>
+          <AlertDialogTitle>{dialog ? dialogTitleMap[dialog.type] : ""}</AlertDialogTitle>
+          <AlertDialogDescription>
+            {dialog ? dialogDescriptionMap[dialog.type] : ""}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogAction asChild>
+            <Button className="rounded-full" onClick={() => setDialog(null)}>
+              好的
+            </Button>
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+
+  const renderContent = () => {
+    if (isLoading) {
+      return (
+        <div className="px-4 space-y-4">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <div
+              key={index}
+              className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 animate-pulse"
+            >
+              <div className="h-4 bg-gray-200/80 rounded w-24 mb-4" />
+              <div className="h-3 bg-gray-200/80 rounded w-full mb-2" />
+              <div className="h-3 bg-gray-200/80 rounded w-3/4" />
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    if (error) {
+      return (
+        <div className="px-4 py-20 text-center">
+          <p className="text-gray-500 mb-4">{error}</p>
+          <Button onClick={retry} className="rounded-full px-6">
+            重新加载
+          </Button>
+        </div>
+      );
+    }
+
+    if (!feed) {
+      return (
+        <div className="px-4 py-20 text-center text-gray-500">
+          暂无动态，稍后再来看吧～
+        </div>
+      );
+    }
+
+    return (
+      <>
+        <div className="px-4 mb-6">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Input
+              placeholder="搜索动态、用户、话题..."
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              className="pl-10 pr-4 py-3 rounded-full bg-white border-gray-200 focus:border-pink-300 focus:ring-pink-200"
+            />
+          </div>
+        </div>
+
+        <div className="px-4 mb-6">
+          <h3 className="text-sm font-medium text-gray-700 mb-3">热门话题</h3>
+          <div className="flex flex-wrap gap-2">
+            {feed.topics.map((topic) => (
+              <button
+                key={topic.value}
+                onClick={() => handleTopicSelect(topic.label)}
+                className="px-3 py-1.5 bg-gradient-to-r from-pink-100 to-purple-100 text-pink-600 rounded-full text-sm hover:from-pink-200 hover:to-purple-200 transition-colors"
+              >
+                {topic.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="px-4">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">最新动态</h2>
+            <div className="flex space-x-2 text-sm">
+              <button
+                className={`font-medium ${
+                  activeOrder === "latest" ? "text-pink-500" : "text-gray-500"
+                }`}
+                onClick={() => setActiveOrder("latest")}
+              >
+                最新
+              </button>
+              <span className="text-gray-300">|</span>
+              <button
+                className={activeOrder === "popular" ? "text-pink-500" : "text-gray-500"}
+                onClick={() => setActiveOrder("popular")}
+              >
+                热门
+              </button>
+            </div>
+          </div>
+
+          {filteredDynamics.length === 0 ? (
+            <div className="text-center py-16 text-gray-500">
+              没有找到相关内容，换个关键词试试吧～
+            </div>
+          ) : (
+            filteredDynamics.map((dynamic) => (
+              <DynamicCard
+                key={dynamic.id}
+                {...dynamic}
+                onLike={handleLike}
+                onBookmark={handleBookmark}
+                onComment={handleComment}
+                onShare={handleShare}
+              />
+            ))
+          )}
+        </div>
+      </>
+    );
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header 
-        title="广场" 
+    <div className="min-h-screen bg-gray-50 pb-24">
+      <Header
+        title="广场"
         rightContent={
           <Button
             onClick={handlePublish}
@@ -129,57 +341,9 @@ export function SquarePage() {
           </Button>
         }
       />
-      
-      <div className="pt-24 pb-20">
-        {/* Search Bar */}
-        <div className="px-4 mb-6">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <Input
-              placeholder="搜索动态、用户、话题..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-4 py-3 rounded-full bg-white border-gray-200 focus:border-pink-300 focus:ring-pink-200"
-            />
-          </div>
-        </div>
 
-        {/* Hot Topics */}
-        <div className="px-4 mb-6">
-          <h3 className="text-sm font-medium text-gray-700 mb-3">热门话题</h3>
-          <div className="flex flex-wrap gap-2">
-            {['#春日穿搭', '#美食探店', '#旅行日记', '#健身打卡', '#护肤心得', '#学习分享'].map((topic, index) => (
-              <span 
-                key={index}
-                className="px-3 py-1.5 bg-gradient-to-r from-pink-100 to-purple-100 text-pink-600 rounded-full text-sm cursor-pointer hover:from-pink-200 hover:to-purple-200 transition-colors"
-              >
-                {topic}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {/* Dynamics Feed */}
-        <div className="px-4">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">最新动态</h2>
-            <div className="flex space-x-2 text-sm">
-              <button className="text-pink-500 font-medium">最新</button>
-              <span className="text-gray-300">|</span>
-              <button className="text-gray-500">热门</button>
-            </div>
-          </div>
-          
-          {dynamics.map((dynamic) => (
-            <DynamicCard
-              key={dynamic.id}
-              {...dynamic}
-              onLike={handleLike}
-              onBookmark={handleBookmark}
-            />
-          ))}
-        </div>
-      </div>
+      <div className="pt-24 pb-24 space-y-6">{renderContent()}</div>
+      {renderAlertDialog()}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { View, Text, Image } from "@tarojs/components";
 import Taro from "@tarojs/taro";
-import { Post } from "@/services/api";
+import { Post } from "@/types";
+import "./index.scss";
 
 interface FeedCardProps {
   post: Post;
@@ -57,48 +58,46 @@ export default function FeedCard({
 
   return (
     <View
-      className={`feed-card card transition-transform duration-300 hover:shadow-medium hover:-translate-y-1 ${layout}`}
+      className={`feed-card feed-card--${layout}`}
+      hoverClass="feed-card--hover"
       onClick={handleCardClick}
     >
       {/* 用户信息 */}
-      <View className="flex items-center p-3">
-        <Image className="w-8 h-8 rounded-full mr-2" src={post.user.avatar} />
-        <View className="flex-1">
-          <Text className="text-sm font-semibold text-gray-800">
-            {post.user.nickname}
-          </Text>
-          <Text className="text-xs text-gray-500">
-            {formatTime(post.createdAt)}
-          </Text>
+      <View className="feed-card__header">
+        <Image className="feed-card__avatar" src={post.user.avatar} />
+        <View className="feed-card__user-info">
+          <Text className="feed-card__username">{post.user.nickname}</Text>
+          <Text className="feed-card__time">{formatTime(post.createdAt)}</Text>
         </View>
       </View>
 
       {/* 内容 */}
-      <Text className="text-sm text-gray-700 px-3 pb-3 leading-relaxed">
-        {post.content}
-      </Text>
+      <View className="feed-card__content">
+        <Text className="feed-card__text">{post.content}</Text>
+      </View>
 
       {/* 图片 */}
       {post.images && post.images.length > 0 && (
-        <View className={`images ${layout === "list" ? "px-3 pb-3" : ""}`}>
+        <View className={`feed-card__images feed-card__images--${layout}`}>
           {layout === "masonry" ? (
             post.images.map((img, index) => (
               <Image
                 key={index}
-                className="w-full object-cover rounded-lg mb-2"
+                className="feed-card__img"
                 src={img}
                 mode="aspectFill"
-                style={{ minHeight: "150px", maxHeight: "300px" }}
+                lazyLoad
               />
             ))
           ) : (
-            <View className="grid grid-cols-2 gap-2">
+            <View className="feed-card__grid">
               {post.images.slice(0, 4).map((img, index) => (
                 <Image
                   key={index}
-                  className="w-full h-24 object-cover rounded-lg"
+                  className="feed-card__img feed-card__img--grid"
                   src={img}
                   mode="aspectFill"
+                  lazyLoad
                 />
               ))}
             </View>
@@ -107,39 +106,35 @@ export default function FeedCard({
       )}
 
       {/* 互动按钮 */}
-      <View className="flex items-center justify-between px-3 py-2 border-t border-gray-100">
-        <View className="flex items-center space-x-4">
+      <View className="feed-card__actions">
+        <View className="feed-card__action-group">
           <View
-            className="flex items-center space-x-1 cursor-pointer"
+            className={`feed-card__action ${post.isLiked ? 'feed-card__action--active' : ''}`}
             onClick={handleLike}
           >
-            <Text
-              className={`text-lg ${post.isLiked ? "text-red-500" : "text-gray-400"}`}
-            >
+            <Text className="feed-card__action-icon">
               {post.isLiked ? "❤️" : "🤍"}
             </Text>
-            <Text className="text-xs text-gray-500">{post.likeCount}</Text>
+            <Text className="feed-card__action-count">{post.likeCount}</Text>
           </View>
 
           <View
-            className="flex items-center space-x-1 cursor-pointer"
+            className="feed-card__action"
             onClick={handleComment}
           >
-            <Text className="text-lg text-gray-400">💬</Text>
-            <Text className="text-xs text-gray-500">{post.commentCount}</Text>
+            <Text className="feed-card__action-icon">💬</Text>
+            <Text className="feed-card__action-count">{post.commentCount}</Text>
           </View>
         </View>
 
         <View
-          className="flex items-center space-x-1 cursor-pointer"
+          className={`feed-card__action ${post.isCollected ? 'feed-card__action--active' : ''}`}
           onClick={handleCollect}
         >
-          <Text
-            className={`text-lg ${post.isCollected ? "text-yellow-500" : "text-gray-400"}`}
-          >
+          <Text className="feed-card__action-icon">
             {post.isCollected ? "⭐" : "☆"}
           </Text>
-          <Text className="text-xs text-gray-500">{post.collectCount}</Text>
+          <Text className="feed-card__action-count">{post.collectCount}</Text>
         </View>
       </View>
     </View>

@@ -1,6 +1,7 @@
 import { View, Text, Image } from "@tarojs/components";
 import Taro from "@tarojs/taro";
-import { Skill } from "@/services/api";
+import { Skill } from "@/types";
+import "./index.scss";
 
 interface SkillCardProps {
   skill: Skill;
@@ -24,19 +25,6 @@ export default function SkillCard({
     }
   };
 
-  const getCategoryColor = (category: string) => {
-    const colors = {
-      makeup: "bg-pink-100 text-pink-800",
-      photography: "bg-blue-100 text-blue-800",
-      editing: "bg-purple-100 text-purple-800",
-      props: "bg-green-100 text-green-800",
-      wigs: "bg-yellow-100 text-yellow-800",
-    };
-    return (
-      colors[category as keyof typeof colors] || "bg-gray-100 text-gray-800"
-    );
-  };
-
   const getCategoryName = (category: string) => {
     const names = {
       makeup: "化妆",
@@ -50,43 +38,38 @@ export default function SkillCard({
 
   return (
     <View
-      className={`skill-card card transition-transform duration-300 hover:shadow-medium hover:-translate-y-1 ${layout}`}
+      className={`skill-card skill-card--${layout}`}
+      hoverClass="skill-card--hover"
       onClick={handleCardClick}
     >
       {layout === "masonry" ? (
         <>
           {/* 瀑布流布局 */}
-          <View className="relative">
+          <View className="skill-card__media">
+            {skill.category && (
+              <Text className="skill-card__tag">
+                {getCategoryName(skill.category)}
+              </Text>
+            )}
             <Image
-              className="w-full h-48 object-cover"
+              className="skill-card__img"
               src={skill.images[0]}
               mode="aspectFill"
+              lazyLoad
             />
-            <View className="absolute top-2 left-2">
-              <View
-                className={`px-2 py-1 rounded-full text-xs font-semibold ${getCategoryColor(skill.category)}`}
-              >
-                {getCategoryName(skill.category)}
-              </View>
-            </View>
           </View>
 
-          <View className="p-3">
-            <Text className="text-sm font-semibold text-gray-800 mb-2 line-clamp-2">
-              {skill.title}
-            </Text>
-
-            <View className="flex items-center justify-between mb-2">
-              <View className="flex items-center">
+          <View className="skill-card__body">
+            <Text className="skill-card__title">{skill.title}</Text>
+            <View className="skill-card__meta">
+              <View className="skill-card__author-info">
                 <Image
-                  className="w-5 h-5 rounded-full mr-2"
+                  className="skill-card__avatar"
                   src={skill.user.avatar}
                 />
-                <Text className="text-xs text-gray-500 truncate flex-1">
-                  {skill.user.nickname}
-                </Text>
+                <Text className="skill-card__author">{skill.user.nickname}</Text>
               </View>
-              <Text className="text-sm font-bold text-primary-600">
+              <Text className="skill-card__price">
                 {skill.price > 0 ? `￥${skill.price}` : "议价"}
               </Text>
             </View>
@@ -95,41 +78,42 @@ export default function SkillCard({
       ) : (
         <>
           {/* 列表布局 */}
-          <View className="flex p-4">
+          <View className="skill-card__media skill-card__media--list">
             <Image
-              className="w-20 h-20 rounded-lg mr-3 flex-shrink-0"
+              className="skill-card__img skill-card__img--list"
               src={skill.images[0]}
               mode="aspectFill"
+              lazyLoad
             />
-
-            <View className="flex-1 min-w-0">
-              <View className="flex items-start justify-between mb-2">
-                <Text className="text-base font-bold text-gray-800 truncate">
-                  {skill.title}
-                </Text>
-                <View
-                  className={`px-2 py-1 rounded-full text-xs font-semibold ml-2 ${getCategoryColor(skill.category)}`}
-                >
-                  {getCategoryName(skill.category)}
-                </View>
-              </View>
-
-              <Text className="text-sm text-gray-500 mb-2 line-clamp-2">
-                {skill.description}
+            {skill.category && (
+              <Text className="skill-card__tag skill-card__tag--list">
+                {getCategoryName(skill.category)}
               </Text>
+            )}
+          </View>
 
-              <View className="flex items-center justify-between">
-                <View className="flex items-center text-sm text-gray-500">
-                  <Image
-                    className="w-5 h-5 rounded-full mr-2"
-                    src={skill.user.avatar}
-                  />
-                  <Text className="text-sm">{skill.user.nickname}</Text>
-                </View>
-                <Text className="text-lg font-bold text-primary-600">
-                  {skill.price > 0 ? `￥${skill.price}` : "议价"}
-                </Text>
+          <View className="skill-card__body skill-card__body--list">
+            <View className="skill-card__header">
+              <Text className="skill-card__title skill-card__title--list">
+                {skill.title}
+              </Text>
+            </View>
+
+            <Text className="skill-card__description">
+              {skill.description}
+            </Text>
+
+            <View className="skill-card__meta skill-card__meta--list">
+              <View className="skill-card__author-info">
+                <Image
+                  className="skill-card__avatar"
+                  src={skill.user.avatar}
+                />
+                <Text className="skill-card__author">{skill.user.nickname}</Text>
               </View>
+              <Text className="skill-card__price skill-card__price--list">
+                {skill.price > 0 ? `￥${skill.price}` : "议价"}
+              </Text>
             </View>
           </View>
         </>

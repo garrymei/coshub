@@ -1,125 +1,245 @@
-import { useState } from 'react';
-import { Search, Plus, Filter } from 'lucide-react';
-import { Header } from './Header';
-import { SkillCard } from './SkillCard';
-import { Input } from './ui/input';
-import { Button } from './ui/button';
+import { useEffect, useMemo, useState } from "react";
+import { Search, Plus, Filter } from "lucide-react";
+import { Header } from "./Header";
+import { SkillCard } from "./SkillCard";
+import { Input } from "./ui/input";
+import { Button } from "./ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "./ui/alert-dialog";
+import { fetchSkillsCatalog } from "../services/contentService";
+import type { SkillCourse, SkillsCatalog } from "../types/content";
 
-const mockSkillsData = [
-  {
-    id: '1',
-    title: 'Python零基础入门到实战',
-    description: '从零开始学习Python编程，掌握基础语法，完成实际项目，适合编程小白',
-    instructor: {
-      name: '张老师',
-      avatar: 'https://images.unsplash.com/photo-1588912914078-2fe5224fd8b8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxza2lsbHMlMjBsZWFybmluZyUyMGVkdWNhdGlvbnxlbnwxfHx8fDE3NTcwNjIyNjV8MA&ixlib=rb-4.1.0&q=80&w=200&utm_source=figma&utm_medium=referral',
-      rating: 4.8
-    },
-    category: '编程',
-    difficulty: '初级',
-    duration: '30小时',
-    students: 2847,
-    price: 199,
-    thumbnail: 'https://images.unsplash.com/photo-1588912914078-2fe5224fd8b8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxza2lsbHMlMjBsZWFybmluZyUyMGVkdWNhdGlvbnxlbnwxfHx8fDE3NTcwNjIyNjV8MA&ixlib=rb-4.1.0&q=80&w=400&utm_source=figma&utm_medium=referral',
-    tags: ['Python', '编程入门', '实战项目']
-  },
-  {
-    id: '2',
-    title: '手机摄影技巧大全',
-    description: '教你用手机拍出专业级照片，包含构图、光线、后期等全方位技巧分享',
-    instructor: {
-      name: '小美老师',
-      avatar: 'https://images.unsplash.com/photo-1639784119996-3de5792ddff1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsaWZlc3R5bGUlMjBiYW5uZXIlMjB5b3VuZyUyMHBlb3BsZXxlbnwxfHx8fDE3NTcwNjIyNjN8MA&ixlib=rb-4.1.0&q=80&w=200&utm_source=figma&utm_medium=referral',
-      rating: 4.9
-    },
-    category: '摄影',
-    difficulty: '初级',
-    duration: '15小时',
-    students: 1623,
-    price: 0,
-    thumbnail: 'https://images.unsplash.com/photo-1639784119996-3de5792ddff1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsaWZlc3R5bGUlMjBiYW5uZXIlMjB5b3VuZyUyMHBlb3BsZXxlbnwxfHx8fDE3NTcwNjIyNjN8MA&ixlib=rb-4.1.0&q=80&w=400&utm_source=figma&utm_medium=referral',
-    tags: ['手机摄影', '构图技巧', '免费课程']
-  },
-  {
-    id: '3',
-    title: 'UI设计系统化学习',
-    description: '系统学习UI设计，从设计理论到实际操作，掌握Figma等设计工具的使用',
-    instructor: {
-      name: '设计师阿森',
-      avatar: 'https://images.unsplash.com/photo-1464854860390-e95991b46441?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmYXNoaW9uJTIwbGlmZXN0eWxlJTIwYmFubmVyfGVufDF8fHx8MTc1NzA2MjI2NHww&ixlib=rb-4.1.0&q=80&w=200&utm_source=figma&utm_medium=referral',
-      rating: 4.7
-    },
-    category: '设计',
-    difficulty: '中级',
-    duration: '45小时',
-    students: 987,
-    price: 399,
-    thumbnail: 'https://images.unsplash.com/photo-1464854860390-e95991b46441?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmYXNoaW9uJTIwbGlmZXN0eWxlJTIwYmFubmVyfGVufDF8fHx8MTc1NzA2MjI2NHww&ixlib=rb-4.1.0&q=80&w=400&utm_source=figma&utm_medium=referral',
-    tags: ['UI设计', 'Figma', '设计系统']
-  },
-  {
-    id: '4',
-    title: '健身训练营：塑造完美身材',
-    description: '专业健身教练指导，科学训练计划，帮你在家就能练出好身材',
-    instructor: {
-      name: '健身达人小李',
-      avatar: 'https://images.unsplash.com/photo-1578960281840-cb36759fb109?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmb29kJTIwbGlmZXN0eWxlJTIwYmFubmVyfGVufDF8fHx8MTc1NzA2MjI2NHww&ixlib=rb-4.1.0&q=80&w=200&utm_source=figma&utm_medium=referral',
-      rating: 4.6
-    },
-    category: '健身',
-    difficulty: '初级',
-    duration: '20小时',
-    students: 3421,
-    price: 99,
-    thumbnail: 'https://images.unsplash.com/photo-1578960281840-cb36759fb109?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmb29kJTIwbGlmZXN0eWxlJTIwYmFubmVyfGVufDF8fHx8MTc1NzA2MjI2NHww&ixlib=rb-4.1.0&q=80&w=400&utm_source=figma&utm_medium=referral',
-    tags: ['健身', '塑形', '居家运动']
-  },
-  {
-    id: '5',
-    title: '英语口语突破训练',
-    description: '地道英语表达，情景对话练习，让你的英语口语更加流利自然',
-    instructor: {
-      name: 'Emma老师',
-      avatar: 'https://images.unsplash.com/photo-1577949619851-db947ef972af?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0cmF2ZWwlMjBsaWZlc3R5bGUlMjBiYW5uZXJ8ZW58MXx8fHwxNzU3MDYyMjY0fDA&ixlib=rb-4.1.0&q=80&w=200&utm_source=figma&utm_medium=referral',
-      rating: 4.8
-    },
-    category: '语言',
-    difficulty: '中级',
-    duration: '25小时',
-    students: 1567,
-    price: 299,
-    thumbnail: 'https://images.unsplash.com/photo-1577949619851-db947ef972af?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0cmF2ZWwlMjBsaWZlc3R5bGUlMjBiYW5uZXJ8ZW58MXx8fHwxNzU3MDYyMjY0fDA&ixlib=rb-4.1.0&q=80&w=400&utm_source=figma&utm_medium=referral',
-    tags: ['英语口语', '情景对话', '流利表达']
-  }
-];
-
-const categories = ['全部', '编程', '设计', '摄影', '健身', '语言', '音乐', '烘焙'];
+type DialogState = {
+  type: "enroll" | "publish";
+  course?: SkillCourse;
+};
 
 export function SkillsPage() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('全部');
-  const [skills] = useState(mockSkillsData);
+  const [catalog, setCatalog] = useState<SkillsCatalog | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("全部");
+  const [dialog, setDialog] = useState<DialogState | null>(null);
 
-  const filteredSkills = skills.filter(skill => {
-    const matchesSearch = skill.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         skill.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         skill.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-    const matchesCategory = selectedCategory === '全部' || skill.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+  useEffect(() => {
+    let isMounted = true;
 
-  const handleEnroll = (skillId: string) => {
-    console.log('报名课程:', skillId);
+    const load = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const data = await fetchSkillsCatalog();
+        if (isMounted) {
+          setCatalog(data);
+        }
+      } catch (err) {
+        if (isMounted) {
+          setError("课程加载失败，请稍后重试");
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    load();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const retry = () => {
+    setIsLoading(true);
+    setError(null);
+    fetchSkillsCatalog()
+      .then(setCatalog)
+      .catch(() => setError("课程加载失败，请稍后重试"))
+      .finally(() => setIsLoading(false));
+  };
+
+  const handleEnroll = (courseId: string) => {
+    const course = catalog?.courses.find((item) => item.id === courseId);
+
+    if (!course) {
+      return;
+    }
+
+    setDialog({ type: "enroll", course });
   };
 
   const handlePublish = () => {
-    console.log('发布新技能');
+    setDialog({ type: "publish" });
+  };
+
+  const filteredSkills = useMemo(() => {
+    if (!catalog) {
+      return [];
+    }
+
+    const query = searchQuery.trim().toLowerCase();
+
+    return catalog.courses.filter((course) => {
+      const matchesSearch =
+        !query ||
+        course.title.toLowerCase().includes(query) ||
+        course.description.toLowerCase().includes(query) ||
+        course.tags.some((tag) => tag.toLowerCase().includes(query)) ||
+        course.instructor.name.toLowerCase().includes(query);
+
+      const matchesCategory =
+        selectedCategory === "全部" || course.category === selectedCategory;
+
+      return matchesSearch && matchesCategory;
+    });
+  }, [catalog, searchQuery, selectedCategory]);
+
+  const renderDialog = () => (
+    <AlertDialog
+      open={Boolean(dialog)}
+      onOpenChange={(open) => {
+        if (!open) {
+          setDialog(null);
+        }
+      }}
+    >
+      <AlertDialogContent className="rounded-2xl">
+        <AlertDialogHeader>
+          <AlertDialogTitle>
+            {dialog?.type === "enroll" ? "报名成功" : "发布课程"}
+          </AlertDialogTitle>
+          <AlertDialogDescription>
+            {dialog?.type === "enroll" && dialog.course
+              ? `我们会为你预留课程《${dialog.course.title}》，稍后将开放正式的报名流程。`
+              : "敬请期待创作者中心，上线后你可以直接上传并发布技能课程。"}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogAction asChild>
+            <Button className="rounded-full" onClick={() => setDialog(null)}>
+              知道了
+            </Button>
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+
+  const renderContent = () => {
+    if (isLoading) {
+      return (
+        <div className="px-4 space-y-4">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <div
+              key={index}
+              className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 animate-pulse"
+            >
+              <div className="h-32 bg-gray-200/80 rounded-xl mb-4" />
+              <div className="h-4 bg-gray-200/80 rounded w-32 mb-2" />
+              <div className="h-3 bg-gray-200/80 rounded w-full mb-1" />
+              <div className="h-3 bg-gray-200/80 rounded w-3/4" />
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    if (error) {
+      return (
+        <div className="px-4 py-20 text-center">
+          <p className="text-gray-500 mb-4">{error}</p>
+          <Button onClick={retry} className="rounded-full px-6">
+            重新加载
+          </Button>
+        </div>
+      );
+    }
+
+    if (!catalog) {
+      return (
+        <div className="px-4 py-20 text-center text-gray-500">
+          暂无课程，稍后再来看吧～
+        </div>
+      );
+    }
+
+    return (
+      <>
+        <div className="px-4 mb-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Input
+              placeholder="搜索技能、讲师、标签..."
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              className="pl-10 pr-12 py-3 rounded-full bg-white border-gray-200 focus:border-purple-300 focus:ring-purple-200"
+            />
+            <Button
+              variant="ghost"
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 p-0 rounded-full hover:bg-gray-100"
+            >
+              <Filter className="w-4 h-4 text-gray-500" />
+            </Button>
+          </div>
+        </div>
+
+        <div className="px-4 mb-6">
+          <div className="flex space-x-2 overflow-x-auto scrollbar-hide">
+            {(catalog.categories || []).map((category) => (
+              <button
+                key={category}
+                onClick={() => setSelectedCategory(category)}
+                className={`px-4 py-2 rounded-full text-sm whitespace-nowrap transition-colors ${
+                  selectedCategory === category
+                    ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white"
+                    : "bg-white text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="px-4">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">
+              {selectedCategory === "全部" ? "热门技能" : `${selectedCategory}技能`}
+            </h2>
+            <span className="text-sm text-gray-500">{filteredSkills.length} 个课程</span>
+          </div>
+
+          {filteredSkills.length === 0 ? (
+            <div className="text-center py-16 text-gray-500">
+              没有找到相关课程，试试其他关键词吧～
+            </div>
+          ) : (
+            filteredSkills.map((skill) => (
+              <SkillCard
+                key={skill.id}
+                {...skill}
+                onEnroll={handleEnroll}
+              />
+            ))
+          )}
+        </div>
+      </>
+    );
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header 
-        title="技能" 
+    <div className="min-h-screen bg-gray-50 pb-24">
+      <Header
+        title="技能"
         rightContent={
           <Button
             onClick={handlePublish}
@@ -129,71 +249,9 @@ export function SkillsPage() {
           </Button>
         }
       />
-      
-      <div className="pt-24 pb-20">
-        {/* Search Bar */}
-        <div className="px-4 mb-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <Input
-              placeholder="搜索技能、讲师、标签..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-12 py-3 rounded-full bg-white border-gray-200 focus:border-purple-300 focus:ring-purple-200"
-            />
-            <Button
-              variant="ghost"
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 w-8 h-8 p-0 rounded-full hover:bg-gray-100"
-            >
-              <Filter className="w-4 h-4 text-gray-500" />
-            </Button>
-          </div>
-        </div>
 
-        {/* Categories */}
-        <div className="px-4 mb-6">
-          <div className="flex space-x-2 overflow-x-auto scrollbar-hide">
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                className={`px-4 py-2 rounded-full text-sm whitespace-nowrap transition-colors ${
-                  selectedCategory === category
-                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
-                    : 'bg-white text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                {category}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Skills List */}
-        <div className="px-4">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">
-              {selectedCategory === '全部' ? '热门技能' : `${selectedCategory}技能`}
-            </h2>
-            <span className="text-sm text-gray-500">{filteredSkills.length}个课程</span>
-          </div>
-          
-          {filteredSkills.map((skill) => (
-            <SkillCard
-              key={skill.id}
-              {...skill}
-              onEnroll={handleEnroll}
-            />
-          ))}
-          
-          {filteredSkills.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-gray-500">没有找到相关技能课程</p>
-              <p className="text-sm text-gray-400 mt-1">试试搜索其他关键词</p>
-            </div>
-          )}
-        </div>
-      </div>
+      <div className="pt-24 pb-24 space-y-6">{renderContent()}</div>
+      {renderDialog()}
     </div>
   );
 }
