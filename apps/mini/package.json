@@ -52,7 +52,7 @@
     "@tarojs/plugin-platform-tt": "3.6.25",
     "@tarojs/plugin-platform-weapp": "3.6.25",
     "@tarojs/react": "3.6.25",
-    "@tarojs/runtime": "3.6.25",
+    "@tarojs/runtime": "4.1.7",
     "@tarojs/shared": "3.6.25",
     "@tarojs/taro": "3.6.25",
     "@types/react-dom": "^19.1.9",
