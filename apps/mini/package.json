@@ -49,7 +49,7 @@
     "@tarojs/plugin-platform-jd": "3.6.25",
     "@tarojs/plugin-platform-qq": "3.6.25",
     "@tarojs/plugin-platform-swan": "3.6.25",
-    "@tarojs/plugin-platform-tt": "3.6.25",
+    "@tarojs/plugin-platform-tt": "4.1.7",
     "@tarojs/plugin-platform-weapp": "3.6.25",
     "@tarojs/react": "3.6.25",
     "@tarojs/runtime": "3.6.25",

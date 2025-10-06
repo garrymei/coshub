@@ -191,8 +191,8 @@ importers:
         specifier: 3.6.25
         version: 3.6.25(@swc/helpers@0.5.5)(@tarojs/components@3.6.25(@tarojs/helper@3.6.25(@swc/helpers@0.5.5))(@tarojs/runtime@3.6.25(@tarojs/shared@3.6.25))(@tarojs/shared@3.6.25)(@types/react@18.3.24)(postcss@8.5.6)(react@18.3.1))(@tarojs/shared@3.6.25)(@tarojs/taro@3.6.25(@tarojs/helper@3.6.25(@swc/helpers@0.5.5))(@tarojs/runtime@3.6.25(@tarojs/shared@3.6.25))(@types/react@18.3.24)(postcss@8.5.6))
       '@tarojs/plugin-platform-tt':
-        specifier: 3.6.25
-        version: 3.6.25(@swc/helpers@0.5.5)(@tarojs/components@3.6.25(@tarojs/helper@3.6.25(@swc/helpers@0.5.5))(@tarojs/runtime@3.6.25(@tarojs/shared@3.6.25))(@tarojs/shared@3.6.25)(@types/react@18.3.24)(postcss@8.5.6)(react@18.3.1))(@tarojs/shared@3.6.25)(@tarojs/taro@3.6.25(@tarojs/helper@3.6.25(@swc/helpers@0.5.5))(@tarojs/runtime@3.6.25(@tarojs/shared@3.6.25))(@types/react@18.3.24)(postcss@8.5.6))
+        specifier: 4.1.7
+        version: 4.1.7(@tarojs/service@4.1.6(@swc/helpers@0.5.5))(@tarojs/shared@3.6.25)
       '@tarojs/plugin-platform-weapp':
         specifier: 3.6.25
         version: 3.6.25(@swc/helpers@0.5.5)(@tarojs/components@3.6.25(@tarojs/helper@3.6.25(@swc/helpers@0.5.5))(@tarojs/runtime@3.6.25(@tarojs/shared@3.6.25))(@tarojs/shared@3.6.25)(@types/react@18.3.24)(postcss@8.5.6)(react@18.3.1))(@tarojs/shared@3.6.25)(@tarojs/taro@3.6.25(@tarojs/helper@3.6.25(@swc/helpers@0.5.5))(@tarojs/runtime@3.6.25(@tarojs/shared@3.6.25))(@types/react@18.3.24)(postcss@8.5.6))
@@ -2694,6 +2694,13 @@ packages:
     peerDependencies:
       '@tarojs/components': ~3.6.25
       '@tarojs/shared': ~3.6.25
+
+  '@tarojs/plugin-platform-tt@4.1.7':
+    resolution: {integrity: sha512-8Um7xhVTH3VScwwgWGP3ZZ73P5Ft8TrgSKqAfQfmWYa44c6ypc3ovC14yyfXiNWwRkxGYZCG+6DJMM5slRWfAg==}
+    engines: {node: '>= 18'}
+    peerDependencies:
+      '@tarojs/service': 4.1.7
+      '@tarojs/shared': 4.1.7
 
   '@tarojs/plugin-platform-weapp@3.6.25':
     resolution: {integrity: sha512-c4iXbMWPOOCx8EOeyqVQwIl5QhMHmNKXC8jS1XESaYY5L3IHbTMY/8nd57GzOoY20tCwOZ/x+Vk13CACbeE6AA==}
@@ -12331,6 +12338,12 @@ snapshots:
       - '@swc/helpers'
       - '@tarojs/taro'
       - supports-color
+
+  '@tarojs/plugin-platform-tt@4.1.7(@tarojs/service@4.1.6(@swc/helpers@0.5.5))(@tarojs/shared@3.6.25)':
+    dependencies:
+      '@tarojs/service': 4.1.6(@swc/helpers@0.5.5)
+      '@tarojs/shared': 3.6.25
+      webpack-sources: 3.3.3
 
   '@tarojs/plugin-platform-weapp@3.6.25(@swc/helpers@0.5.5)(@tarojs/components@3.6.25(@tarojs/helper@3.6.25(@swc/helpers@0.5.5))(@tarojs/runtime@3.6.25(@tarojs/shared@3.6.25))(@tarojs/shared@3.6.25)(@types/react@18.3.24)(postcss@8.5.6)(react@18.3.1))(@tarojs/shared@3.6.25)(@tarojs/taro@3.6.25(@tarojs/helper@3.6.25(@swc/helpers@0.5.5))(@tarojs/runtime@3.6.25(@tarojs/shared@3.6.25))(@types/react@18.3.24)(postcss@8.5.6))':
     dependencies:
